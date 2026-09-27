@@ -16,7 +16,7 @@ class DashboardScreen extends ConsumerWidget {
     final dashboard = ref.watch(dashboardProvider);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dashboard'),
+        title: const Text('Today at a glance'),
         actions: [
           IconButton(onPressed: () => ref.invalidate(dashboardProvider), icon: const Icon(Icons.refresh)),
           IconButton(
@@ -42,10 +42,11 @@ class DashboardScreen extends ConsumerWidget {
                           child: Padding(
                             padding: const EdgeInsets.all(16),
                             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text('Welcome, ${user.fullName}', style: Theme.of(context).textTheme.headlineSmall),
-                              const SizedBox(height: 8),
-                              Text(user.email),
-                              Text('Role: ${user.roles?.join(', ') ?? 'N/A'}'),
+                              Row(children: [
+                                CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE0F5ED), child: Text(user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : 'U', style: const TextStyle(color: Color(0xFF16805F), fontWeight: FontWeight.bold, fontSize: 20))),
+                                const SizedBox(width: 14),
+                                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Good day,', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])), Text(user.fullName, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF123047))), const SizedBox(height: 2), Text(user.roles?.join(' • ') ?? 'Field officer', style: TextStyle(color: Colors.grey[600]))])),
+                              ]),
                             ]),
                           ),
                         ),
@@ -57,12 +58,12 @@ class DashboardScreen extends ConsumerWidget {
                           mainAxisSpacing: 12,
                           crossAxisSpacing: 12,
                           children: [
-                            _card(context, Icons.store, 'Outlets', data['total_outlets'], () => _open(context, const OutletsScreen())),
+                            _card(context, Icons.storefront_outlined, 'Outlets', data['total_outlets'], () => _open(context, const OutletsScreen())),
                             _card(context, Icons.assignment, 'Visited today', data['visited_today'], () => _open(context, const VisitsScreen())),
                             _card(context, Icons.pending_actions, 'Pending today', data['pending_today'], () => _open(context, const VisitsScreen())),
                             _card(context, Icons.check_circle, 'Completed today', data['completed_today'], () => _open(context, const VisitsScreen())),
                             _card(context, Icons.shopping_cart, 'Orders today', data['orders_today_count']),
-                            _card(context, Icons.map, 'Coverage', '${data['coverage_percentage'] ?? 0}%', () => _open(context, const MapScreen())),
+                            _card(context, Icons.track_changes, 'Coverage', '${data['coverage_percentage'] ?? 0}%', () => _open(context, const MapScreen())),
                           ],
                         ),
                         const SizedBox(height: 20),
@@ -83,10 +84,10 @@ class DashboardScreen extends ConsumerWidget {
           child: Padding(
             padding: const EdgeInsets.all(14),
             child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Icon(icon, size: 36, color: Theme.of(context).primaryColor),
+              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFFEAF7F2), borderRadius: BorderRadius.circular(12)), child: Icon(icon, size: 24, color: const Color(0xFF16805F))),
               const SizedBox(height: 6),
-              Text(title, textAlign: TextAlign.center),
-              Text('${value ?? 0}', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold)),
+              Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600)),
+              Text('${value ?? 0}', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF123047))),
             ]),
           ),
         ),

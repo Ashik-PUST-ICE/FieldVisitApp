@@ -7,20 +7,20 @@ part of 'outlet.dart';
 // **************************************************************************
 
 _$OutletImpl _$$OutletImplFromJson(Map<String, dynamic> json) => _$OutletImpl(
-      id: (json['id'] as num).toInt(),
-      name: json['name'] as String,
-      code: json['code'] as String?,
-      qrToken: json['qr_token'] as String?,
-      address: json['address'] as String?,
-      latitude: (json['latitude'] as num?)?.toDouble(),
-      longitude: (json['longitude'] as num?)?.toDouble(),
-      phone: json['phone'] as String?,
-      ownerName: json['owner_name'] as String?,
+      id: _outletInt(json['id']) ?? 0,
+      name: _outletRequiredString(json['name']),
+      code: _outletString(json['code']),
+      qrToken: _outletString(json['qr_token']),
+      address: _outletString(json['address']),
+      latitude: _outletDouble(json['latitude']),
+      longitude: _outletDouble(json['longitude']),
+      phone: _outletString(json['phone']),
+      ownerName: _outletString(json['owner_name']),
       category: json['category'],
-      status: json['status'] as String?,
-      geofenceRadius: (json['geofence_radius'] as num?)?.toInt(),
-      createdAt: json['created_at'] as String?,
-      updatedAt: json['updated_at'] as String?,
+      status: _outletString(json['status']),
+      geofenceRadius: _outletInt(json['geofence_radius']),
+      createdAt: _outletString(json['created_at']),
+      updatedAt: _outletString(json['updated_at']),
     );
 
 Map<String, dynamic> _$$OutletImplToJson(_$OutletImpl instance) =>

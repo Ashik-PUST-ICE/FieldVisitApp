@@ -129,18 +129,27 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
     context: context,
     builder: (dialogContext) => AlertDialog(
       title: Text(outlet == null ? 'Add outlet' : 'Edit outlet'),
-      content: Form(
-        key: formKey,
-        child: SingleChildScrollView(
-          child: Column(children: [
-            TextFormField(controller: name, decoration: const InputDecoration(labelText: 'Name'), validator: (v) => v == null || v.trim().isEmpty ? 'Name is required' : null),
-            TextFormField(controller: code, decoration: const InputDecoration(labelText: 'Code')),
-            TextFormField(controller: address, decoration: const InputDecoration(labelText: 'Address')),
-            TextFormField(controller: phone, decoration: const InputDecoration(labelText: 'Phone')),
-            TextFormField(controller: latitude, decoration: const InputDecoration(labelText: 'Latitude'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            TextFormField(controller: longitude, decoration: const InputDecoration(labelText: 'Longitude'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
-            TextFormField(controller: radius, decoration: const InputDecoration(labelText: 'Geofence radius'), keyboardType: TextInputType.number),
-          ]),
+      content: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 520),
+        child: Form(
+          key: formKey,
+          child: SingleChildScrollView(
+            child: Column(children: [
+              TextFormField(controller: name, decoration: const InputDecoration(labelText: 'Name'), validator: (v) => v == null || v.trim().isEmpty ? 'Name is required' : null),
+              const SizedBox(height: 10),
+              TextFormField(controller: code, decoration: const InputDecoration(labelText: 'Code')),
+              const SizedBox(height: 10),
+              TextFormField(controller: address, decoration: const InputDecoration(labelText: 'Address')),
+              const SizedBox(height: 10),
+              TextFormField(controller: phone, decoration: const InputDecoration(labelText: 'Phone')),
+              const SizedBox(height: 10),
+              TextFormField(controller: latitude, decoration: const InputDecoration(labelText: 'Latitude'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 10),
+              TextFormField(controller: longitude, decoration: const InputDecoration(labelText: 'Longitude'), keyboardType: const TextInputType.numberWithOptions(decimal: true)),
+              const SizedBox(height: 10),
+              TextFormField(controller: radius, decoration: const InputDecoration(labelText: 'Geofence radius'), keyboardType: TextInputType.number),
+            ]),
+          ),
         ),
       ),
       actions: [

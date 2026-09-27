@@ -22,39 +22,31 @@ class DashboardScreen extends ConsumerWidget {
               data: (data) => RefreshIndicator(
                     onRefresh: () async => ref.invalidate(dashboardProvider),
                     child: ListView(
-                      padding: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.only(top: 8, bottom: 20),
                       children: [
-                        Card(
-                          child: Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Row(children: [
-                                CircleAvatar(radius: 25, backgroundColor: const Color(0xFFE0F5ED), child: Text(user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : 'U', style: const TextStyle(color: Color(0xFF16805F), fontWeight: FontWeight.bold, fontSize: 20))),
-                                const SizedBox(width: 14),
-                                Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Good day,', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600])), Text(user.fullName, style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF123047))), const SizedBox(height: 2), Text(user.roles?.join(' • ') ?? 'Field officer', style: TextStyle(color: Colors.grey[600]))])),
-                              ]),
-                            ]),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        GridView.count(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 12,
-                          crossAxisSpacing: 12,
-                          children: [
-                            _card(context, Icons.storefront_outlined, 'Outlets', data['total_outlets'], () => _open(context, const OutletsScreen())),
-                            _card(context, Icons.assignment, 'Visited today', data['visited_today'], () => _open(context, const VisitsScreen())),
-                            _card(context, Icons.pending_actions, 'Pending today', data['pending_today'], () => _open(context, const VisitsScreen())),
-                            _card(context, Icons.check_circle, 'Completed today', data['completed_today'], () => _open(context, const VisitsScreen())),
-                            _card(context, Icons.shopping_cart, 'Orders today', data['orders_today_count']),
-                            _card(context, Icons.track_changes, 'Coverage', '${data['coverage_percentage'] ?? 0}%', () => _open(context, const MapScreen())),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
-                        Text('Recent visits', style: Theme.of(context).textTheme.titleLarge),
+                        _profileHeader(context, user),
                         const SizedBox(height: 8),
+                        Card(child: Padding(padding: const EdgeInsets.fromLTRB(12, 10, 12, 8), child: Column(children: [
+                          Row(children: [
+                            CircleAvatar(radius: 19, backgroundColor: const Color(0xFFE7F3FF), child: Text(user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : 'U', style: const TextStyle(color: Color(0xFF1877F2), fontWeight: FontWeight.w700))),
+                            const SizedBox(width: 10),
+                            Expanded(child: InkWell(onTap: () => _open(context, const VisitsScreen()), child: Container(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10), decoration: BoxDecoration(color: const Color(0xFFF0F2F5), borderRadius: BorderRadius.circular(20)), child: const Text('What is your next field visit?')))),
+                          ]),
+                          const Divider(height: 18),
+                          Row(children: [Expanded(child: _quickAction(Icons.play_arrow, 'Start visit', () => _open(context, const VisitsScreen()))), const SizedBox(width: 4), Expanded(child: _quickAction(Icons.store, 'Outlets', () => _open(context, const OutletsScreen()))), const SizedBox(width: 4), Expanded(child: _quickAction(Icons.map, 'Map', () => _open(context, const MapScreen())))])
+                        ]))),
+                        const SizedBox(height: 8),
+                        _sectionTitle('Today at a glance'),
+                        Card(child: Column(children: [
+                          _statRow(context, Icons.storefront_outlined, 'Outlets', data['total_outlets'], const OutletsScreen()),
+                          _statRow(context, Icons.assignment_outlined, 'Visited today', data['visited_today'], const VisitsScreen()),
+                          _statRow(context, Icons.pending_actions, 'Pending today', data['pending_today'], const VisitsScreen()),
+                          _statRow(context, Icons.check_circle_outline, 'Completed today', data['completed_today'], const VisitsScreen()),
+                          _statRow(context, Icons.shopping_cart_outlined, 'Orders today', data['orders_today_count']),
+                          _statRow(context, Icons.track_changes, 'Coverage', '${data['coverage_percentage'] ?? 0}%', const MapScreen(), true),
+                        ])),
+                        const SizedBox(height: 8),
+                        _sectionTitle('Recent visits'),
                         ..._recentVisits(data['recent_visits']),
                       ],
                     ),
@@ -63,21 +55,13 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  static Widget _card(BuildContext context, IconData icon, String title, dynamic value, [VoidCallback? onTap]) => Card(
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(14),
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              Container(padding: const EdgeInsets.all(10), decoration: BoxDecoration(color: const Color(0xFFEAF7F2), borderRadius: BorderRadius.circular(12)), child: Icon(icon, size: 24, color: const Color(0xFF16805F))),
-              const SizedBox(height: 6),
-              Text(title, textAlign: TextAlign.center, style: TextStyle(color: Colors.grey[600], fontSize: 12, fontWeight: FontWeight.w600)),
-              Text('${value ?? 0}', style: Theme.of(context).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w800, color: const Color(0xFF123047))),
-            ]),
-          ),
-        ),
-      );
+  static Widget _profileHeader(BuildContext context, dynamic user) => Padding(padding: const EdgeInsets.fromLTRB(16, 10, 16, 8), child: Row(children: [CircleAvatar(radius: 24, backgroundColor: const Color(0xFFE7F3FF), child: Text(user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : 'U', style: const TextStyle(color: Color(0xFF1877F2), fontSize: 20, fontWeight: FontWeight.w700))), const SizedBox(width: 12), Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [Text('Welcome back', style: TextStyle(color: Colors.grey[600], fontSize: 13)), Text(user.fullName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)), Text(user.roles?.join(' • ') ?? 'Field officer', style: TextStyle(color: Colors.grey[600], fontSize: 12))]))]));
+
+  static Widget _sectionTitle(String title) => Padding(padding: const EdgeInsets.fromLTRB(16, 8, 16, 6), child: Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700)));
+
+  static Widget _quickAction(IconData icon, String title, VoidCallback onTap) => InkWell(onTap: onTap, child: Padding(padding: const EdgeInsets.symmetric(vertical: 5), child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 18, color: const Color(0xFF1877F2)), const SizedBox(width: 5), Flexible(child: Text(title, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)))])));
+
+  static Widget _statRow(BuildContext context, IconData icon, String title, dynamic value, [Widget? target, bool last = false]) => InkWell(onTap: target == null ? null : () => _open(context, target), child: Column(children: [ListTile(leading: CircleAvatar(radius: 18, backgroundColor: const Color(0xFFE7F3FF), child: Icon(icon, size: 19, color: const Color(0xFF1877F2))), title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)), trailing: Text('${value ?? 0}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF1877F2)))), if (!last) const Divider(height: 1, indent: 64)]));
 
   static List<Widget> _recentVisits(dynamic value) {
     final visits = value is List ? value : const [];

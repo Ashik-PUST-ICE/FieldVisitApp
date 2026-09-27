@@ -40,9 +40,15 @@ class AppTheme {
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: const Color(0xFFF8FAFC),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFFD9E2EC)),
         ),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFFD9E2EC))),
+        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: accentColor, width: 2)),
+        labelStyle: const TextStyle(color: Color(0xFF718096)),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
       cardTheme: CardTheme(
@@ -50,6 +56,31 @@ class AppTheme {
         elevation: 1,
         margin: const EdgeInsets.symmetric(vertical: 4),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      dialogTheme: DialogTheme(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+        titleTextStyle: const TextStyle(color: primaryColor, fontSize: 21, fontWeight: FontWeight.w800),
+        contentTextStyle: const TextStyle(color: Color(0xFF52606D), fontSize: 14, height: 1.4),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 18),
+      ),
+      listTileTheme: const ListTileThemeData(
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 5),
+        iconColor: primaryColor,
+        titleTextStyle: TextStyle(color: primaryColor, fontSize: 15, fontWeight: FontWeight.w700),
+        subtitleTextStyle: TextStyle(color: Color(0xFF718096), fontSize: 13, height: 1.35),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: accentColor,
+          foregroundColor: Colors.white,
+          minimumSize: const Size(0, 48),
+          padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 13),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        ),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.white,
@@ -68,6 +99,9 @@ class AppTheme {
       appBarTheme: const AppBarTheme(backgroundColor: Color(0xFF102B43), foregroundColor: Colors.white, elevation: 0, centerTitle: false),
       cardTheme: CardTheme(color: const Color(0xFF162B3A), elevation: 1, margin: const EdgeInsets.symmetric(vertical: 4), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
       inputDecorationTheme: InputDecorationTheme(filled: true, fillColor: const Color(0xFF162B3A), border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12)),
+      dialogTheme: DialogTheme(backgroundColor: const Color(0xFF162B3A), surfaceTintColor: const Color(0xFF162B3A), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)), insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24), actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 18), titleTextStyle: const TextStyle(color: Color(0xFF65E6B2), fontSize: 21, fontWeight: FontWeight.w800)),
+      listTileTheme: const ListTileThemeData(contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 5), iconColor: Color(0xFF65E6B2), titleTextStyle: TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w700), subtitleTextStyle: TextStyle(color: Color(0xFFB0BEC5), fontSize: 13)),
+      filledButtonTheme: FilledButtonThemeData(style: FilledButton.styleFrom(backgroundColor: const Color(0xFF20B486), foregroundColor: Colors.white, minimumSize: const Size(0, 48), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)))),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(backgroundColor: Color(0xFF102B43), selectedItemColor: Color(0xFF65E6B2), unselectedItemColor: Color(0xFF90A4AE), type: BottomNavigationBarType.fixed),
     );
   }

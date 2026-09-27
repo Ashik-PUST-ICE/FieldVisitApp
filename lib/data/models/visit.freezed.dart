@@ -21,16 +21,21 @@ Visit _$VisitFromJson(Map<String, dynamic> json) {
 /// @nodoc
 mixin _$Visit {
   int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'outlet_id')
   int get outletId => throw _privateConstructorUsedError;
-  int get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'client_id')
+  String? get clientId => throw _privateConstructorUsedError;
   String? get status => throw _privateConstructorUsedError;
-  String? get checkInTime => throw _privateConstructorUsedError;
-  String? get checkOutTime => throw _privateConstructorUsedError;
-  double? get latitude => throw _privateConstructorUsedError;
-  double? get longitude => throw _privateConstructorUsedError;
+  String? get latitude => throw _privateConstructorUsedError;
+  String? get longitude => throw _privateConstructorUsedError;
   String? get notes => throw _privateConstructorUsedError;
-  String? get syncStatus => throw _privateConstructorUsedError;
+  @JsonKey(name: 'started_at')
+  String? get startedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'completed_at')
+  String? get completedAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Visit to a JSON map.
@@ -49,17 +54,16 @@ abstract class $VisitCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      int outletId,
-      int userId,
+      @JsonKey(name: 'outlet_id') int outletId,
+      @JsonKey(name: 'client_id') String? clientId,
       String? status,
-      String? checkInTime,
-      String? checkOutTime,
-      double? latitude,
-      double? longitude,
+      String? latitude,
+      String? longitude,
       String? notes,
-      String? syncStatus,
-      String? createdAt,
-      String? updatedAt});
+      @JsonKey(name: 'started_at') String? startedAt,
+      @JsonKey(name: 'completed_at') String? completedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -79,14 +83,13 @@ class _$VisitCopyWithImpl<$Res, $Val extends Visit>
   $Res call({
     Object? id = null,
     Object? outletId = null,
-    Object? userId = null,
+    Object? clientId = freezed,
     Object? status = freezed,
-    Object? checkInTime = freezed,
-    Object? checkOutTime = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? notes = freezed,
-    Object? syncStatus = freezed,
+    Object? startedAt = freezed,
+    Object? completedAt = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -99,37 +102,33 @@ class _$VisitCopyWithImpl<$Res, $Val extends Visit>
           ? _value.outletId
           : outletId // ignore: cast_nullable_to_non_nullable
               as int,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int,
+      clientId: freezed == clientId
+          ? _value.clientId
+          : clientId // ignore: cast_nullable_to_non_nullable
+              as String?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      checkInTime: freezed == checkInTime
-          ? _value.checkInTime
-          : checkInTime // ignore: cast_nullable_to_non_nullable
-              as String?,
-      checkOutTime: freezed == checkOutTime
-          ? _value.checkOutTime
-          : checkOutTime // ignore: cast_nullable_to_non_nullable
-              as String?,
       latitude: freezed == latitude
           ? _value.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       longitude: freezed == longitude
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      syncStatus: freezed == syncStatus
-          ? _value.syncStatus
-          : syncStatus // ignore: cast_nullable_to_non_nullable
+      startedAt: freezed == startedAt
+          ? _value.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      completedAt: freezed == completedAt
+          ? _value.completedAt
+          : completedAt // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -152,17 +151,16 @@ abstract class _$$VisitImplCopyWith<$Res> implements $VisitCopyWith<$Res> {
   @useResult
   $Res call(
       {int id,
-      int outletId,
-      int userId,
+      @JsonKey(name: 'outlet_id') int outletId,
+      @JsonKey(name: 'client_id') String? clientId,
       String? status,
-      String? checkInTime,
-      String? checkOutTime,
-      double? latitude,
-      double? longitude,
+      String? latitude,
+      String? longitude,
       String? notes,
-      String? syncStatus,
-      String? createdAt,
-      String? updatedAt});
+      @JsonKey(name: 'started_at') String? startedAt,
+      @JsonKey(name: 'completed_at') String? completedAt,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -180,14 +178,13 @@ class __$$VisitImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? outletId = null,
-    Object? userId = null,
+    Object? clientId = freezed,
     Object? status = freezed,
-    Object? checkInTime = freezed,
-    Object? checkOutTime = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? notes = freezed,
-    Object? syncStatus = freezed,
+    Object? startedAt = freezed,
+    Object? completedAt = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -200,37 +197,33 @@ class __$$VisitImplCopyWithImpl<$Res>
           ? _value.outletId
           : outletId // ignore: cast_nullable_to_non_nullable
               as int,
-      userId: null == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int,
+      clientId: freezed == clientId
+          ? _value.clientId
+          : clientId // ignore: cast_nullable_to_non_nullable
+              as String?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      checkInTime: freezed == checkInTime
-          ? _value.checkInTime
-          : checkInTime // ignore: cast_nullable_to_non_nullable
-              as String?,
-      checkOutTime: freezed == checkOutTime
-          ? _value.checkOutTime
-          : checkOutTime // ignore: cast_nullable_to_non_nullable
-              as String?,
       latitude: freezed == latitude
           ? _value.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       longitude: freezed == longitude
           ? _value.longitude
           : longitude // ignore: cast_nullable_to_non_nullable
-              as double?,
+              as String?,
       notes: freezed == notes
           ? _value.notes
           : notes // ignore: cast_nullable_to_non_nullable
               as String?,
-      syncStatus: freezed == syncStatus
-          ? _value.syncStatus
-          : syncStatus // ignore: cast_nullable_to_non_nullable
+      startedAt: freezed == startedAt
+          ? _value.startedAt
+          : startedAt // ignore: cast_nullable_to_non_nullable
+              as String?,
+      completedAt: freezed == completedAt
+          ? _value.completedAt
+          : completedAt // ignore: cast_nullable_to_non_nullable
               as String?,
       createdAt: freezed == createdAt
           ? _value.createdAt
@@ -249,17 +242,16 @@ class __$$VisitImplCopyWithImpl<$Res>
 class _$VisitImpl implements _Visit {
   const _$VisitImpl(
       {required this.id,
-      required this.outletId,
-      required this.userId,
+      @JsonKey(name: 'outlet_id') required this.outletId,
+      @JsonKey(name: 'client_id') this.clientId,
       this.status,
-      this.checkInTime,
-      this.checkOutTime,
       this.latitude,
       this.longitude,
       this.notes,
-      this.syncStatus,
-      this.createdAt,
-      this.updatedAt});
+      @JsonKey(name: 'started_at') this.startedAt,
+      @JsonKey(name: 'completed_at') this.completedAt,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$VisitImpl.fromJson(Map<String, dynamic> json) =>
       _$$VisitImplFromJson(json);
@@ -267,31 +259,35 @@ class _$VisitImpl implements _Visit {
   @override
   final int id;
   @override
+  @JsonKey(name: 'outlet_id')
   final int outletId;
   @override
-  final int userId;
+  @JsonKey(name: 'client_id')
+  final String? clientId;
   @override
   final String? status;
   @override
-  final String? checkInTime;
+  final String? latitude;
   @override
-  final String? checkOutTime;
-  @override
-  final double? latitude;
-  @override
-  final double? longitude;
+  final String? longitude;
   @override
   final String? notes;
   @override
-  final String? syncStatus;
+  @JsonKey(name: 'started_at')
+  final String? startedAt;
   @override
+  @JsonKey(name: 'completed_at')
+  final String? completedAt;
+  @override
+  @JsonKey(name: 'created_at')
   final String? createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final String? updatedAt;
 
   @override
   String toString() {
-    return 'Visit(id: $id, outletId: $outletId, userId: $userId, status: $status, checkInTime: $checkInTime, checkOutTime: $checkOutTime, latitude: $latitude, longitude: $longitude, notes: $notes, syncStatus: $syncStatus, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Visit(id: $id, outletId: $outletId, clientId: $clientId, status: $status, latitude: $latitude, longitude: $longitude, notes: $notes, startedAt: $startedAt, completedAt: $completedAt, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -302,19 +298,18 @@ class _$VisitImpl implements _Visit {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.outletId, outletId) ||
                 other.outletId == outletId) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
+            (identical(other.clientId, clientId) ||
+                other.clientId == clientId) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.checkInTime, checkInTime) ||
-                other.checkInTime == checkInTime) &&
-            (identical(other.checkOutTime, checkOutTime) ||
-                other.checkOutTime == checkOutTime) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
             (identical(other.notes, notes) || other.notes == notes) &&
-            (identical(other.syncStatus, syncStatus) ||
-                other.syncStatus == syncStatus) &&
+            (identical(other.startedAt, startedAt) ||
+                other.startedAt == startedAt) &&
+            (identical(other.completedAt, completedAt) ||
+                other.completedAt == completedAt) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -323,20 +318,8 @@ class _$VisitImpl implements _Visit {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      outletId,
-      userId,
-      status,
-      checkInTime,
-      checkOutTime,
-      latitude,
-      longitude,
-      notes,
-      syncStatus,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, outletId, clientId, status,
+      latitude, longitude, notes, startedAt, completedAt, createdAt, updatedAt);
 
   /// Create a copy of Visit
   /// with the given fields replaced by the non-null parameter values.
@@ -357,43 +340,46 @@ class _$VisitImpl implements _Visit {
 abstract class _Visit implements Visit {
   const factory _Visit(
       {required final int id,
-      required final int outletId,
-      required final int userId,
+      @JsonKey(name: 'outlet_id') required final int outletId,
+      @JsonKey(name: 'client_id') final String? clientId,
       final String? status,
-      final String? checkInTime,
-      final String? checkOutTime,
-      final double? latitude,
-      final double? longitude,
+      final String? latitude,
+      final String? longitude,
       final String? notes,
-      final String? syncStatus,
-      final String? createdAt,
-      final String? updatedAt}) = _$VisitImpl;
+      @JsonKey(name: 'started_at') final String? startedAt,
+      @JsonKey(name: 'completed_at') final String? completedAt,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$VisitImpl;
 
   factory _Visit.fromJson(Map<String, dynamic> json) = _$VisitImpl.fromJson;
 
   @override
   int get id;
   @override
+  @JsonKey(name: 'outlet_id')
   int get outletId;
   @override
-  int get userId;
+  @JsonKey(name: 'client_id')
+  String? get clientId;
   @override
   String? get status;
   @override
-  String? get checkInTime;
+  String? get latitude;
   @override
-  String? get checkOutTime;
-  @override
-  double? get latitude;
-  @override
-  double? get longitude;
+  String? get longitude;
   @override
   String? get notes;
   @override
-  String? get syncStatus;
+  @JsonKey(name: 'started_at')
+  String? get startedAt;
   @override
+  @JsonKey(name: 'completed_at')
+  String? get completedAt;
+  @override
+  @JsonKey(name: 'created_at')
   String? get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   String? get updatedAt;
 
   /// Create a copy of Visit

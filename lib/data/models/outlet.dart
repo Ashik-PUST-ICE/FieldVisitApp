@@ -8,17 +8,18 @@ class Outlet with _$Outlet {
   const factory Outlet({
     required int id,
     required String name,
-    required String address,
-    required double latitude,
-    required double longitude,
+    String? code,
+    @JsonKey(name: 'qr_token') String? qrToken,
+    String? address,
+    double? latitude,
+    double? longitude,
     String? phone,
-    String? email,
-    String? qrToken,
-    String? qrStatus,
+    @JsonKey(name: 'owner_name') String? ownerName,
+    dynamic category,
     String? status,
-    int? geofenceRadius,
-    String? createdAt,
-    String? updatedAt,
+    @JsonKey(name: 'geofence_radius') int? geofenceRadius,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
   }) = _Outlet;
 
   factory Outlet.fromJson(Map<String, dynamic> json) => _$OutletFromJson(json);

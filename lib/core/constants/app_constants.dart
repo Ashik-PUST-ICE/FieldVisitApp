@@ -2,8 +2,12 @@ class AppConstants {
   AppConstants._();
 
   // API Base URLs
-  static const String authBaseUrl = 'https://fieldvisit-ecosystem-auth-service.test/api/v1';
-  static const String businessBaseUrl = 'https://fieldvisit-ecosystem-business-service.test/api/v1';
+  static const String authBaseUrl =
+      'https://fieldvisit-ecosystem-api-gateway.test/api/p/auth_service/v1';
+  static const String authUserBaseUrl =
+      'https://fieldvisit-ecosystem-api-gateway.test/api/u/auth_service/v1';
+  static const String businessBaseUrl =
+      'https://fieldvisit-ecosystem-api-gateway.test/api/u/business_service/v1';
 
   // API Endpoints
   static const String login = '/auth/login';

@@ -6,13 +6,13 @@ part 'user.g.dart';
 @freezed
 class User with _$User {
   const factory User({
-    required int id,
-    required String fullName,
+    @JsonKey(name: 'auth_id') required int id,
+    @JsonKey(name: 'full_name') required String fullName,
     required String email,
     String? image,
-    required String uniqueId,
+    @JsonKey(name: 'unique_id') required String uniqueId,
     required int status,
-    String? lastLoginAt,
+    @JsonKey(name: 'last_login_at') String? lastLoginAt,
     List<String>? roles,
     List<String>? permissions,
   }) = _User;

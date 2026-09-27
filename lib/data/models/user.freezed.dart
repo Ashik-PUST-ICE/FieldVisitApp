@@ -20,12 +20,16 @@ User _$UserFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$User {
+  @JsonKey(name: 'auth_id')
   int get id => throw _privateConstructorUsedError;
+  @JsonKey(name: 'full_name')
   String get fullName => throw _privateConstructorUsedError;
   String get email => throw _privateConstructorUsedError;
   String? get image => throw _privateConstructorUsedError;
+  @JsonKey(name: 'unique_id')
   String get uniqueId => throw _privateConstructorUsedError;
   int get status => throw _privateConstructorUsedError;
+  @JsonKey(name: 'last_login_at')
   String? get lastLoginAt => throw _privateConstructorUsedError;
   List<String>? get roles => throw _privateConstructorUsedError;
   List<String>? get permissions => throw _privateConstructorUsedError;
@@ -45,13 +49,13 @@ abstract class $UserCopyWith<$Res> {
       _$UserCopyWithImpl<$Res, User>;
   @useResult
   $Res call(
-      {int id,
-      String fullName,
+      {@JsonKey(name: 'auth_id') int id,
+      @JsonKey(name: 'full_name') String fullName,
       String email,
       String? image,
-      String uniqueId,
+      @JsonKey(name: 'unique_id') String uniqueId,
       int status,
-      String? lastLoginAt,
+      @JsonKey(name: 'last_login_at') String? lastLoginAt,
       List<String>? roles,
       List<String>? permissions});
 }
@@ -130,13 +134,13 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
-      String fullName,
+      {@JsonKey(name: 'auth_id') int id,
+      @JsonKey(name: 'full_name') String fullName,
       String email,
       String? image,
-      String uniqueId,
+      @JsonKey(name: 'unique_id') String uniqueId,
       int status,
-      String? lastLoginAt,
+      @JsonKey(name: 'last_login_at') String? lastLoginAt,
       List<String>? roles,
       List<String>? permissions});
 }
@@ -208,13 +212,13 @@ class __$$UserImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$UserImpl implements _User {
   const _$UserImpl(
-      {required this.id,
-      required this.fullName,
+      {@JsonKey(name: 'auth_id') required this.id,
+      @JsonKey(name: 'full_name') required this.fullName,
       required this.email,
       this.image,
-      required this.uniqueId,
+      @JsonKey(name: 'unique_id') required this.uniqueId,
       required this.status,
-      this.lastLoginAt,
+      @JsonKey(name: 'last_login_at') this.lastLoginAt,
       final List<String>? roles,
       final List<String>? permissions})
       : _roles = roles,
@@ -224,18 +228,22 @@ class _$UserImpl implements _User {
       _$$UserImplFromJson(json);
 
   @override
+  @JsonKey(name: 'auth_id')
   final int id;
   @override
+  @JsonKey(name: 'full_name')
   final String fullName;
   @override
   final String email;
   @override
   final String? image;
   @override
+  @JsonKey(name: 'unique_id')
   final String uniqueId;
   @override
   final int status;
   @override
+  @JsonKey(name: 'last_login_at')
   final String? lastLoginAt;
   final List<String>? _roles;
   @override
@@ -314,31 +322,35 @@ class _$UserImpl implements _User {
 
 abstract class _User implements User {
   const factory _User(
-      {required final int id,
-      required final String fullName,
+      {@JsonKey(name: 'auth_id') required final int id,
+      @JsonKey(name: 'full_name') required final String fullName,
       required final String email,
       final String? image,
-      required final String uniqueId,
+      @JsonKey(name: 'unique_id') required final String uniqueId,
       required final int status,
-      final String? lastLoginAt,
+      @JsonKey(name: 'last_login_at') final String? lastLoginAt,
       final List<String>? roles,
       final List<String>? permissions}) = _$UserImpl;
 
   factory _User.fromJson(Map<String, dynamic> json) = _$UserImpl.fromJson;
 
   @override
+  @JsonKey(name: 'auth_id')
   int get id;
   @override
+  @JsonKey(name: 'full_name')
   String get fullName;
   @override
   String get email;
   @override
   String? get image;
   @override
+  @JsonKey(name: 'unique_id')
   String get uniqueId;
   @override
   int get status;
   @override
+  @JsonKey(name: 'last_login_at')
   String? get lastLoginAt;
   @override
   List<String>? get roles;

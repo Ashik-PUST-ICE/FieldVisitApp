@@ -7,17 +7,16 @@ part 'visit.g.dart';
 class Visit with _$Visit {
   const factory Visit({
     required int id,
-    required int outletId,
-    required int userId,
+    @JsonKey(name: 'outlet_id') required int outletId,
+    @JsonKey(name: 'client_id') String? clientId,
     String? status,
-    String? checkInTime,
-    String? checkOutTime,
-    double? latitude,
-    double? longitude,
+    String? latitude,
+    String? longitude,
     String? notes,
-    String? syncStatus,
-    String? createdAt,
-    String? updatedAt,
+    @JsonKey(name: 'started_at') String? startedAt,
+    @JsonKey(name: 'completed_at') String? completedAt,
+    @JsonKey(name: 'created_at') String? createdAt,
+    @JsonKey(name: 'updated_at') String? updatedAt,
   }) = _Visit;
 
   factory Visit.fromJson(Map<String, dynamic> json) => _$VisitFromJson(json);

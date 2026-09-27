@@ -3,9 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:field_visit_app/core/theme/app_theme.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
+import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
 
 class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
@@ -79,10 +79,34 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
+  Future<void> _loadNearby() async {
+    final position = _currentPosition;
+    if (position == null) return;
+    try {
+      final response = await ref.read(businessApiProvider).nearby(latitude: position.latitude, longitude: position.longitude, radius: 5000);
+      final payload = Map<String, dynamic>.from(response.data as Map);
+      final raw = payload['data'];
+      final list = raw is Map ? raw['data'] : raw;
+      final outlets = (list as List<dynamic>? ?? const []).map((item) => Outlet.fromJson(Map<String, dynamic>.from(item as Map))).toList();
+      if (!mounted) return;
+      setState(() {
+        _markers.clear();
+        for (final outlet in outlets) {
+          if (outlet.latitude != null && outlet.longitude != null) {
+            _markers.add(Marker(markerId: MarkerId('nearby_${outlet.id}'), position: LatLng(outlet.latitude!, outlet.longitude!), infoWindow: InfoWindow(title: outlet.name)));
+          }
+        }
+      });
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${outlets.length} nearby outlets loaded')));
+    } catch (e) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Map')),
+      appBar: AppBar(title: const Text('Map'), actions: [IconButton(onPressed: _loadNearby, icon: const Icon(Icons.radar))]),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _currentPosition == null

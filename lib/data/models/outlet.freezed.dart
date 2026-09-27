@@ -22,16 +22,22 @@ Outlet _$OutletFromJson(Map<String, dynamic> json) {
 mixin _$Outlet {
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String get address => throw _privateConstructorUsedError;
-  double get latitude => throw _privateConstructorUsedError;
-  double get longitude => throw _privateConstructorUsedError;
-  String? get phone => throw _privateConstructorUsedError;
-  String? get email => throw _privateConstructorUsedError;
+  String? get code => throw _privateConstructorUsedError;
+  @JsonKey(name: 'qr_token')
   String? get qrToken => throw _privateConstructorUsedError;
-  String? get qrStatus => throw _privateConstructorUsedError;
+  String? get address => throw _privateConstructorUsedError;
+  double? get latitude => throw _privateConstructorUsedError;
+  double? get longitude => throw _privateConstructorUsedError;
+  String? get phone => throw _privateConstructorUsedError;
+  @JsonKey(name: 'owner_name')
+  String? get ownerName => throw _privateConstructorUsedError;
+  dynamic get category => throw _privateConstructorUsedError;
   String? get status => throw _privateConstructorUsedError;
+  @JsonKey(name: 'geofence_radius')
   int? get geofenceRadius => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Outlet to a JSON map.
@@ -51,17 +57,18 @@ abstract class $OutletCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
-      String address,
-      double latitude,
-      double longitude,
+      String? code,
+      @JsonKey(name: 'qr_token') String? qrToken,
+      String? address,
+      double? latitude,
+      double? longitude,
       String? phone,
-      String? email,
-      String? qrToken,
-      String? qrStatus,
+      @JsonKey(name: 'owner_name') String? ownerName,
+      dynamic category,
       String? status,
-      int? geofenceRadius,
-      String? createdAt,
-      String? updatedAt});
+      @JsonKey(name: 'geofence_radius') int? geofenceRadius,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -81,13 +88,14 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? address = null,
-    Object? latitude = null,
-    Object? longitude = null,
-    Object? phone = freezed,
-    Object? email = freezed,
+    Object? code = freezed,
     Object? qrToken = freezed,
-    Object? qrStatus = freezed,
+    Object? address = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? phone = freezed,
+    Object? ownerName = freezed,
+    Object? category = freezed,
     Object? status = freezed,
     Object? geofenceRadius = freezed,
     Object? createdAt = freezed,
@@ -102,34 +110,38 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      address: null == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String,
-      latitude: null == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      longitude: null == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      phone: freezed == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
+      code: freezed == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
               as String?,
       qrToken: freezed == qrToken
           ? _value.qrToken
           : qrToken // ignore: cast_nullable_to_non_nullable
               as String?,
-      qrStatus: freezed == qrStatus
-          ? _value.qrStatus
-          : qrStatus // ignore: cast_nullable_to_non_nullable
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
               as String?,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerName: freezed == ownerName
+          ? _value.ownerName
+          : ownerName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      category: freezed == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -160,17 +172,18 @@ abstract class _$$OutletImplCopyWith<$Res> implements $OutletCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
-      String address,
-      double latitude,
-      double longitude,
+      String? code,
+      @JsonKey(name: 'qr_token') String? qrToken,
+      String? address,
+      double? latitude,
+      double? longitude,
       String? phone,
-      String? email,
-      String? qrToken,
-      String? qrStatus,
+      @JsonKey(name: 'owner_name') String? ownerName,
+      dynamic category,
       String? status,
-      int? geofenceRadius,
-      String? createdAt,
-      String? updatedAt});
+      @JsonKey(name: 'geofence_radius') int? geofenceRadius,
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -188,13 +201,14 @@ class __$$OutletImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? address = null,
-    Object? latitude = null,
-    Object? longitude = null,
-    Object? phone = freezed,
-    Object? email = freezed,
+    Object? code = freezed,
     Object? qrToken = freezed,
-    Object? qrStatus = freezed,
+    Object? address = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
+    Object? phone = freezed,
+    Object? ownerName = freezed,
+    Object? category = freezed,
     Object? status = freezed,
     Object? geofenceRadius = freezed,
     Object? createdAt = freezed,
@@ -209,34 +223,38 @@ class __$$OutletImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      address: null == address
-          ? _value.address
-          : address // ignore: cast_nullable_to_non_nullable
-              as String,
-      latitude: null == latitude
-          ? _value.latitude
-          : latitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      longitude: null == longitude
-          ? _value.longitude
-          : longitude // ignore: cast_nullable_to_non_nullable
-              as double,
-      phone: freezed == phone
-          ? _value.phone
-          : phone // ignore: cast_nullable_to_non_nullable
-              as String?,
-      email: freezed == email
-          ? _value.email
-          : email // ignore: cast_nullable_to_non_nullable
+      code: freezed == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
               as String?,
       qrToken: freezed == qrToken
           ? _value.qrToken
           : qrToken // ignore: cast_nullable_to_non_nullable
               as String?,
-      qrStatus: freezed == qrStatus
-          ? _value.qrStatus
-          : qrStatus // ignore: cast_nullable_to_non_nullable
+      address: freezed == address
+          ? _value.address
+          : address // ignore: cast_nullable_to_non_nullable
               as String?,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      phone: freezed == phone
+          ? _value.phone
+          : phone // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ownerName: freezed == ownerName
+          ? _value.ownerName
+          : ownerName // ignore: cast_nullable_to_non_nullable
+              as String?,
+      category: freezed == category
+          ? _value.category
+          : category // ignore: cast_nullable_to_non_nullable
+              as dynamic,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
@@ -263,17 +281,18 @@ class _$OutletImpl implements _Outlet {
   const _$OutletImpl(
       {required this.id,
       required this.name,
-      required this.address,
-      required this.latitude,
-      required this.longitude,
+      this.code,
+      @JsonKey(name: 'qr_token') this.qrToken,
+      this.address,
+      this.latitude,
+      this.longitude,
       this.phone,
-      this.email,
-      this.qrToken,
-      this.qrStatus,
+      @JsonKey(name: 'owner_name') this.ownerName,
+      this.category,
       this.status,
-      this.geofenceRadius,
-      this.createdAt,
-      this.updatedAt});
+      @JsonKey(name: 'geofence_radius') this.geofenceRadius,
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$OutletImpl.fromJson(Map<String, dynamic> json) =>
       _$$OutletImplFromJson(json);
@@ -283,31 +302,38 @@ class _$OutletImpl implements _Outlet {
   @override
   final String name;
   @override
-  final String address;
+  final String? code;
   @override
-  final double latitude;
+  @JsonKey(name: 'qr_token')
+  final String? qrToken;
   @override
-  final double longitude;
+  final String? address;
+  @override
+  final double? latitude;
+  @override
+  final double? longitude;
   @override
   final String? phone;
   @override
-  final String? email;
+  @JsonKey(name: 'owner_name')
+  final String? ownerName;
   @override
-  final String? qrToken;
-  @override
-  final String? qrStatus;
+  final dynamic category;
   @override
   final String? status;
   @override
+  @JsonKey(name: 'geofence_radius')
   final int? geofenceRadius;
   @override
+  @JsonKey(name: 'created_at')
   final String? createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final String? updatedAt;
 
   @override
   String toString() {
-    return 'Outlet(id: $id, name: $name, address: $address, latitude: $latitude, longitude: $longitude, phone: $phone, email: $email, qrToken: $qrToken, qrStatus: $qrStatus, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -317,16 +343,17 @@ class _$OutletImpl implements _Outlet {
             other is _$OutletImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
+            (identical(other.code, code) || other.code == code) &&
+            (identical(other.qrToken, qrToken) || other.qrToken == qrToken) &&
             (identical(other.address, address) || other.address == address) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
                 other.longitude == longitude) &&
             (identical(other.phone, phone) || other.phone == phone) &&
-            (identical(other.email, email) || other.email == email) &&
-            (identical(other.qrToken, qrToken) || other.qrToken == qrToken) &&
-            (identical(other.qrStatus, qrStatus) ||
-                other.qrStatus == qrStatus) &&
+            (identical(other.ownerName, ownerName) ||
+                other.ownerName == ownerName) &&
+            const DeepCollectionEquality().equals(other.category, category) &&
             (identical(other.status, status) || other.status == status) &&
             (identical(other.geofenceRadius, geofenceRadius) ||
                 other.geofenceRadius == geofenceRadius) &&
@@ -342,13 +369,14 @@ class _$OutletImpl implements _Outlet {
       runtimeType,
       id,
       name,
+      code,
+      qrToken,
       address,
       latitude,
       longitude,
       phone,
-      email,
-      qrToken,
-      qrStatus,
+      ownerName,
+      const DeepCollectionEquality().hash(category),
       status,
       geofenceRadius,
       createdAt,
@@ -374,17 +402,18 @@ abstract class _Outlet implements Outlet {
   const factory _Outlet(
       {required final int id,
       required final String name,
-      required final String address,
-      required final double latitude,
-      required final double longitude,
+      final String? code,
+      @JsonKey(name: 'qr_token') final String? qrToken,
+      final String? address,
+      final double? latitude,
+      final double? longitude,
       final String? phone,
-      final String? email,
-      final String? qrToken,
-      final String? qrStatus,
+      @JsonKey(name: 'owner_name') final String? ownerName,
+      final dynamic category,
       final String? status,
-      final int? geofenceRadius,
-      final String? createdAt,
-      final String? updatedAt}) = _$OutletImpl;
+      @JsonKey(name: 'geofence_radius') final int? geofenceRadius,
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$OutletImpl;
 
   factory _Outlet.fromJson(Map<String, dynamic> json) = _$OutletImpl.fromJson;
 
@@ -393,26 +422,33 @@ abstract class _Outlet implements Outlet {
   @override
   String get name;
   @override
-  String get address;
+  String? get code;
   @override
-  double get latitude;
+  @JsonKey(name: 'qr_token')
+  String? get qrToken;
   @override
-  double get longitude;
+  String? get address;
+  @override
+  double? get latitude;
+  @override
+  double? get longitude;
   @override
   String? get phone;
   @override
-  String? get email;
+  @JsonKey(name: 'owner_name')
+  String? get ownerName;
   @override
-  String? get qrToken;
-  @override
-  String? get qrStatus;
+  dynamic get category;
   @override
   String? get status;
   @override
+  @JsonKey(name: 'geofence_radius')
   int? get geofenceRadius;
   @override
+  @JsonKey(name: 'created_at')
   String? get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   String? get updatedAt;
 
   /// Create a copy of Outlet

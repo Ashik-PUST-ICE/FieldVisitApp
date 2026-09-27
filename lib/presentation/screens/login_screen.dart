@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_theme.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
+import 'package:field_visit_app/presentation/screens/register_screen.dart';
+import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -116,11 +118,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         onPressed: _login,
                         child: const Text('Login'),
                       ),
+                TextButton(
+                  onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
+                  child: const Text('Create a new account'),
+                ),
+                TextButton(onPressed: _forgotPassword, child: const Text('Forgot password?')),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  Future<void> _forgotPassword() async {
+    final email = TextEditingController(text: _emailController.text);
+    await showDialog<void>(context: context, builder: (dialogContext) => AlertDialog(title: const Text('Reset password'), content: TextField(controller: email, keyboardType: TextInputType.emailAddress, decoration: const InputDecoration(labelText: 'Email')), actions: [TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')), FilledButton(onPressed: () async { try { await ref.read(authApiProvider).forgotPassword(email.text.trim()); if (dialogContext.mounted) Navigator.pop(dialogContext); if (mounted) ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Reset link sent'))); } catch (e) { if (dialogContext.mounted) ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(e.toString()))); } }, child: const Text('Send'))]));
+    email.dispose();
   }
 }

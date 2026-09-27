@@ -22,11 +22,14 @@ Beat _$BeatFromJson(Map<String, dynamic> json) {
 mixin _$Beat {
   int get id => throw _privateConstructorUsedError;
   String get name => throw _privateConstructorUsedError;
-  String? get description => throw _privateConstructorUsedError;
-  String? get assignedDate => throw _privateConstructorUsedError;
+  String? get code => throw _privateConstructorUsedError;
+  @JsonKey(name: 'assigned_user_id')
+  int? get assignedUserId => throw _privateConstructorUsedError;
+  String? get date => throw _privateConstructorUsedError;
   String? get status => throw _privateConstructorUsedError;
-  int? get userId => throw _privateConstructorUsedError;
+  @JsonKey(name: 'created_at')
   String? get createdAt => throw _privateConstructorUsedError;
+  @JsonKey(name: 'updated_at')
   String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Beat to a JSON map.
@@ -46,12 +49,12 @@ abstract class $BeatCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
-      String? description,
-      String? assignedDate,
+      String? code,
+      @JsonKey(name: 'assigned_user_id') int? assignedUserId,
+      String? date,
       String? status,
-      int? userId,
-      String? createdAt,
-      String? updatedAt});
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -71,10 +74,10 @@ class _$BeatCopyWithImpl<$Res, $Val extends Beat>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? description = freezed,
-    Object? assignedDate = freezed,
+    Object? code = freezed,
+    Object? assignedUserId = freezed,
+    Object? date = freezed,
     Object? status = freezed,
-    Object? userId = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -87,22 +90,22 @@ class _$BeatCopyWithImpl<$Res, $Val extends Beat>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
+      code: freezed == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
               as String?,
-      assignedDate: freezed == assignedDate
-          ? _value.assignedDate
-          : assignedDate // ignore: cast_nullable_to_non_nullable
+      assignedUserId: freezed == assignedUserId
+          ? _value.assignedUserId
+          : assignedUserId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      date: freezed == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
               as String?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -125,12 +128,12 @@ abstract class _$$BeatImplCopyWith<$Res> implements $BeatCopyWith<$Res> {
   $Res call(
       {int id,
       String name,
-      String? description,
-      String? assignedDate,
+      String? code,
+      @JsonKey(name: 'assigned_user_id') int? assignedUserId,
+      String? date,
       String? status,
-      int? userId,
-      String? createdAt,
-      String? updatedAt});
+      @JsonKey(name: 'created_at') String? createdAt,
+      @JsonKey(name: 'updated_at') String? updatedAt});
 }
 
 /// @nodoc
@@ -147,10 +150,10 @@ class __$$BeatImplCopyWithImpl<$Res>
   $Res call({
     Object? id = null,
     Object? name = null,
-    Object? description = freezed,
-    Object? assignedDate = freezed,
+    Object? code = freezed,
+    Object? assignedUserId = freezed,
+    Object? date = freezed,
     Object? status = freezed,
-    Object? userId = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -163,22 +166,22 @@ class __$$BeatImplCopyWithImpl<$Res>
           ? _value.name
           : name // ignore: cast_nullable_to_non_nullable
               as String,
-      description: freezed == description
-          ? _value.description
-          : description // ignore: cast_nullable_to_non_nullable
+      code: freezed == code
+          ? _value.code
+          : code // ignore: cast_nullable_to_non_nullable
               as String?,
-      assignedDate: freezed == assignedDate
-          ? _value.assignedDate
-          : assignedDate // ignore: cast_nullable_to_non_nullable
+      assignedUserId: freezed == assignedUserId
+          ? _value.assignedUserId
+          : assignedUserId // ignore: cast_nullable_to_non_nullable
+              as int?,
+      date: freezed == date
+          ? _value.date
+          : date // ignore: cast_nullable_to_non_nullable
               as String?,
       status: freezed == status
           ? _value.status
           : status // ignore: cast_nullable_to_non_nullable
               as String?,
-      userId: freezed == userId
-          ? _value.userId
-          : userId // ignore: cast_nullable_to_non_nullable
-              as int?,
       createdAt: freezed == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
@@ -197,12 +200,12 @@ class _$BeatImpl implements _Beat {
   const _$BeatImpl(
       {required this.id,
       required this.name,
-      this.description,
-      this.assignedDate,
+      this.code,
+      @JsonKey(name: 'assigned_user_id') this.assignedUserId,
+      this.date,
       this.status,
-      this.userId,
-      this.createdAt,
-      this.updatedAt});
+      @JsonKey(name: 'created_at') this.createdAt,
+      @JsonKey(name: 'updated_at') this.updatedAt});
 
   factory _$BeatImpl.fromJson(Map<String, dynamic> json) =>
       _$$BeatImplFromJson(json);
@@ -212,21 +215,24 @@ class _$BeatImpl implements _Beat {
   @override
   final String name;
   @override
-  final String? description;
+  final String? code;
   @override
-  final String? assignedDate;
+  @JsonKey(name: 'assigned_user_id')
+  final int? assignedUserId;
+  @override
+  final String? date;
   @override
   final String? status;
   @override
-  final int? userId;
-  @override
+  @JsonKey(name: 'created_at')
   final String? createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   final String? updatedAt;
 
   @override
   String toString() {
-    return 'Beat(id: $id, name: $name, description: $description, assignedDate: $assignedDate, status: $status, userId: $userId, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Beat(id: $id, name: $name, code: $code, assignedUserId: $assignedUserId, date: $date, status: $status, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -236,12 +242,11 @@ class _$BeatImpl implements _Beat {
             other is _$BeatImpl &&
             (identical(other.id, id) || other.id == id) &&
             (identical(other.name, name) || other.name == name) &&
-            (identical(other.description, description) ||
-                other.description == description) &&
-            (identical(other.assignedDate, assignedDate) ||
-                other.assignedDate == assignedDate) &&
+            (identical(other.code, code) || other.code == code) &&
+            (identical(other.assignedUserId, assignedUserId) ||
+                other.assignedUserId == assignedUserId) &&
+            (identical(other.date, date) || other.date == date) &&
             (identical(other.status, status) || other.status == status) &&
-            (identical(other.userId, userId) || other.userId == userId) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -250,8 +255,8 @@ class _$BeatImpl implements _Beat {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, name, description,
-      assignedDate, status, userId, createdAt, updatedAt);
+  int get hashCode => Object.hash(runtimeType, id, name, code, assignedUserId,
+      date, status, createdAt, updatedAt);
 
   /// Create a copy of Beat
   /// with the given fields replaced by the non-null parameter values.
@@ -273,12 +278,12 @@ abstract class _Beat implements Beat {
   const factory _Beat(
       {required final int id,
       required final String name,
-      final String? description,
-      final String? assignedDate,
+      final String? code,
+      @JsonKey(name: 'assigned_user_id') final int? assignedUserId,
+      final String? date,
       final String? status,
-      final int? userId,
-      final String? createdAt,
-      final String? updatedAt}) = _$BeatImpl;
+      @JsonKey(name: 'created_at') final String? createdAt,
+      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$BeatImpl;
 
   factory _Beat.fromJson(Map<String, dynamic> json) = _$BeatImpl.fromJson;
 
@@ -287,16 +292,19 @@ abstract class _Beat implements Beat {
   @override
   String get name;
   @override
-  String? get description;
+  String? get code;
   @override
-  String? get assignedDate;
+  @JsonKey(name: 'assigned_user_id')
+  int? get assignedUserId;
+  @override
+  String? get date;
   @override
   String? get status;
   @override
-  int? get userId;
-  @override
+  @JsonKey(name: 'created_at')
   String? get createdAt;
   @override
+  @JsonKey(name: 'updated_at')
   String? get updatedAt;
 
   /// Create a copy of Beat

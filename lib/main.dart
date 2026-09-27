@@ -5,6 +5,10 @@ import 'package:field_visit_app/presentation/screens/login_screen.dart';
 import 'package:field_visit_app/presentation/screens/main_screen.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 
+void main() {
+  runApp(const ProviderScope(child: FieldVisitApp()));
+}
+
 class FieldVisitApp extends ConsumerWidget {
   const FieldVisitApp({super.key});
 

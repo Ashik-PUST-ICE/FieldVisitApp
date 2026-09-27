@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -15,7 +16,6 @@ class MapScreen extends ConsumerStatefulWidget {
 }
 
 class _MapScreenState extends ConsumerState<MapScreen> {
-  GoogleMapController? _mapController;
   Position? _currentPosition;
   final Set<Marker> _markers = {};
   bool _isLoading = true;
@@ -46,7 +46,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
       );
       setState(() {
         _currentPosition = position;
@@ -106,13 +106,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Map'), actions: [IconButton(onPressed: _loadNearby, icon: const Icon(Icons.radar))]),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _currentPosition == null
               ? const Center(child: Text('Unable to get location'))
-              : GoogleMap(
-                  onMapCreated: (controller) => _mapController = controller,
+              : kIsWeb
+                  ? _buildWebMapFallback(context)
+                  : GoogleMap(
                   initialCameraPosition: CameraPosition(
                     target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
                     zoom: 14,
@@ -125,6 +125,57 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         onPressed: _loadOutlets,
         child: const Icon(Icons.refresh),
       ),
+    );
+  }
+
+  Widget _buildWebMapFallback(BuildContext context) {
+    final outlets = ref.watch(outletsProvider).valueOrNull ?? const [];
+    final position = _currentPosition!;
+    return ListView(
+      padding: const EdgeInsets.all(12),
+      children: [
+        Card(
+          child: ListTile(
+            leading: const CircleAvatar(
+              backgroundColor: Color(0xFFE7F3FF),
+              child: Icon(Icons.my_location, color: Color(0xFF1877F2)),
+            ),
+            title: const Text('Your current location'),
+            subtitle: Text('${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}'),
+            trailing: IconButton(
+              tooltip: 'Nearby outlets',
+              onPressed: _loadNearby,
+              icon: const Icon(Icons.radar),
+            ),
+          ),
+        ),
+        const Padding(
+          padding: EdgeInsets.fromLTRB(4, 12, 4, 6),
+          child: Text('Outlet locations', style: TextStyle(fontWeight: FontWeight.w700)),
+        ),
+        if (outlets.isEmpty)
+          const Card(
+            child: ListTile(
+              leading: Icon(Icons.location_off),
+              title: Text('No outlet coordinates found'),
+              subtitle: Text('Add latitude and longitude to an outlet to see it here.'),
+            ),
+          )
+        else
+          ...outlets.map(
+            (outlet) => Card(
+              child: ListTile(
+                leading: const Icon(Icons.place, color: Color(0xFF1877F2)),
+                title: Text(outlet.name),
+                subtitle: Text(
+                  outlet.latitude != null && outlet.longitude != null
+                      ? '${outlet.latitude!.toStringAsFixed(5)}, ${outlet.longitude!.toStringAsFixed(5)}'
+                      : 'Coordinates unavailable',
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }

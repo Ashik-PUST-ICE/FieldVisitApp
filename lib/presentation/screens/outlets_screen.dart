@@ -12,7 +12,6 @@ class OutletsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final outletsAsync = ref.watch(outletsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Outlets')),
       body: RefreshIndicator(
         onRefresh: () => ref.read(outletsProvider.notifier).refresh(),
         child: outletsAsync.when(

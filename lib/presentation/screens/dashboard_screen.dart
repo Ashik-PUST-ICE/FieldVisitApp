@@ -5,7 +5,6 @@ import 'package:field_visit_app/presentation/providers/dashboard_provider.dart';
 import 'package:field_visit_app/presentation/screens/map_screen.dart';
 import 'package:field_visit_app/presentation/screens/outlets_screen.dart';
 import 'package:field_visit_app/presentation/screens/visits_screen.dart';
-import 'package:field_visit_app/presentation/screens/login_screen.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -15,19 +14,6 @@ class DashboardScreen extends ConsumerWidget {
     final user = ref.watch(authProvider).value;
     final dashboard = ref.watch(dashboardProvider);
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Today at a glance'),
-        actions: [
-          IconButton(onPressed: () => ref.invalidate(dashboardProvider), icon: const Icon(Icons.refresh)),
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await ref.read(authProvider.notifier).logout();
-              if (context.mounted) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const LoginScreen()), (_) => false);
-            },
-          ),
-        ],
-      ),
       body: user == null
           ? const Center(child: Text('Please login'))
           : dashboard.when(

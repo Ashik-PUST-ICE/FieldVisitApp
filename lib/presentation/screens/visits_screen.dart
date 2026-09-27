@@ -15,7 +15,6 @@ class VisitsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final visitsAsync = ref.watch(visitsProvider);
     return Scaffold(
-      appBar: AppBar(title: const Text('Visits')),
       body: RefreshIndicator(
         onRefresh: () => ref.read(visitsProvider.notifier).refresh(),
         child: visitsAsync.when(

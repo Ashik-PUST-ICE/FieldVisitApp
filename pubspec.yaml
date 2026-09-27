@@ -1,0 +1,59 @@
+name: field_visit_app
+description: "Field Visit Management App"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+  riverpod_annotation: ^2.3.2
+
+  # Networking
+  dio: ^5.4.3
+  pretty_dio_logger: ^1.4.0
+
+  # Storage
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.2.2
+
+  # Firebase
+  firebase_core: ^3.3.0
+  firebase_messaging: ^15.0.4
+
+  # Notifications
+  flutter_local_notifications: ^17.2.1
+
+  # Maps & Location
+  google_maps_flutter: ^2.6.1
+  geolocator: ^13.0.1
+  permission_handler: ^11.3.1
+
+  # QR Code
+  mobile_scanner: ^5.0.0
+
+  # Image
+  image_picker: ^1.1.2
+
+  # Utils
+  intl: ^0.19.0
+  freezed_annotation: ^2.4.4
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  build_runner: ^2.4.11
+  riverpod_generator: ^2.4.0
+  freezed: ^2.5.2
+  json_serializable: ^6.8.0
+
+flutter:
+  uses-material-design: true

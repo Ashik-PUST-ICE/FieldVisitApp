@@ -1,0 +1,9 @@
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        options:
+          generate_async_notifiers: true
+      freezed:
+        options:
+          generic_argument_support: true

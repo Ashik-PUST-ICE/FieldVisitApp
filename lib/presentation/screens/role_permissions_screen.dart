@@ -44,7 +44,11 @@ class _RolePermissionsState extends ConsumerState<RolePermissionsScreen> {
           DropdownButtonFormField<int>(
             value: selectedRole,
             decoration: const InputDecoration(labelText: 'Role'),
-            items: roles.map((role) => DropdownMenuItem(value: (role['id'] as num).toInt(), child: Text('${role['name'] ?? ''}'))).toList(),
+            items: roles.map((role) {
+              final id = _intValue(role['id']);
+              if (id == null) return null;
+              return DropdownMenuItem<int>(value: id, child: Text('${role['name'] ?? 'Unnamed role'}'));
+            }).whereType<DropdownMenuItem<int>>().toList(),
             onChanged: (value) => setState(() => selectedRole = value),
           ),
           const SizedBox(height: 12),
@@ -52,8 +56,8 @@ class _RolePermissionsState extends ConsumerState<RolePermissionsScreen> {
             child: permissions.isEmpty
                 ? const Center(child: Text('No permissions found'))
                 : ListView(
-                    children: permissions.map((permission) {
-                      final id = (permission['id'] as num).toInt();
+                    children: permissions.where((permission) => _intValue(permission['id']) != null).map((permission) {
+                      final id = _intValue(permission['id'])!;
                       return CheckboxListTile(
                         value: selected.contains(id),
                         title: Text('${permission['title'] ?? permission['name'] ?? ''}'),
@@ -71,3 +75,9 @@ class _RolePermissionsState extends ConsumerState<RolePermissionsScreen> {
 }
 
 String _message(Object e) => e is DioException && e.response?.data is Map ? ((e.response!.data as Map)['message'] ?? (e.response!.data as Map)['errors'] ?? e.message).toString() : e.toString();
+
+int? _intValue(Object? value) {
+  if (value == null) return null;
+  if (value is num) return value.toInt();
+  return int.tryParse(value.toString());
+}

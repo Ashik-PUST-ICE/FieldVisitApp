@@ -50,7 +50,26 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       key: _scaffoldKey,
       appBar: AppBar(
         title: _currentIndex == 0
-            ? const Text('FieldVisit')
+            ? InkWell(
+                onTap: _search,
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  height: 36,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF0F2F5),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.search, size: 20, color: Color(0xFF65676B)),
+                      SizedBox(width: 8),
+                      Text('Search FieldVisit', style: TextStyle(color: Color(0xFF65676B), fontSize: 14, fontWeight: FontWeight.w500)),
+                    ],
+                  ),
+                ),
+              )
             : Text(_titles[_currentIndex]),
         leading: IconButton(tooltip: 'Menu', icon: const Icon(Icons.menu), onPressed: () => _scaffoldKey.currentState?.openDrawer()),
         actions: [

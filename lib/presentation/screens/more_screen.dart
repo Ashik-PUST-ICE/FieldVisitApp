@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/presentation/providers/theme_provider.dart';
 import 'package:field_visit_app/presentation/screens/account_screen.dart';
 import 'package:field_visit_app/presentation/screens/assignments_screen.dart';
 import 'package:field_visit_app/presentation/screens/auth_settings_screen.dart';
@@ -8,21 +10,251 @@ import 'package:field_visit_app/presentation/screens/notifications_screen.dart';
 import 'package:field_visit_app/presentation/screens/orders_screen.dart';
 import 'package:field_visit_app/presentation/screens/products_screen.dart';
 import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
-import 'package:field_visit_app/presentation/screens/reports_screen.dart';
 import 'package:field_visit_app/presentation/screens/reference_data_screen.dart';
+import 'package:field_visit_app/presentation/screens/reports_screen.dart';
 import 'package:field_visit_app/presentation/screens/role_permissions_screen.dart';
-import 'package:field_visit_app/presentation/providers/theme_provider.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    const items = <_MoreItem>[
-      _MoreItem('Beats', Icons.route, BeatsScreen()), _MoreItem('Orders', Icons.shopping_cart, OrdersScreen()), _MoreItem('Products', Icons.inventory_2, ProductsScreen()), _MoreItem('Alerts', Icons.notifications, NotificationsScreen()), _MoreItem('Reports', Icons.analytics, ReportsScreen()), _MoreItem('Reference data', Icons.settings_input_component, ReferenceDataScreen()), _MoreItem('Assignments', Icons.person_pin, AssignmentsScreen()), _MoreItem('Auth settings', Icons.security, AuthSettingsScreen()), _MoreItem('Users & companies', Icons.manage_accounts, DirectoryScreen()), _MoreItem('Role access', Icons.vpn_key, RolePermissionsScreen()), _MoreItem('Scan QR', Icons.qr_code_scanner, QrScannerScreen()), _MoreItem('My account', Icons.account_circle, AccountScreen()),
-    ];
     final dark = ref.watch(themeProvider);
-    return Scaffold(appBar: AppBar(title: const Text('More'), actions: [IconButton(tooltip: dark ? 'Light mode' : 'Dark mode', onPressed: () => ref.read(themeProvider.notifier).toggle(), icon: Icon(dark ? Icons.light_mode : Icons.dark_mode))]), body: GridView.builder(padding: const EdgeInsets.all(12), gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 8, mainAxisSpacing: 8, childAspectRatio: 1.25), itemCount: items.length, itemBuilder: (_, index) { final item = items[index]; return Card(child: InkWell(borderRadius: BorderRadius.circular(4), onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => item.screen)), child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(item.icon, size: 30, color: Theme.of(context).colorScheme.primary), const SizedBox(height: 8), Text(item.title, textAlign: TextAlign.center, style: const TextStyle(fontWeight: FontWeight.w600))]))); }));
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('All Modules & Services', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        actions: [
+          IconButton(
+            tooltip: dark ? 'Light mode' : 'Dark mode',
+            onPressed: () => ref.read(themeProvider.notifier).toggle(),
+            icon: Icon(dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+          ),
+        ],
+      ),
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        children: [
+          _buildCategoryHeader('Field Operations', 'Core day-to-day visiting and sales tools'),
+          const SizedBox(height: 10),
+          _buildGrid(context, [
+            _ModuleItem(
+              title: 'Beats & Routes',
+              subtitle: 'Assigned paths',
+              icon: Icons.alt_route_rounded,
+              gradient: [const Color(0xFF0D9488), const Color(0xFF14B8A6)],
+              screen: const BeatsScreen(),
+            ),
+            _ModuleItem(
+              title: 'Orders',
+              subtitle: 'Catalog sales',
+              icon: Icons.shopping_bag_rounded,
+              gradient: [const Color(0xFF3B82F6), const Color(0xFF60A5FA)],
+              screen: const OrdersScreen(),
+            ),
+            _ModuleItem(
+              title: 'Products',
+              subtitle: 'Price & inventory',
+              icon: Icons.inventory_2_rounded,
+              gradient: [const Color(0xFF8B5CF6), const Color(0xFFA78BFA)],
+              screen: const ProductsScreen(),
+            ),
+            _ModuleItem(
+              title: 'Scan QR Code',
+              subtitle: 'Instant check-in',
+              icon: Icons.qr_code_scanner_rounded,
+              gradient: [const Color(0xFFF59E0B), const Color(0xFFFBBF24)],
+              screen: const QrScannerScreen(),
+            ),
+          ], isDark),
+          const SizedBox(height: 24),
+          _buildCategoryHeader('Intelligence & Reports', 'Field metrics, targets, and references'),
+          const SizedBox(height: 10),
+          _buildGrid(context, [
+            _ModuleItem(
+              title: 'Analytics Reports',
+              subtitle: 'Performance charts',
+              icon: Icons.analytics_rounded,
+              gradient: [const Color(0xFF10B981), const Color(0xFF34D399)],
+              screen: const ReportsScreen(),
+            ),
+            _ModuleItem(
+              title: 'System Alerts',
+              subtitle: 'Notifications feed',
+              icon: Icons.notifications_active_rounded,
+              gradient: [const Color(0xFFEF4444), const Color(0xFFF87171)],
+              screen: const NotificationsScreen(),
+            ),
+            _ModuleItem(
+              title: 'Reference Data',
+              subtitle: 'Metadata configs',
+              icon: Icons.tune_rounded,
+              gradient: [const Color(0xFF06B6D4), const Color(0xFF22D3EE)],
+              screen: const ReferenceDataScreen(),
+            ),
+            _ModuleItem(
+              title: 'Assignments',
+              subtitle: 'Officer allocations',
+              icon: Icons.person_pin_circle_rounded,
+              gradient: [const Color(0xFFEC4899), const Color(0xFFF472B6)],
+              screen: const AssignmentsScreen(),
+            ),
+          ], isDark),
+          const SizedBox(height: 24),
+          _buildCategoryHeader('Administration & Security', 'User access, security policies, and personal profile'),
+          const SizedBox(height: 10),
+          _buildGrid(context, [
+            _ModuleItem(
+              title: 'Company Directory',
+              subtitle: 'Users & teams',
+              icon: Icons.corporate_fare_rounded,
+              gradient: [const Color(0xFF6366F1), const Color(0xFF818CF8)],
+              screen: const DirectoryScreen(),
+            ),
+            _ModuleItem(
+              title: 'Role Permissions',
+              subtitle: 'Access controls',
+              icon: Icons.security_rounded,
+              gradient: [const Color(0xFF64748B), const Color(0xFF94A3B8)],
+              screen: const RolePermissionsScreen(),
+            ),
+            _ModuleItem(
+              title: 'Auth Settings',
+              subtitle: 'Security parameters',
+              icon: Icons.lock_person_rounded,
+              gradient: [const Color(0xFF059669), const Color(0xFF10B981)],
+              screen: const AuthSettingsScreen(),
+            ),
+            _ModuleItem(
+              title: 'My Profile',
+              subtitle: 'Account & password',
+              icon: Icons.account_circle_rounded,
+              gradient: [const Color(0xFF0D9488), const Color(0xFF0891B2)],
+              screen: const AccountScreen(),
+            ),
+          ], isDark),
+          const SizedBox(height: 30),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryHeader(String title, String subtitle) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: -0.2),
+        ),
+        const SizedBox(height: 2),
+        Text(
+          subtitle,
+          style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGrid(BuildContext context, List<_ModuleItem> items, bool isDark) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.45,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => item.screen)),
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.02),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: item.gradient,
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Icon(item.icon, color: Colors.white, size: 20),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        item.subtitle,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }
-class _MoreItem { final String title; final IconData icon; final Widget screen; const _MoreItem(this.title, this.icon, this.screen); }
+
+class _ModuleItem {
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final List<Color> gradient;
+  final Widget screen;
+
+  const _ModuleItem({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.gradient,
+    required this.screen,
+  });
+}

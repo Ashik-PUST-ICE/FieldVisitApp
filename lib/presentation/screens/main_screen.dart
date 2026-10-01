@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:field_visit_app/presentation/providers/theme_provider.dart';
+import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 import 'package:field_visit_app/presentation/screens/account_screen.dart';
 import 'package:field_visit_app/presentation/screens/dashboard_screen.dart';
-import 'package:field_visit_app/presentation/screens/directory_screen.dart';
 import 'package:field_visit_app/presentation/screens/map_screen.dart';
 import 'package:field_visit_app/presentation/screens/more_screen.dart';
+import 'package:field_visit_app/presentation/screens/notifications_screen.dart';
 import 'package:field_visit_app/presentation/screens/outlets_screen.dart';
+import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
 import 'package:field_visit_app/presentation/screens/visits_screen.dart';
 
@@ -20,157 +22,479 @@ class MainScreen extends ConsumerStatefulWidget {
 class _MainScreenState extends ConsumerState<MainScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
-  final _titles = const ['Home', 'Outlets', 'Visits', 'Map', 'More'];
-  final List<Widget> _screens = const [DashboardScreen(), OutletsScreen(), VisitsScreen(), MapScreen(), MoreScreen()];
+
+  final List<Widget> _screens = const [
+    DashboardScreen(),   // 0: Dashboard
+    OutletsScreen(),     // 1: Outlets
+    VisitsScreen(),      // 2: Visits
+    MapScreen(),         // 3: Route Map
+    MoreScreen(),        // 4: All Modules
+  ];
 
   void _selectTab(int index) {
     setState(() => _currentIndex = index);
-    Navigator.of(context).pop();
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+      Navigator.of(context).pop();
+    }
   }
 
   void _openScreen(Widget screen) {
-    Navigator.of(context).pop();
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
-  }
-
-  Future<void> _search() async {
-    final result = await showSearch<_SearchItem?>(context: context, delegate: _AppSearchDelegate());
-    if (!mounted || result == null) return;
-    if (result.tabIndex != null) {
-      setState(() => _currentIndex = result.tabIndex!);
-    } else if (result.screen != null) {
-      Navigator.of(context).push(MaterialPageRoute(builder: (_) => result.screen!));
+    if (_scaffoldKey.currentState?.isDrawerOpen ?? false) {
+      Navigator.of(context).pop();
     }
+    Navigator.of(context).push(MaterialPageRoute(builder: (_) => screen));
   }
 
   @override
   Widget build(BuildContext context) {
-    final dark = ref.watch(themeProvider);
     return Scaffold(
       key: _scaffoldKey,
-      appBar: AppBar(
-        title: _currentIndex == 0
-            ? InkWell(
-                onTap: _search,
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  height: 36,
-                  padding: const EdgeInsets.symmetric(horizontal: 14),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF0F2F5),
-                    borderRadius: BorderRadius.circular(18),
+      backgroundColor: const Color(0xFFF1F5F2),
+
+      // Top Green Header (Cellfin Layout with FieldVisit Branding)
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(60),
+        child: Container(
+          color: AppColors.cellfinGreen,
+          child: SafeArea(
+            bottom: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+              child: Row(
+                children: [
+                  // Hamburger Menu Button
+                  IconButton(
+                    icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 28),
+                    onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                   ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.search, size: 20, color: Color(0xFF65676B)),
-                      SizedBox(width: 8),
-                      Text('Search FieldVisit', style: TextStyle(color: Color(0xFF65676B), fontSize: 14, fontWeight: FontWeight.w500)),
-                    ],
+
+                  const SizedBox(width: 4),
+
+                  // White Logo Pill/Card for FieldVisit
+                  Container(
+                    height: 38,
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF136B3E),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: const Center(
+                            child: Icon(Icons.location_city_rounded, color: Colors.white, size: 14),
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        RichText(
+                          text: const TextSpan(
+                            children: [
+                              TextSpan(
+                                text: 'Field',
+                                style: TextStyle(
+                                  color: Color(0xFF136B3E),
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                              TextSpan(
+                                text: 'Visit',
+                                style: TextStyle(
+                                  color: Color(0xFFFFB300), // Golden Yellow
+                                  fontWeight: FontWeight.w900,
+                                  fontSize: 16,
+                                  fontStyle: FontStyle.italic,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              )
-            : Text(_titles[_currentIndex]),
-        leading: IconButton(tooltip: 'Menu', icon: const Icon(Icons.menu), onPressed: () => _scaffoldKey.currentState?.openDrawer()),
-        actions: [
-          IconButton(tooltip: 'Search', onPressed: _search, icon: const Icon(Icons.search)),
-          IconButton(tooltip: dark ? 'Light mode' : 'Dark mode', onPressed: () => ref.read(themeProvider.notifier).toggle(), icon: Icon(dark ? Icons.light_mode : Icons.dark_mode)),
-        ],
-      ),
-      drawer: Drawer(
-        child: SafeArea(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              const UserAccountsDrawerHeader(
-                decoration: BoxDecoration(color: Color(0xFF1877F2)),
-                accountName: Text('FieldVisit'),
-                accountEmail: Text('Field visit management'),
-                currentAccountPicture: CircleAvatar(backgroundColor: Colors.white, child: Icon(Icons.business, color: Color(0xFF1877F2), size: 30)),
+
+                  const Spacer(),
+
+                  // Profile Icon
+                  IconButton(
+                    tooltip: 'My Profile',
+                    icon: const Icon(Icons.person_outline_rounded, color: Colors.white, size: 24),
+                    onPressed: () => _openScreen(const AccountScreen()),
+                  ),
+
+                  // Notifications Bell
+                  IconButton(
+                    tooltip: 'Alerts',
+                    icon: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 24),
+                    onPressed: () => _openScreen(const NotificationsScreen()),
+                  ),
+
+                  // Logout Icon
+                  IconButton(
+                    tooltip: 'Logout',
+                    icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 24),
+                    onPressed: () => ref.read(authProvider.notifier).logout(),
+                  ),
+                ],
               ),
-              _drawerItem(Icons.home, 'Home', 0),
-              _drawerItem(Icons.store, 'Outlets', 1),
-              _drawerItem(Icons.assignment, 'Visits', 2),
-              _drawerItem(Icons.map, 'Map', 3),
-              const Divider(height: 8),
-              _drawerAction(Icons.analytics, 'Reports', const ReportsScreen()),
-              _drawerAction(Icons.manage_accounts, 'Users & companies', const DirectoryScreen()),
-              _drawerAction(Icons.account_circle, 'My account', const AccountScreen()),
-              _drawerItem(Icons.grid_view, 'All modules', 4),
-            ],
+            ),
           ),
         ),
       ),
+
+      // Side Drawer Menu with FieldVisit Organization branding
+      drawer: _buildFieldVisitDrawer(context),
+
+      // Body Content
       body: IndexedStack(index: _currentIndex, children: _screens),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        type: BottomNavigationBarType.fixed,
-        showUnselectedLabels: true,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.store_outlined), activeIcon: Icon(Icons.store), label: 'Outlets'),
-          BottomNavigationBarItem(icon: Icon(Icons.assignment_outlined), activeIcon: Icon(Icons.assignment), label: 'Visits'),
-          BottomNavigationBarItem(icon: Icon(Icons.map_outlined), activeIcon: Icon(Icons.map), label: 'Map'),
-          BottomNavigationBarItem(icon: Icon(Icons.menu), activeIcon: Icon(Icons.menu), label: 'More'),
+
+      // Bottom Navigation Bar with Floating Center Scan QR Button
+      bottomNavigationBar: _buildFieldVisitBottomBar(context),
+    );
+  }
+
+  /// Cellfin Style Bottom Navigation Bar with Center Floating QR Check-in Button
+  Widget _buildFieldVisitBottomBar(BuildContext context) {
+    return Container(
+      color: AppColors.cellfinGreen,
+      height: 68,
+      child: Stack(
+        clipBehavior: Clip.none,
+        alignment: Alignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              // 1. Dashboard
+              _buildBottomNavItem(
+                icon: Icons.dashboard_outlined,
+                activeIcon: Icons.dashboard_rounded,
+                label: 'Dashboard',
+                isSelected: _currentIndex == 0,
+                onTap: () => setState(() => _currentIndex = 0),
+              ),
+
+              // 2. Outlets
+              _buildBottomNavItem(
+                icon: Icons.storefront_outlined,
+                activeIcon: Icons.storefront_rounded,
+                label: 'Outlets',
+                isSelected: _currentIndex == 1,
+                onTap: () => setState(() => _currentIndex = 1),
+              ),
+
+              // Spacer for the center circular button
+              const SizedBox(width: 60),
+
+              // 4. Visits
+              _buildBottomNavItem(
+                icon: Icons.assignment_outlined,
+                activeIcon: Icons.assignment_rounded,
+                label: 'Visits',
+                isSelected: _currentIndex == 2,
+                onTap: () => setState(() => _currentIndex = 2),
+              ),
+
+              // 5. More / Modules
+              _buildBottomNavItem(
+                icon: Icons.grid_view_rounded,
+                activeIcon: Icons.grid_view_rounded,
+                label: 'More',
+                isSelected: _currentIndex == 4,
+                onTap: () => setState(() => _currentIndex = 4),
+              ),
+            ],
+          ),
+
+          // Center Circular Floating "Scan QR" Button
+          Positioned(
+            top: -24,
+            child: InkWell(
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QrScannerScreen())),
+              borderRadius: BorderRadius.circular(35),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 58,
+                    height: 58,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.18),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: const Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'CHECK-IN',
+                          style: TextStyle(
+                            color: Color(0xFFD32F2F),
+                            fontSize: 7,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.2,
+                          ),
+                        ),
+                        Icon(
+                          Icons.qr_code_2_rounded,
+                          color: Color(0xFF136B3E),
+                          size: 26,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  const Text(
+                    'Scan QR',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _drawerItem(IconData icon, String title, int index) => ListTile(
-        leading: Icon(icon),
-        title: Text(title),
-        selected: _currentIndex == index,
-        selectedTileColor: const Color(0xFFE7F3FF),
-        onTap: () => _selectTab(index),
-      );
+  Widget _buildBottomNavItem({
+    required IconData icon,
+    required IconData activeIcon,
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              isSelected ? activeIcon : icon,
+              color: isSelected ? const Color(0xFFFFB300) : Colors.white,
+              size: 24,
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? const Color(0xFFFFB300) : Colors.white,
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  Widget _drawerAction(IconData icon, String title, Widget screen) => ListTile(leading: Icon(icon), title: Text(title), onTap: () => _openScreen(screen));
-}
+  /// Side Drawer Menu with FieldVisit branding
+  Widget _buildFieldVisitDrawer(BuildContext context) {
+    return Drawer(
+      backgroundColor: Colors.white,
+      child: SafeArea(
+        child: Column(
+          children: [
+            // Drawer Top Green Area with Logo Card
+            Container(
+              width: double.infinity,
+              height: 140,
+              color: AppColors.cellfinGreen,
+              child: Center(
+                child: Container(
+                  width: 210,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.12),
+                        blurRadius: 8,
+                        offset: const Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 38,
+                        height: 38,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF136B3E),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Icon(Icons.location_city_rounded, color: Colors.white, size: 24),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          RichText(
+                            text: const TextSpan(
+                              children: [
+                                TextSpan(
+                                  text: 'Field',
+                                  style: TextStyle(
+                                    color: Color(0xFF136B3E),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 20,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'Visit',
+                                  style: TextStyle(
+                                    color: Color(0xFFFFB300),
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 20,
+                                    fontStyle: FontStyle.italic,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Text(
+                            'Field Operations & Sales',
+                            style: TextStyle(
+                              color: Color(0xFF6B7280),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
 
-class _SearchItem {
-  const _SearchItem(this.title, this.icon, {this.tabIndex, this.screen});
-  final String title;
-  final IconData icon;
-  final int? tabIndex;
-  final Widget? screen;
-}
+            // Drawer Menu List with Field Visit Modules
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                children: [
+                  _buildDrawerTile(Icons.home_rounded, 'Home Dashboard', () => _selectTab(0)),
+                  _buildDrawerTile(Icons.storefront_rounded, 'Outlets & Stores', () => _selectTab(1)),
+                  _buildDrawerTile(Icons.assignment_rounded, 'My Field Visits', () => _selectTab(2)),
+                  _buildDrawerTile(Icons.map_rounded, 'Field Route & Map', () => _openScreen(const MapScreen())),
+                  _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports', () => _openScreen(const ReportsScreen())),
+                  _buildDrawerTile(Icons.settings_rounded, 'Settings & Profile', () => _openScreen(const AccountScreen())),
+                  _buildDrawerTile(Icons.logout_rounded, 'Logout', () => ref.read(authProvider.notifier).logout()),
+                ],
+              ),
+            ),
 
-class _AppSearchDelegate extends SearchDelegate<_SearchItem?> {
-  final items = const [
-    _SearchItem('Home', Icons.home, tabIndex: 0),
-    _SearchItem('Outlets', Icons.store, tabIndex: 1),
-    _SearchItem('Visits', Icons.assignment, tabIndex: 2),
-    _SearchItem('Map', Icons.map, tabIndex: 3),
-    _SearchItem('More modules', Icons.grid_view, tabIndex: 4),
-    _SearchItem('Reports', Icons.analytics, screen: ReportsScreen()),
-    _SearchItem('Users and companies', Icons.manage_accounts, screen: DirectoryScreen()),
-    _SearchItem('My account', Icons.account_circle, screen: AccountScreen()),
-  ];
+            // Bottom Footer
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Version 2.4.0 (Build 395)',
+                    style: TextStyle(
+                      color: Color(0xFF6B7280),
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(color: const Color(0xFF136B3E), width: 1.5),
+                        ),
+                        child: const Icon(Icons.verified_user_rounded, color: Color(0xFF136B3E), size: 18),
+                      ),
+                      const SizedBox(width: 8),
+                      const Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'ফিল্ড ভিজিট এন্টারপ্রাইজ',
+                            style: TextStyle(
+                              color: Color(0xFF136B3E),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w900,
+                            ),
+                          ),
+                          Text(
+                            'ফিল্ড ফোর্স ও সেলস অটোমেশন সিস্টেম',
+                            style: TextStyle(
+                              color: Color(0xFF4B5563),
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-  @override
-  List<Widget>? buildActions(BuildContext context) => [if (query.isNotEmpty) IconButton(onPressed: () => query = '', icon: const Icon(Icons.clear))];
-
-  @override
-  Widget? buildLeading(BuildContext context) => IconButton(onPressed: () => close(context, null), icon: const Icon(Icons.arrow_back));
-
-  @override
-  Widget buildResults(BuildContext context) => _buildList(context);
-
-  @override
-  Widget buildSuggestions(BuildContext context) => _buildList(context);
-
-  Widget _buildList(BuildContext context) {
-    final filtered = items.where((item) => item.title.toLowerCase().contains(query.toLowerCase())).toList();
-    if (filtered.isEmpty) return const Center(child: Text('No matching module found'));
-    return ListView.separated(
-      itemCount: filtered.length,
-      separatorBuilder: (_, __) => const Divider(height: 1),
-      itemBuilder: (_, index) {
-        final item = filtered[index];
-        return ListTile(leading: Icon(item.icon), title: Text(item.title), onTap: () => close(context, item));
-      },
+  Widget _buildDrawerTile(IconData icon, String title, VoidCallback onTap) {
+    return ListTile(
+      leading: Icon(icon, color: const Color(0xFF374151), size: 24),
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Color(0xFF1F2937),
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
+      onTap: onTap,
     );
   }
 }

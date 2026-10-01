@@ -5,6 +5,7 @@ import 'package:field_visit_app/core/theme/app_theme.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 import 'package:field_visit_app/presentation/screens/main_screen.dart';
 import 'package:field_visit_app/presentation/screens/register_screen.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -147,72 +148,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                               const SizedBox(height: 24),
 
-                              // Email Field
-                              TextFormField(
+                              // Receiver Account / Email Field
+                              CellfinInputField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                decoration: InputDecoration(
-                                  labelText: 'Email Address / User ID',
-                                  hintText: 'officer@fieldvisit.com',
-                                  prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF136B3E), size: 20),
-                                  filled: true,
-                                  fillColor: const Color(0xFFF9FAFB),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: Color(0xFF136B3E), width: 1.8),
-                                  ),
-                                ),
+                                hint: 'Receiver Account / Email Address',
+                                prefixIcon: const Icon(Icons.account_circle_outlined, color: Color(0xFF6B7280), size: 22),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Please enter your email';
+                                    return 'Please enter your email or user ID';
                                   }
                                   return null;
                                 },
                               ),
-                              const SizedBox(height: 16),
+                              const SizedBox(height: 14),
 
-                              // Password Field
-                              TextFormField(
+                              // CellFin 6 Digit Pin / Password Field (Exact screenshot match!)
+                              CellfinInputField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
-                                decoration: InputDecoration(
-                                  labelText: 'Password / PIN',
-                                  hintText: '••••••••',
-                                  prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF136B3E), size: 20),
-                                  suffixIcon: IconButton(
-                                    icon: Icon(
-                                      _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                                      color: const Color(0xFF6B7280),
-                                      size: 20,
-                                    ),
-                                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                hint: 'CellFin 6 Digit Pin / Password',
+                                prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF6B7280), size: 22),
+                                suffixIcon: IconButton(
+                                  icon: Icon(
+                                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    color: const Color(0xFF6B7280),
+                                    size: 20,
                                   ),
-                                  filled: true,
-                                  fillColor: const Color(0xFFF9FAFB),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: Color(0xFFE5E7EB)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(color: Color(0xFF136B3E), width: 1.8),
-                                  ),
+                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter your password';
+                                    return 'Please enter your PIN or password';
                                   }
                                   return null;
                                 },
@@ -240,30 +207,30 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                               const SizedBox(height: 14),
 
-                              // Login Action Button (Cellfin Green with Golden Accent)
+                              // Submit Button (Solid Forest Green, 10px radius, Exact match to screenshot)
                               ElevatedButton(
                                 onPressed: authState.isLoading ? null : _login,
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFF136B3E),
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  minimumSize: const Size(double.infinity, 50),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(16),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
-                                  elevation: 4,
+                                  elevation: 0,
                                 ),
                                 child: authState.isLoading
                                     ? const SizedBox(
                                         width: 22,
                                         height: 22,
-                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2),
                                       )
                                     : const Text(
-                                        'SIGN IN',
+                                        'Submit',
                                         style: TextStyle(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w800,
-                                          letterSpacing: 0.8,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w700,
+                                          color: Colors.white,
                                         ),
                                       ),
                               ),

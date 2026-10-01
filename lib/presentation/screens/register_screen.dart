@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -146,101 +147,78 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           Row(
                             children: [
                               Expanded(
-                                child: TextFormField(
+                                child: CellfinInputField(
                                   controller: first,
-                                  decoration: InputDecoration(
-                                    labelText: 'First Name *',
-                                    filled: true,
-                                    fillColor: const Color(0xFFF9FAFB),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                                  ),
+                                  hint: 'First Name *',
+                                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280), size: 20),
                                   validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                                 ),
                               ),
                               const SizedBox(width: 10),
                               Expanded(
-                                child: TextFormField(
+                                child: CellfinInputField(
                                   controller: last,
-                                  decoration: InputDecoration(
-                                    labelText: 'Last Name',
-                                    filled: true,
-                                    fillColor: const Color(0xFFF9FAFB),
-                                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                                  ),
+                                  hint: 'Last Name',
+                                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280), size: 20),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
 
                           // Email
-                          TextFormField(
+                          CellfinInputField(
                             controller: email,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              labelText: 'Work Email *',
-                              prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF136B3E), size: 20),
-                              filled: true,
-                              fillColor: const Color(0xFFF9FAFB),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
+                            hint: 'Receiver / Work Email *',
+                            prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF6B7280), size: 20),
                             validator: (v) => v == null || !v.contains('@') ? 'Enter a valid email' : null,
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
 
                           // Password
-                          TextFormField(
+                          CellfinInputField(
                             controller: password,
                             obscureText: _obscurePass,
-                            decoration: InputDecoration(
-                              labelText: 'Password (8+ chars) *',
-                              prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF136B3E), size: 20),
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscurePass ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
-                                onPressed: () => setState(() => _obscurePass = !_obscurePass),
-                              ),
-                              filled: true,
-                              fillColor: const Color(0xFFF9FAFB),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            hint: 'Password (8+ chars) *',
+                            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF6B7280), size: 20),
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscurePass ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280), size: 20),
+                              onPressed: () => setState(() => _obscurePass = !_obscurePass),
                             ),
                             validator: (v) => v == null || v.length < 8 ? 'Minimum 8 characters' : null,
                           ),
-                          const SizedBox(height: 14),
+                          const SizedBox(height: 12),
 
                           // Confirm Password
-                          TextFormField(
+                          CellfinInputField(
                             controller: confirm,
                             obscureText: _obscureConfirm,
-                            decoration: InputDecoration(
-                              labelText: 'Confirm Password *',
-                              prefixIcon: const Icon(Icons.check_circle_outline, color: Color(0xFF136B3E), size: 20),
-                              suffixIcon: IconButton(
-                                icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 20),
-                                onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                              ),
-                              filled: true,
-                              fillColor: const Color(0xFFF9FAFB),
-                              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            hint: 'Confirm Password *',
+                            prefixIcon: const Icon(Icons.lock_reset_rounded, color: Color(0xFF6B7280), size: 20),
+                            suffixIcon: IconButton(
+                              icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280), size: 20),
+                              onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                             ),
                             validator: (v) => v != password.text ? 'Passwords do not match' : null,
                           ),
-                          const SizedBox(height: 22),
+                          const SizedBox(height: 18),
 
-                          // Register Action
+                          // Submit Action
                           ElevatedButton(
                             onPressed: loading ? null : submit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF136B3E),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              elevation: 4,
+                              minimumSize: const Size(double.infinity, 50),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              elevation: 0,
                             ),
                             child: loading
-                                ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                                ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2))
                                 : const Text(
-                                    'CREATE ACCOUNT',
-                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, letterSpacing: 0.8),
+                                    'Submit',
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
                                   ),
                           ),
                         ],

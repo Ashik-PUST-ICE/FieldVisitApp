@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/orders_provider.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 
@@ -251,53 +252,51 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
   }
   int selectedOutlet = outlets.first.id;
   final notes = TextEditingController();
-  await showDialog<void>(
+
+  await CellfinFormModal.show(
     context: context,
-    builder: (dialogContext) => StatefulBuilder(
-      builder: (context, setState) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Create New Order', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            DropdownButtonFormField<int>(
-              value: selectedOutlet,
-              decoration: InputDecoration(labelText: 'Select Outlet', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-              items: outlets.map((outlet) => DropdownMenuItem(value: outlet.id, child: Text(outlet.name))).toList(),
-              onChanged: (value) => setState(() => selectedOutlet = value ?? selectedOutlet),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: notes,
-              decoration: InputDecoration(labelText: 'Order Notes (optional)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-            ),
-          ],
+    title: 'Book Retail Order',
+    cards: const [
+      CellfinCardItem(title: 'Standard', icon: Icons.shopping_bag_outlined),
+      CellfinCardItem(title: 'Priority', icon: Icons.bolt_rounded),
+      CellfinCardItem(title: 'Cash COD', icon: Icons.payments_outlined),
+      CellfinCardItem(title: 'Bulk Order', icon: Icons.inventory_2_outlined),
+    ],
+    submitText: 'Submit',
+    fields: [
+      StatefulBuilder(
+        builder: (context, setDropState) => CellfinDropdownField<int>(
+          value: selectedOutlet,
+          hint: 'Receiver Outlet Account *',
+          items: outlets.map((outlet) => DropdownMenuItem(value: outlet.id, child: Text(outlet.name))).toList(),
+          onChanged: (value) => setDropState(() => selectedOutlet = value ?? selectedOutlet),
         ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-          FilledButton(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () async {
-              try {
-                await ref.read(ordersProvider.notifier).create({
-                  'outlet_id': selectedOutlet,
-                  if (notes.text.trim().isNotEmpty) 'notes': notes.text.trim(),
-                });
-                if (dialogContext.mounted) Navigator.pop(dialogContext);
-              } catch (e) {
-                if (dialogContext.mounted) {
-                  ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
-                }
-              }
-            },
-            child: const Text('Create Order'),
-          ),
-        ],
       ),
-    ),
+      CellfinInputField(
+        controller: notes,
+        maxLines: 2,
+        hint: 'Note / Order Delivery Specifics',
+        prefixIcon: const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
+      ),
+    ],
+    onSubmit: () async {
+      try {
+        await ref.read(ordersProvider.notifier).create({
+          'outlet_id': selectedOutlet,
+          if (notes.text.trim().isNotEmpty) 'notes': notes.text.trim(),
+        });
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Order booked successfully!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+        }
+      }
+    },
   );
   notes.dispose();
 }
@@ -411,56 +410,64 @@ Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) asyn
   final productId = TextEditingController();
   final quantity = TextEditingController(text: '1');
   final price = TextEditingController(text: '0');
-  await showDialog<void>(
+
+  await CellfinFormModal.show(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text('Add Order Line Item', style: TextStyle(fontWeight: FontWeight.bold)),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: productId,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Product ID *', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: quantity,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Quantity *', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: price,
-            keyboardType: TextInputType.number,
-            decoration: InputDecoration(labelText: 'Unit Price *', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-          ),
-        ],
+    title: 'Add Order Line Item',
+    cards: const [
+      CellfinCardItem(title: 'Item Units', icon: Icons.inventory_2_outlined),
+      CellfinCardItem(title: 'Master Box', icon: Icons.all_inbox_rounded),
+      CellfinCardItem(title: 'Sample Free', icon: Icons.card_giftcard_rounded),
+      CellfinCardItem(title: 'Urgent Dispatch', icon: Icons.local_shipping_outlined),
+    ],
+    submitText: 'Submit',
+    fields: [
+      CellfinInputField(
+        controller: productId,
+        keyboardType: TextInputType.number,
+        hint: 'Product ID *',
+        prefixIcon: const Icon(Icons.inventory_2_outlined, color: Color(0xFF6B7280)),
+        validator: (v) => v == null || v.trim().isEmpty ? 'Product ID is required' : null,
       ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          onPressed: () async {
-            final p = int.tryParse(productId.text);
-            final q = int.tryParse(quantity.text) ?? 0;
-            final u = int.tryParse(price.text) ?? 0;
-            if (p == null || q < 1) return;
-            try {
-              await ref.read(ordersProvider.notifier).createItem(orderId, {'product_id': p, 'quantity': q, 'unit_price': u, 'total_price': q * u});
-              if (dialogContext.mounted) Navigator.pop(dialogContext);
-            } catch (e) {
-              if (dialogContext.mounted) ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
-            }
-          },
-          child: const Text('Add Item'),
-        ),
-      ],
-    ),
+      CellfinInputField(
+        controller: quantity,
+        keyboardType: TextInputType.number,
+        hint: 'Quantity (Pcs / Units) *',
+        prefixIcon: const Icon(Icons.format_list_numbered_rounded, color: Color(0xFF6B7280)),
+        validator: (v) => v == null || v.trim().isEmpty ? 'Quantity is required' : null,
+      ),
+      CellfinInputField(
+        controller: price,
+        keyboardType: TextInputType.number,
+        hint: 'Amount / Unit Price',
+        suffixText: '৳',
+        validator: (v) => v == null || v.trim().isEmpty ? 'Price is required' : null,
+      ),
+    ],
+    onSubmit: () async {
+      final p = int.tryParse(productId.text);
+      final q = int.tryParse(quantity.text) ?? 0;
+      final u = int.tryParse(price.text) ?? 0;
+      if (p == null || q < 1) return;
+      try {
+        await ref.read(ordersProvider.notifier).createItem(orderId, {
+          'product_id': p,
+          'quantity': q,
+          'unit_price': u,
+          'total_price': q * u,
+        });
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Item added to order!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+        }
+      }
+    },
   );
   productId.dispose();
   quantity.dispose();

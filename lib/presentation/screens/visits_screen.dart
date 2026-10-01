@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/visit.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/presentation/providers/visits_provider.dart';
@@ -561,39 +562,65 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
   int? selectedOutletId;
   final latitude = TextEditingController();
   final longitude = TextEditingController();
-  await showDialog(
+
+  await CellfinFormModal.show(
     context: context,
-    builder: (dialogContext) => _VisitInputDialog(
-      title: 'Start New Visit',
-      fields: [
-        DropdownButtonFormField<int>(
-          decoration: InputDecoration(
-            labelText: 'Select Outlet',
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+    title: 'Start Field Visit',
+    cards: const [
+      CellfinCardItem(title: 'Routine', icon: Icons.storefront_rounded),
+      CellfinCardItem(title: 'Sales Call', icon: Icons.trending_up_rounded),
+      CellfinCardItem(title: 'Audit', icon: Icons.fact_check_outlined),
+      CellfinCardItem(title: 'Collection', icon: Icons.receipt_long_rounded),
+    ],
+    submitText: 'Submit',
+    fields: [
+      StatefulBuilder(
+        builder: (context, setDropState) => CellfinDropdownField<int>(
+          value: selectedOutletId,
+          hint: 'Receiver Outlet Account',
           items: outlets
               .map((outlet) => DropdownMenuItem<int>(
                     value: outlet.id,
                     child: Text('${outlet.name} (#${outlet.id})'),
                   ))
               .toList(),
-          onChanged: (value) => selectedOutletId = value,
-          validator: (value) => value == null ? 'Select an outlet' : null,
+          onChanged: (value) => setDropState(() => selectedOutletId = value),
         ),
-        const SizedBox(height: 12),
-        _field(latitude, 'Latitude (optional GPS)'),
-        const SizedBox(height: 12),
-        _field(longitude, 'Longitude (optional GPS)'),
-      ],
-      onSubmit: () async {
+      ),
+      CellfinInputField(
+        controller: latitude,
+        hint: 'GPS Latitude (Optional)',
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      ),
+      CellfinInputField(
+        controller: longitude,
+        hint: 'GPS Longitude (Optional)',
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+      ),
+    ],
+    onSubmit: () async {
+      if (selectedOutletId == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select an outlet')),
+        );
+        return;
+      }
+      try {
         await ref.read(visitsProvider.notifier).start(
               outletId: selectedOutletId!,
               latitude: latitude.text.trim(),
               longitude: longitude.text.trim(),
             );
-        if (dialogContext.mounted) Navigator.pop(dialogContext);
-      },
-    ),
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Field visit started successfully!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
+      }
+    },
   );
   latitude.dispose();
   longitude.dispose();
@@ -602,24 +629,48 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
 Future<void> _showVerifyLocation(BuildContext context, WidgetRef ref, Visit visit) async {
   final latitude = TextEditingController(text: visit.latitude);
   final longitude = TextEditingController(text: visit.longitude);
-  await showDialog(
+
+  await CellfinFormModal.show(
     context: context,
-    builder: (dialogContext) => _VisitInputDialog(
-      title: 'Verify GPS Location',
-      fields: [
-        _field(latitude, 'Latitude', required: true),
-        const SizedBox(height: 12),
-        _field(longitude, 'Longitude', required: true),
-      ],
-      onSubmit: () async {
+    title: 'Verify GPS Coordinates',
+    cards: const [
+      CellfinCardItem(title: 'GPS Auto', icon: Icons.my_location_rounded),
+      CellfinCardItem(title: 'Manual Pin', icon: Icons.edit_location_alt_rounded),
+      CellfinCardItem(title: 'Geofence', icon: Icons.fmd_good_outlined),
+      CellfinCardItem(title: 'QR Match', icon: Icons.qr_code_2_rounded),
+    ],
+    submitText: 'Submit',
+    fields: [
+      CellfinInputField(
+        controller: latitude,
+        hint: 'GPS Latitude *',
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        validator: (v) => v == null || v.trim().isEmpty ? 'Latitude is required' : null,
+      ),
+      CellfinInputField(
+        controller: longitude,
+        hint: 'GPS Longitude *',
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        validator: (v) => v == null || v.trim().isEmpty ? 'Longitude is required' : null,
+      ),
+    ],
+    onSubmit: () async {
+      try {
         await ref.read(visitsProvider.notifier).verifyLocation(
               visit.id,
               latitude: latitude.text.trim(),
               longitude: longitude.text.trim(),
             );
-        if (dialogContext.mounted) Navigator.pop(dialogContext);
-      },
-    ),
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Location verified successfully!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
+      }
+    },
   );
   latitude.dispose();
   longitude.dispose();
@@ -627,68 +678,41 @@ Future<void> _showVerifyLocation(BuildContext context, WidgetRef ref, Visit visi
 
 Future<void> _showCompleteVisit(BuildContext context, WidgetRef ref, Visit visit) async {
   final remarks = TextEditingController();
-  await showDialog(
+
+  await CellfinFormModal.show(
     context: context,
-    builder: (dialogContext) => _VisitInputDialog(
-      title: 'Complete Visit',
-      fields: [
-        _field(remarks, 'Visit Remarks / Summary', required: false, maxLines: 3),
-      ],
-      onSubmit: () async {
+    title: 'Complete Field Visit',
+    cards: const [
+      CellfinCardItem(title: 'Completed', icon: Icons.check_circle_outline_rounded),
+      CellfinCardItem(title: 'Partial', icon: Icons.published_with_changes_rounded),
+      CellfinCardItem(title: 'Follow-up', icon: Icons.event_repeat_rounded),
+      CellfinCardItem(title: 'Reschedule', icon: Icons.calendar_month_outlined),
+    ],
+    submitText: 'Submit',
+    fields: [
+      CellfinInputField(
+        controller: remarks,
+        hint: 'Note / Visit Observation',
+        maxLines: 3,
+      ),
+    ],
+    onSubmit: () async {
+      try {
         await ref.read(visitsProvider.notifier).complete(visit.id, remarks: remarks.text);
-        if (dialogContext.mounted) Navigator.pop(dialogContext);
-      },
-    ),
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Visit marked as complete!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
+      }
+    },
   );
   remarks.dispose();
 }
 
-Widget _field(TextEditingController controller, String label, {bool number = false, bool required = true, int maxLines = 1}) => TextFormField(
-      controller: controller,
-      maxLines: maxLines,
-      keyboardType: number ? TextInputType.number : TextInputType.text,
-      decoration: InputDecoration(
-        labelText: label,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-      ),
-      validator: required ? (value) => value == null || value.trim().isEmpty ? '$label is required' : null : null,
-    );
-
-class _VisitInputDialog extends StatelessWidget {
-  final String title;
-  final List<Widget> fields;
-  final Future<void> Function() onSubmit;
-  const _VisitInputDialog({required this.title, required this.fields, required this.onSubmit});
-
-  @override
-  Widget build(BuildContext context) {
-    final key = GlobalKey<FormState>();
-    return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-      content: Form(key: key, child: SingleChildScrollView(child: Column(mainAxisSize: MainAxisSize.min, children: fields))),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          onPressed: () async {
-            if (key.currentState!.validate()) {
-              try {
-                await onSubmit();
-              } catch (e) {
-                if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
-              }
-            }
-          },
-          child: const Text('Save & Submit'),
-        ),
-      ],
-    );
-  }
-}
 
 String _apiErrorMessage(Object error) {
   if (error is DioException) {

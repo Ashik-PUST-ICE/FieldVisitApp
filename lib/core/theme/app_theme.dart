@@ -220,46 +220,48 @@ class AppTheme {
         ),
       ),
 
-      // ─── INPUT DECORATION ─────────────────────────────────────────
+      // ─── INPUT DECORATION (Exact Cellfin Specification) ─────────────
       inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         filled: true,
-        fillColor: AppColors.scaffold,
+        fillColor: Colors.white,
         contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusSm),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFC4C4C4), width: 1.0),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusSm),
-          borderSide: const BorderSide(color: AppColors.border),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFC4C4C4), width: 1.0),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusSm),
-          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFF136B3E), width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusSm),
-          borderSide: const BorderSide(color: AppColors.error),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 1.0),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(radiusSm),
-          borderSide: const BorderSide(color: AppColors.error, width: 2),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 1.5),
         ),
+        floatingLabelBehavior: FloatingLabelBehavior.never,
         labelStyle: GoogleFonts.inter(
-          color: AppColors.textSecondary,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
+          color: const Color(0xFF757575),
+          fontSize: 14.5,
+          fontWeight: FontWeight.w400,
         ),
         hintStyle: GoogleFonts.inter(
-          color: AppColors.textTertiary,
-          fontSize: 14,
+          color: const Color(0xFF757575),
+          fontSize: 14.5,
+          fontWeight: FontWeight.w400,
         ),
-        prefixIconColor: AppColors.textTertiary,
-        suffixIconColor: AppColors.textTertiary,
+        prefixIconColor: const Color(0xFF6B7280),
+        suffixIconColor: const Color(0xFF6B7280),
         floatingLabelStyle: GoogleFonts.inter(
-          color: AppColors.primary,
+          color: const Color(0xFF136B3E),
           fontWeight: FontWeight.w600,
         ),
       ),

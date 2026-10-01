@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
@@ -396,7 +397,6 @@ Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
 }
 
 Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outlet}) async {
-  final formKey = GlobalKey<FormState>();
   final name = TextEditingController(text: outlet?.name);
   final address = TextEditingController(text: outlet?.address);
   final code = TextEditingController(text: outlet?.code);
@@ -405,103 +405,87 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
   final longitude = TextEditingController(text: outlet?.longitude?.toString());
   final radius = TextEditingController(text: outlet?.geofenceRadius?.toString());
 
-  final saved = await showDialog<bool>(
+  await CellfinFormModal.show(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: Text(outlet == null ? 'Add Retail Outlet' : 'Edit Outlet Details', style: const TextStyle(fontWeight: FontWeight.bold)),
-      content: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 520),
-        child: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: name,
-                  decoration: InputDecoration(labelText: 'Outlet Name *', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                  validator: (v) => v == null || v.trim().isEmpty ? 'Name is required' : null,
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: code,
-                  decoration: InputDecoration(labelText: 'Outlet Code (e.g., OUT-101)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: address,
-                  decoration: InputDecoration(labelText: 'Full Address', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: phone,
-                  decoration: InputDecoration(labelText: 'Phone Number', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        controller: latitude,
-                        decoration: InputDecoration(labelText: 'Latitude', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextFormField(
-                        controller: longitude,
-                        decoration: InputDecoration(labelText: 'Longitude', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                TextFormField(
-                  controller: radius,
-                  decoration: InputDecoration(labelText: 'Geofence Radius (meters)', border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-                  keyboardType: TextInputType.number,
-                ),
-              ],
+    title: outlet == null ? 'Add Retail Outlet' : 'Edit Outlet Details',
+    cards: const [
+      CellfinCardItem(title: 'Retail Store', icon: Icons.store_rounded),
+      CellfinCardItem(title: 'Wholesale', icon: Icons.warehouse_rounded),
+      CellfinCardItem(title: 'Supermarket', icon: Icons.local_mall_outlined),
+      CellfinCardItem(title: 'Dealer Hub', icon: Icons.business_center_rounded),
+    ],
+    submitText: 'Submit',
+    fields: [
+      CellfinInputField(
+        controller: name,
+        hint: 'Receiver / Outlet Store Name *',
+        validator: (v) => v == null || v.trim().isEmpty ? 'Outlet name is required' : null,
+      ),
+      CellfinInputField(
+        controller: code,
+        hint: 'Outlet Code (Optional e.g. OUT-104)',
+      ),
+      CellfinInputField(
+        controller: address,
+        hint: 'Full Store / Market Address *',
+        validator: (v) => v == null || v.trim().isEmpty ? 'Address is required' : null,
+      ),
+      CellfinInputField(
+        controller: phone,
+        keyboardType: TextInputType.phone,
+        hint: 'Store Contact Phone Number',
+      ),
+      Row(
+        children: [
+          Expanded(
+            child: CellfinInputField(
+              controller: latitude,
+              hint: 'GPS Latitude',
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
             ),
           ),
-        ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          const SizedBox(width: 10),
+          Expanded(
+            child: CellfinInputField(
+              controller: longitude,
+              hint: 'GPS Longitude',
+              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            ),
           ),
-          onPressed: () async {
-            if (!formKey.currentState!.validate()) return;
-            final data = <String, dynamic>{
-              'name': name.text.trim(),
-              if (code.text.trim().isNotEmpty) 'code': code.text.trim(),
-              if (address.text.trim().isNotEmpty) 'address': address.text.trim(),
-              if (phone.text.trim().isNotEmpty) 'phone': phone.text.trim(),
-              if (latitude.text.trim().isNotEmpty) 'latitude': latitude.text.trim(),
-              if (longitude.text.trim().isNotEmpty) 'longitude': longitude.text.trim(),
-              if (radius.text.trim().isNotEmpty) 'geofence_radius': int.tryParse(radius.text.trim()),
-            };
-            try {
-              if (outlet == null) {
-                await ref.read(outletsProvider.notifier).create(data);
-              } else {
-                await ref.read(outletsProvider.notifier).update(outlet.id, data);
-              }
-              if (dialogContext.mounted) Navigator.pop(dialogContext, true);
-            } catch (e) {
-              if (dialogContext.mounted) ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(e.toString())));
-            }
-          },
-          child: const Text('Save Outlet'),
-        ),
-      ],
-    ),
+        ],
+      ),
+      CellfinInputField(
+        controller: radius,
+        keyboardType: TextInputType.number,
+        hint: 'Geofence Radius (Meters)',
+      ),
+    ],
+    onSubmit: () async {
+      final data = <String, dynamic>{
+        'name': name.text.trim(),
+        if (code.text.trim().isNotEmpty) 'code': code.text.trim(),
+        if (address.text.trim().isNotEmpty) 'address': address.text.trim(),
+        if (phone.text.trim().isNotEmpty) 'phone': phone.text.trim(),
+        if (latitude.text.trim().isNotEmpty) 'latitude': latitude.text.trim(),
+        if (longitude.text.trim().isNotEmpty) 'longitude': longitude.text.trim(),
+        if (radius.text.trim().isNotEmpty) 'geofence_radius': int.tryParse(radius.text.trim()),
+      };
+      try {
+        if (outlet == null) {
+          await ref.read(outletsProvider.notifier).create(data);
+        } else {
+          await ref.read(outletsProvider.notifier).update(outlet.id, data);
+        }
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Outlet saved successfully!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
+    },
   );
   name.dispose();
   address.dispose();
@@ -510,9 +494,6 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
   latitude.dispose();
   longitude.dispose();
   radius.dispose();
-  if (saved == true && context.mounted) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Outlet saved successfully!')));
-  }
 }
 
 class _ErrorView extends StatelessWidget {

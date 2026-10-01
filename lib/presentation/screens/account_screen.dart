@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 
@@ -203,47 +204,37 @@ class _AccountState extends ConsumerState<AccountScreen> {
             title: 'Personal Details',
             icon: Icons.badge_outlined,
             children: [
-              TextField(
+              CellfinInputField(
                 controller: first,
-                decoration: InputDecoration(
-                  labelText: 'First Name',
-                  prefixIcon: const Icon(Icons.person_outline_rounded),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
+                hint: 'First Name',
+                prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 12),
-              TextField(
+              CellfinInputField(
                 controller: last,
-                decoration: InputDecoration(
-                  labelText: 'Last Name',
-                  prefixIcon: const Icon(Icons.person_outline_rounded),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
+                hint: 'Last Name',
+                prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 12),
-              TextField(
+              CellfinInputField(
                 controller: mobile,
                 keyboardType: TextInputType.phone,
-                decoration: InputDecoration(
-                  labelText: 'Mobile Number',
-                  prefixIcon: const Icon(Icons.phone_outlined),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                ),
+                hint: 'Mobile Number',
+                prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: _isUpdatingProfile ? null : profile,
-                  child: _isUpdatingProfile
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Save Profile Changes', style: TextStyle(fontWeight: FontWeight.w700)),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF136B3E),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  elevation: 0,
                 ),
+                onPressed: _isUpdatingProfile ? null : profile,
+                child: _isUpdatingProfile
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Text('Submit Profile Changes', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             ],
           ),
@@ -256,61 +247,51 @@ class _AccountState extends ConsumerState<AccountScreen> {
             title: 'Security & Password',
             icon: Icons.lock_outline_rounded,
             children: [
-              TextField(
+              CellfinInputField(
                 controller: current,
                 obscureText: _obscureCurrent,
-                decoration: InputDecoration(
-                  labelText: 'Current Password',
-                  prefixIcon: const Icon(Icons.lock_clock_outlined),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureCurrent ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                hint: 'Current Password',
+                prefixIcon: const Icon(Icons.lock_clock_outlined, color: Color(0xFF6B7280)),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureCurrent ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280)),
+                  onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
+              CellfinInputField(
                 controller: password,
                 obscureText: _obscureNew,
-                decoration: InputDecoration(
-                  labelText: 'New Password (8+ chars)',
-                  prefixIcon: const Icon(Icons.lock_open_rounded),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureNew ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                hint: 'New Password (8+ chars)',
+                prefixIcon: const Icon(Icons.lock_open_rounded, color: Color(0xFF6B7280)),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280)),
+                  onPressed: () => setState(() => _obscureNew = !_obscureNew),
                 ),
               ),
               const SizedBox(height: 12),
-              TextField(
+              CellfinInputField(
                 controller: confirm,
                 obscureText: _obscureConfirm,
-                decoration: InputDecoration(
-                  labelText: 'Confirm New Password',
-                  prefixIcon: const Icon(Icons.check_circle_outline),
-                  suffixIcon: IconButton(
-                    icon: Icon(_obscureConfirm ? Icons.visibility_off : Icons.visibility),
-                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                  ),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                hint: 'Confirm New Password',
+                prefixIcon: const Icon(Icons.check_circle_outline, color: Color(0xFF6B7280)),
+                suffixIcon: IconButton(
+                  icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280)),
+                  onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
                 ),
               ),
               const SizedBox(height: 16),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton(
-                  style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  ),
-                  onPressed: _isChangingPassword ? null : changePassword,
-                  child: _isChangingPassword
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                      : const Text('Change Password', style: TextStyle(fontWeight: FontWeight.w700)),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF136B3E),
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 50),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  elevation: 0,
                 ),
+                onPressed: _isChangingPassword ? null : changePassword,
+                child: _isChangingPassword
+                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                    : const Text('Submit Password Change', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             ],
           ),

@@ -10,6 +10,7 @@ import 'package:field_visit_app/presentation/screens/notifications_screen.dart';
 import 'package:field_visit_app/presentation/screens/orders_screen.dart';
 import 'package:field_visit_app/presentation/screens/products_screen.dart';
 import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
+import 'package:field_visit_app/presentation/screens/kpi_screen.dart';
 import 'package:field_visit_app/presentation/screens/reference_data_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
 import 'package:field_visit_app/presentation/screens/role_permissions_screen.dart';
@@ -72,6 +73,13 @@ class MoreScreen extends ConsumerWidget {
           _buildCategoryHeader('Intelligence & Reports', 'Field metrics, targets, and references'),
           const SizedBox(height: 10),
           _buildGrid(context, [
+            _ModuleItem(
+              title: 'Target & KPIs',
+              subtitle: 'Goals & rankings',
+              icon: Icons.fact_check_rounded,
+              gradient: [const Color(0xFF0F766E), const Color(0xFF14B8A6)],
+              screen: const KpiScreen(),
+            ),
             _ModuleItem(
               title: 'Analytics Reports',
               subtitle: 'Performance charts',

@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/data/business_api.dart';
 import 'package:field_visit_app/data/models/visit.dart';
@@ -50,5 +51,81 @@ class VisitsNotifier extends StateNotifier<AsyncValue<List<Visit>>> {
     await fetchVisits();
   }
 
+  // --- Visit Photos ---
+  Future<List<Map<String, dynamic>>> getPhotos(int visitId) async {
+    final response = await api.visitPhotos(visitId);
+    final payload = Map<String, dynamic>.from(response.data as Map);
+    final raw = payload['data'];
+    return (raw is List ? raw : const <dynamic>[])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  Future<void> uploadPhoto(int visitId, Uint8List bytes, String filename, {String? caption}) async {
+    await api.uploadVisitPhotoBytes(visitId, bytes, filename, caption: caption);
+  }
+
+  // --- Visit Competitors ---
+  Future<List<Map<String, dynamic>>> getCompetitors(int visitId) async {
+    final response = await api.visitCompetitors(visitId);
+    final payload = Map<String, dynamic>.from(response.data as Map);
+    final raw = payload['data'];
+    return (raw is List ? raw : const <dynamic>[])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  Future<void> addCompetitor(int visitId, {required int competitorId, String? notes}) async {
+    await api.addVisitCompetitor(visitId, {
+      'competitor_id': competitorId,
+      if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
+    });
+  }
+
+  Future<void> removeCompetitor(int visitId, int visitCompetitorId) async {
+    await api.removeVisitCompetitor(visitId, visitCompetitorId);
+  }
+
+  // --- Visit Products ---
+  Future<List<Map<String, dynamic>>> getProducts(int visitId) async {
+    final response = await api.visitProducts(visitId);
+    final payload = Map<String, dynamic>.from(response.data as Map);
+    final raw = payload['data'];
+    return (raw is List ? raw : const <dynamic>[])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
+  }
+
+  Future<void> addProduct(
+    int visitId, {
+    required int productId,
+    int? quantity,
+    bool? availability,
+    String? notes,
+  }) async {
+    await api.addVisitProduct(visitId, {
+      'product_id': productId,
+      if (quantity != null) 'quantity': quantity,
+      if (availability != null) 'availability': availability,
+      if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
+    });
+  }
+
+  Future<void> removeProduct(int visitId, int visitProductId) async {
+    await api.removeVisitProduct(visitId, visitProductId);
+  }
+
   Future<void> refresh() => fetchVisits();
 }
+
+/// Fetches the completed visit history from /visits/history.
+final visitHistoryProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+  final api = ref.watch(businessApiProvider);
+  final response = await api.visitHistory();
+  final payload = Map<String, dynamic>.from(response.data as Map);
+  final raw = payload['data'];
+  final list = raw is Map ? raw['data'] : raw;
+  return (list as List<dynamic>? ?? const [])
+      .map((e) => Map<String, dynamic>.from(e as Map))
+      .toList();
+});

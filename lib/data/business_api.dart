@@ -107,4 +107,10 @@ class BusinessApi {
   Future<Response> markNotificationRead(int id) => client.post('/notifications/$id/mark-as-read');
   Future<Response> markAllNotificationsRead() => client.post('/notifications/mark-all-as-read');
   Future<Response> unreadCount() => client.get('/notifications/unread-count');
+
+  Future<Response> kpiSummary({Map<String, dynamic>? query}) => client.get('/kpis/summary', queryParameters: query);
+  Future<Response> kpiTargets({Map<String, dynamic>? query}) => client.get('/kpis', queryParameters: query);
+  Future<Response> createKpiTarget(Map<String, dynamic> data) => client.post('/kpis', data: data);
+  Future<Response> updateKpiTarget(int id, Map<String, dynamic> data) => client.put('/kpis/$id', data: data);
+  Future<Response> deleteKpiTarget(int id) => client.delete('/kpis/$id');
 }

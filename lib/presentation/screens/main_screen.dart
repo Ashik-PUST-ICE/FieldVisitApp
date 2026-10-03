@@ -7,6 +7,8 @@ import 'package:field_visit_app/presentation/screens/dashboard_screen.dart';
 import 'package:field_visit_app/presentation/screens/map_screen.dart';
 import 'package:field_visit_app/presentation/screens/more_screen.dart';
 import 'package:field_visit_app/presentation/screens/notifications_screen.dart';
+import 'package:field_visit_app/presentation/providers/notifications_provider.dart';
+import 'package:field_visit_app/presentation/screens/kpi_screen.dart';
 import 'package:field_visit_app/presentation/screens/outlets_screen.dart';
 import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
@@ -137,11 +139,44 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     onPressed: () => _openScreen(const AccountScreen()),
                   ),
 
-                  // Notifications Bell
-                  IconButton(
-                    tooltip: 'Alerts',
-                    icon: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 24),
-                    onPressed: () => _openScreen(const NotificationsScreen()),
+                  // Notifications Bell with Unread Badge
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final unread = ref.watch(unreadNotificationsCountProvider);
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          IconButton(
+                            tooltip: 'Alerts',
+                            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 24),
+                            onPressed: () => _openScreen(const NotificationsScreen()),
+                          ),
+                          if (unread > 0)
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Color(0xFFEF4444),
+                                  shape: BoxShape.circle,
+                                ),
+                                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                                child: Text(
+                                  unread > 99 ? '99+' : '$unread',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w800,
+                                    height: 1,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
 
                   // Logout Icon
@@ -412,6 +447,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   _buildDrawerTile(Icons.home_rounded, 'Home Dashboard', () => _selectTab(0)),
                   _buildDrawerTile(Icons.storefront_rounded, 'Outlets & Stores', () => _selectTab(1)),
                   _buildDrawerTile(Icons.assignment_rounded, 'My Field Visits', () => _selectTab(2)),
+                  _buildDrawerTile(Icons.fact_check_rounded, 'Target & KPIs', () => _openScreen(const KpiScreen())),
                   _buildDrawerTile(Icons.map_rounded, 'Field Route & Map', () => _openScreen(const MapScreen())),
                   _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports', () => _openScreen(const ReportsScreen())),
                   _buildDrawerTile(Icons.settings_rounded, 'Settings & Profile', () => _openScreen(const AccountScreen())),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
@@ -281,26 +282,49 @@ class _OutletCard extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                InkWell(
-                  onTap: () => _showOutletForm(context, ref, outlet: outlet),
-                  borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.edit_outlined, size: 16, color: Color(0xFF0D9488)),
-                        SizedBox(width: 4),
-                        Text('Edit Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0D9488))),
-                      ],
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: () => _showOutletForm(context, ref, outlet: outlet),
+                      borderRadius: BorderRadius.circular(8),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit_outlined, size: 16, color: Color(0xFF136B3E)),
+                            SizedBox(width: 4),
+                            Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF136B3E))),
+                          ],
+                        ),
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 4),
+                    InkWell(
+                      onTap: () => _showOutletQrDialog(context, ref, outlet),
+                      borderRadius: BorderRadius.circular(8),
+                      child: const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.qr_code_2_rounded, size: 16, color: Color(0xFFD97706)),
+                            SizedBox(width: 4),
+                            Text('QR Code', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFD97706))),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 PopupMenuButton<String>(
                   icon: const Icon(Icons.more_horiz_rounded, size: 22),
                   onSelected: (action) async {
                     final notifier = ref.read(outletsProvider.notifier);
-                    if (action == 'edit') {
+                    if (action == 'qr_view') {
+                      _showOutletQrDialog(context, ref, outlet);
+                    } else if (action == 'edit') {
                       if (context.mounted) _showOutletForm(context, ref, outlet: outlet);
                     } else if (action == 'qr') {
                       await notifier.regenerateQr(outlet.id);
@@ -335,6 +359,7 @@ class _OutletCard extends ConsumerWidget {
                     }
                   },
                   itemBuilder: (_) => const [
+                    PopupMenuItem(value: 'qr_view', child: Text('View & Download QR')),
                     PopupMenuItem(value: 'edit', child: Text('Edit Info')),
                     PopupMenuItem(value: 'qr', child: Text('Regenerate QR Token')),
                     PopupMenuItem(value: 'deactivate', child: Text('Deactivate QR')),
@@ -348,6 +373,147 @@ class _OutletCard extends ConsumerWidget {
       ),
     );
   }
+}
+
+Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet outlet) async {
+  final qrToken = outlet.qrToken ?? 'OUTLET-${outlet.id}';
+  final qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${Uri.encodeComponent(qrToken)}';
+  final downloadUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&download=1&data=${Uri.encodeComponent(qrToken)}';
+
+  await showDialog<void>(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      title: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: const Color(0xFF136B3E).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: const Icon(Icons.qr_code_2_rounded, color: Color(0xFF136B3E), size: 24),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(outlet.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                Text('Code: ${outlet.code ?? "#${outlet.id}"}',
+                    style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+              ],
+            ),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 300,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+                ],
+              ),
+              child: Image.network(
+                qrUrl,
+                width: 200,
+                height: 200,
+                loadingBuilder: (_, child, progress) => progress == null
+                    ? child
+                    : const SizedBox(
+                        width: 200,
+                        height: 200,
+                        child: Center(child: CircularProgressIndicator(color: Color(0xFF136B3E))),
+                      ),
+                errorBuilder: (_, __, ___) => const SizedBox(
+                  width: 200,
+                  height: 200,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.broken_image_rounded, size: 40, color: Colors.grey),
+                        SizedBox(height: 8),
+                        Text('Unable to load QR image', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Text(
+                'Token: $qrToken',
+                style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color(0xFF334155)),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Close'),
+        ),
+        // ── Download QR ──────────────────────────────────────────────
+        OutlinedButton.icon(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.primary),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () async {
+            final uri = Uri.parse(downloadUrl);
+            if (await canLaunchUrl(uri)) {
+              await launchUrl(uri, mode: LaunchMode.externalApplication);
+            } else {
+              if (ctx.mounted) {
+                ScaffoldMessenger.of(ctx).showSnackBar(
+                  const SnackBar(content: Text('Could not open download link')),
+                );
+              }
+            }
+          },
+          icon: const Icon(Icons.download_rounded, size: 16),
+          label: const Text('Download'),
+        ),
+        // ── Regenerate ───────────────────────────────────────────────
+        FilledButton.icon(
+          style: FilledButton.styleFrom(
+            backgroundColor: const Color(0xFF136B3E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () async {
+            await ref.read(outletsProvider.notifier).regenerateQr(outlet.id);
+            if (ctx.mounted) Navigator.pop(ctx);
+            if (context.mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('QR token regenerated!'), backgroundColor: Color(0xFF136B3E)),
+              );
+            }
+          },
+          icon: const Icon(Icons.refresh_rounded, size: 16),
+          label: const Text('Regenerate'),
+        ),
+      ],
+    ),
+  );
 }
 
 Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
@@ -405,35 +571,41 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
   final longitude = TextEditingController(text: outlet?.longitude?.toString());
   final radius = TextEditingController(text: outlet?.geofenceRadius?.toString());
 
-  await CellfinFormModal.show(
+  await CellfinFormScreen.push(
     context: context,
     title: outlet == null ? 'Add Retail Outlet' : 'Edit Outlet Details',
+    officerName: 'OUTLET REGISTRATION',
+    officerInfo: 'Retail Partner Directory Entry',
     cards: const [
       CellfinCardItem(title: 'Retail Store', icon: Icons.store_rounded),
       CellfinCardItem(title: 'Wholesale', icon: Icons.warehouse_rounded),
       CellfinCardItem(title: 'Supermarket', icon: Icons.local_mall_outlined),
       CellfinCardItem(title: 'Dealer Hub', icon: Icons.business_center_rounded),
     ],
-    submitText: 'Submit',
+    submitText: outlet == null ? 'Create Outlet' : 'Save Changes',
     fields: [
       CellfinInputField(
         controller: name,
         hint: 'Receiver / Outlet Store Name *',
+        prefixIcon: const Icon(Icons.storefront_rounded, color: Color(0xFF6B7280)),
         validator: (v) => v == null || v.trim().isEmpty ? 'Outlet name is required' : null,
       ),
       CellfinInputField(
         controller: code,
         hint: 'Outlet Code (Optional e.g. OUT-104)',
+        prefixIcon: const Icon(Icons.tag_rounded, color: Color(0xFF6B7280)),
       ),
       CellfinInputField(
         controller: address,
         hint: 'Full Store / Market Address *',
+        prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
         validator: (v) => v == null || v.trim().isEmpty ? 'Address is required' : null,
       ),
       CellfinInputField(
         controller: phone,
         keyboardType: TextInputType.phone,
         hint: 'Store Contact Phone Number',
+        prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF6B7280)),
       ),
       Row(
         children: [
@@ -442,6 +614,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
               controller: latitude,
               hint: 'GPS Latitude',
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              prefixIcon: const Icon(Icons.my_location_rounded, color: Color(0xFF6B7280)),
             ),
           ),
           const SizedBox(width: 10),
@@ -450,6 +623,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
               controller: longitude,
               hint: 'GPS Longitude',
               keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
             ),
           ),
         ],
@@ -458,6 +632,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
         controller: radius,
         keyboardType: TextInputType.number,
         hint: 'Geofence Radius (Meters)',
+        prefixIcon: const Icon(Icons.radar_rounded, color: Color(0xFF6B7280)),
       ),
     ],
     onSubmit: () async {

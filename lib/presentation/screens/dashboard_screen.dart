@@ -13,6 +13,7 @@ import 'package:field_visit_app/presentation/screens/orders_screen.dart';
 import 'package:field_visit_app/presentation/screens/outlets_screen.dart';
 import 'package:field_visit_app/presentation/screens/products_screen.dart';
 import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
+import 'package:field_visit_app/presentation/screens/kpi_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
 import 'package:field_visit_app/presentation/screens/role_permissions_screen.dart';
 import 'package:field_visit_app/presentation/screens/visits_screen.dart';
@@ -92,8 +93,6 @@ class DashboardScreen extends ConsumerWidget {
     final officerName = user != null && user.fullName.isNotEmpty
         ? user.fullName.toUpperCase()
         : 'FIELD OFFICER';
-    final visited = data['visited_today'] ?? 0;
-    final total = data['total_outlets'] ?? 0;
     final coverage = data['coverage_percentage'] ?? 0;
 
     return Container(
@@ -160,17 +159,7 @@ class DashboardScreen extends ConsumerWidget {
 
               // Golden Target Coverage Pill Button
               InkWell(
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      backgroundColor: AppColors.cellfinDarkGreen,
-                      content: Text(
-                        'Today\'s Progress: $visited of $total outlets visited ($coverage% coverage)',
-                        style: const TextStyle(fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  );
-                },
+                onTap: () => _open(context, const KpiScreen()),
                 borderRadius: BorderRadius.circular(24),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
@@ -335,7 +324,7 @@ class DashboardScreen extends ConsumerWidget {
               _buildCircularMintItem(
                 icon: Icons.fact_check_rounded,
                 title: 'Target\nKPIs',
-                onTap: () => _open(context, const ReportsScreen()),
+                onTap: () => _open(context, const KpiScreen()),
               ),
             ],
           ),

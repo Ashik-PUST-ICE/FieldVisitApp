@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/visit.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/presentation/providers/visits_provider.dart';
-import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
+import 'package:field_visit_app/presentation/screens/orders_screen.dart';
+import 'package:field_visit_app/presentation/screens/visit_details_screens.dart';
+
 
 class VisitsScreen extends ConsumerStatefulWidget {
   const VisitsScreen({super.key});
@@ -16,8 +18,21 @@ class VisitsScreen extends ConsumerStatefulWidget {
   ConsumerState<VisitsScreen> createState() => _VisitsScreenState();
 }
 
-class _VisitsScreenState extends ConsumerState<VisitsScreen> {
+class _VisitsScreenState extends ConsumerState<VisitsScreen> with SingleTickerProviderStateMixin {
   String _filter = 'all'; // 'all', 'in_progress', 'completed'
+  late final TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,85 +44,113 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen> {
         title: const Text('Field Visits', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
+            tooltip: 'Sync Cloud Visits',
+            icon: const Icon(Icons.cloud_sync_rounded),
+            onPressed: () {
+              ref.read(visitsProvider.notifier).refresh();
+              ref.invalidate(visitHistoryProvider);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Visits synced with cloud server!'),
+                  backgroundColor: Color(0xFF136B3E),
+                ),
+              );
+            },
+          ),
+          IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh_rounded),
-            onPressed: () => ref.read(visitsProvider.notifier).refresh(),
+            onPressed: () {
+              ref.read(visitsProvider.notifier).refresh();
+              ref.invalidate(visitHistoryProvider);
+            },
           ),
         ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: AppColors.primary,
+          indicatorWeight: 3,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: isDark ? Colors.white60 : Colors.grey,
+          labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+          tabs: const [
+            Tab(text: 'Active Visits', icon: Icon(Icons.assignment_rounded, size: 18)),
+            Tab(text: 'History', icon: Icon(Icons.history_rounded, size: 18)),
+          ],
+        ),
       ),
-      body: Column(
+      body: TabBarView(
+        controller: _tabController,
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            color: isDark ? const Color(0xFF0F172A) : Colors.white,
-            child: Row(
-              children: [
-                _buildFilterChip('All Visits', 'all', isDark),
-                const SizedBox(width: 8),
-                _buildFilterChip('In Progress', 'in_progress', isDark),
-                const SizedBox(width: 8),
-                _buildFilterChip('Completed', 'completed', isDark),
-              ],
-            ),
-          ),
-          Expanded(
-            child: RefreshIndicator(
-              color: AppColors.primary,
-              onRefresh: () => ref.read(visitsProvider.notifier).refresh(),
-              child: visitsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
-                error: (error, _) => _ErrorView(
-                  error: error,
-                  onRetry: () => ref.read(visitsProvider.notifier).refresh(),
+          // ── Tab 1: Active Visits ──────────────────────────────────
+          Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                color: isDark ? const Color(0xFF0F172A) : Colors.white,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      _buildFilterChip('All', 'all', isDark),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('In Progress', 'in_progress', isDark),
+                      const SizedBox(width: 8),
+                      _buildFilterChip('Completed', 'completed', isDark),
+                    ],
+                  ),
                 ),
-                data: (visits) {
-                  final filtered = visits.where((v) {
-                    if (_filter == 'all') return true;
-                    final st = (v.status ?? '').toLowerCase();
-                    if (_filter == 'completed') {
-                      return st.contains('complete') || st.contains('verified');
-                    }
-                    if (_filter == 'in_progress') {
-                      return st.contains('progress') || st.contains('started');
-                    }
-                    return true;
-                  }).toList();
+              ),
+              Expanded(
+                child: RefreshIndicator(
+                  color: AppColors.primary,
+                  onRefresh: () => ref.read(visitsProvider.notifier).refresh(),
+                  child: visitsAsync.when(
+                    loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                    error: (error, _) => _ErrorView(
+                      error: error,
+                      onRetry: () => ref.read(visitsProvider.notifier).refresh(),
+                    ),
+                    data: (visits) {
+                      final filtered = visits.where((v) {
+                        if (_filter == 'all') return true;
+                        final st = (v.status ?? '').toLowerCase();
+                        if (_filter == 'completed') return st.contains('complete') || st.contains('verified');
+                        if (_filter == 'in_progress') return st.contains('progress') || st.contains('started');
+                        return true;
+                      }).toList();
 
-                  if (filtered.isEmpty) {
-                    return ListView(
-                      children: [
-                        const SizedBox(height: 120),
-                        Center(
-                          child: Column(
-                            children: [
+                      if (filtered.isEmpty) {
+                        return ListView(children: [
+                          const SizedBox(height: 120),
+                          Center(
+                            child: Column(children: [
                               Container(
                                 padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  color: AppColors.primary.withOpacity(0.08),
-                                  shape: BoxShape.circle,
-                                ),
+                                decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.08), shape: BoxShape.circle),
                                 child: const Icon(Icons.assignment_outlined, size: 48, color: AppColors.primary),
                               ),
                               const SizedBox(height: 16),
                               const Text('No visits found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text('Tap "Start Visit" button below to create one', style: TextStyle(color: Colors.grey, fontSize: 13)),
-                            ],
+                              const Text('Tap "Start Visit" below to begin', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                            ]),
                           ),
-                        ),
-                      ],
-                    );
-                  }
-
-                  return ListView.builder(
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
-                    itemCount: filtered.length,
-                    itemBuilder: (_, index) => _VisitTile(visit: filtered[index]),
-                  );
-                },
+                        ]);
+                      }
+                      return ListView.builder(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
+                        itemCount: filtered.length,
+                        itemBuilder: (_, i) => _VisitTile(visit: filtered[i]),
+                      );
+                    },
+                  ),
+                ),
               ),
-            ),
+            ],
           ),
+          // ── Tab 2: Visit History ──────────────────────────────────
+          _VisitHistoryTab(isDark: isDark),
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -130,9 +173,7 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen> {
         duration: const Duration(milliseconds: 180),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected
-              ? AppColors.primary
-              : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
+          color: isSelected ? AppColors.primary : (isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9)),
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
@@ -144,6 +185,175 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+// ─── Visit History Tab ───────────────────────────────────────────────────────
+
+class _VisitHistoryTab extends ConsumerWidget {
+  final bool isDark;
+  const _VisitHistoryTab({required this.isDark});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final historyAsync = ref.watch(visitHistoryProvider);
+    return RefreshIndicator(
+      color: AppColors.primary,
+      onRefresh: () async => ref.invalidate(visitHistoryProvider),
+      child: historyAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        error: (e, _) => Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(color: AppColors.errorLight, shape: BoxShape.circle),
+              child: const Icon(Icons.history_toggle_off_rounded, size: 48, color: AppColors.error),
+            ),
+            const SizedBox(height: 16),
+            const Text('Could not load history', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            const SizedBox(height: 8),
+            Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+              onPressed: () => ref.invalidate(visitHistoryProvider),
+              child: const Text('Retry'),
+            ),
+          ]),
+        ),
+        data: (history) {
+          if (history.isEmpty) {
+            return ListView(children: [
+              const SizedBox(height: 120),
+              Center(child: Column(children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(color: AppColors.primary.withOpacity(0.08), shape: BoxShape.circle),
+                  child: const Icon(Icons.history_rounded, size: 48, color: AppColors.primary),
+                ),
+                const SizedBox(height: 16),
+                const Text('No visit history yet', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 6),
+                const Text('Completed visits will appear here', style: TextStyle(color: Colors.grey, fontSize: 13)),
+              ])),
+            ]);
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            itemCount: history.length,
+            itemBuilder: (_, i) => _HistoryCard(record: history[i], isDark: isDark, index: i),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _HistoryCard extends StatelessWidget {
+  final Map<String, dynamic> record;
+  final bool isDark;
+  final int index;
+  const _HistoryCard({required this.record, required this.isDark, required this.index});
+
+  @override
+  Widget build(BuildContext context) {
+    final status = (record['status'] ?? '').toString().toLowerCase();
+    final isComplete = status.contains('complete') || status.contains('verified');
+    final color = isComplete ? AppColors.primary : AppColors.warning;
+    final createdAt = record['created_at']?.toString() ?? '';
+    String formattedDate = createdAt;
+    try {
+      if (createdAt.isNotEmpty) {
+        final dt = DateTime.parse(createdAt).toLocal();
+        formattedDate = DateFormat('dd MMM yyyy, hh:mm a').format(dt);
+      }
+    } catch (_) {}
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Timeline line
+        Column(children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.15),
+              shape: BoxShape.circle,
+              border: Border.all(color: color.withOpacity(0.4), width: 2),
+            ),
+            child: Icon(isComplete ? Icons.check_rounded : Icons.pending_rounded, size: 18, color: color),
+          ),
+          Container(width: 2, height: 60, color: isDark ? AppColors.darkBorder : AppColors.border),
+        ]),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.darkCard : Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+              boxShadow: AppColors.cardShadow,
+            ),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                Text(
+                  'Visit #${record['id'] ?? index + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    isComplete ? 'Completed' : (record['status']?.toString() ?? 'Unknown'),
+                    style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 6),
+              if (record['outlet_id'] != null)
+                _InfoRow(icon: Icons.store_rounded, text: 'Outlet #${record['outlet_id']}', isDark: isDark),
+              if (formattedDate.isNotEmpty)
+                _InfoRow(icon: Icons.access_time_rounded, text: formattedDate, isDark: isDark),
+              if (record['remarks'] != null && record['remarks'].toString().isNotEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    record['remarks'].toString(),
+                    style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.grey[600], fontStyle: FontStyle.italic),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final bool isDark;
+  const _InfoRow({required this.icon, required this.text, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(top: 3),
+      child: Row(children: [
+        Icon(icon, size: 13, color: isDark ? Colors.white38 : Colors.grey),
+        const SizedBox(width: 5),
+        Expanded(child: Text(text, style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.grey[600]))),
+      ]),
     );
   }
 }
@@ -317,6 +527,8 @@ class _VisitTile extends ConsumerWidget {
                         await _showVisitCompetitors(context, ref, visit);
                       } else if (action == 'photos') {
                         await _showVisitPhotos(context, ref, visit);
+                      } else if (action == 'take_order') {
+                        Navigator.push(context, MaterialPageRoute(builder: (_) => const OrdersScreen()));
                       } else if (action == 'delete') {
                         await notifier.remove(visit.id);
                       }
@@ -327,6 +539,16 @@ class _VisitTile extends ConsumerWidget {
                     }
                   },
                   itemBuilder: (_) => const [
+                    PopupMenuItem(
+                      value: 'take_order',
+                      child: Row(
+                        children: [
+                          Icon(Icons.add_shopping_cart_rounded, size: 18, color: Color(0xFF10B981)),
+                          SizedBox(width: 8),
+                          Text('Book / Take Order'),
+                        ],
+                      ),
+                    ),
                     PopupMenuItem(value: 'products', child: Text('Visit Products')),
                     PopupMenuItem(value: 'competitors', child: Text('Competitor Analysis')),
                     PopupMenuItem(value: 'delete', child: Text('Delete Visit', style: TextStyle(color: Colors.red))),
@@ -349,11 +571,11 @@ class _VisitTile extends ConsumerWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 16, color: const Color(0xFF0D9488)),
+            Icon(icon, size: 16, color: const Color(0xFF136B3E)),
             const SizedBox(width: 4),
             Text(
               label,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0D9488)),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF136B3E)),
             ),
           ],
         ),
@@ -363,192 +585,24 @@ class _VisitTile extends ConsumerWidget {
 }
 
 Future<void> _showVisitPhotos(BuildContext context, WidgetRef ref, Visit visit) async {
-  try {
-    final response = await ref.read(businessApiProvider).visitPhotos(visit.id);
-    final payload = Map<String, dynamic>.from(response.data as Map);
-    final raw = payload['data'];
-    final items = (raw is List ? raw : const <dynamic>[]).map((e) => Map<String, dynamic>.from(e as Map)).toList();
-    if (!context.mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Visit #${visit.id} Photos'),
-        content: SizedBox(
-          width: 420,
-          child: items.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Center(child: Text('No photos uploaded yet')),
-                )
-              : ListView(
-                  shrinkWrap: true,
-                  children: items
-                      .map((item) => ListTile(
-                            leading: Container(
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                color: AppColors.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Icon(Icons.photo_rounded, color: AppColors.primary),
-                            ),
-                            title: Text('${item['caption'] ?? 'Visit photo'}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                            subtitle: Text('${item['created_at'] ?? ''}'),
-                          ))
-                      .toList(),
-                ),
-        ),
-        actions: [
-          FilledButton.icon(
-            style: FilledButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              _uploadVisitPhoto(context, ref, visit);
-            },
-            icon: const Icon(Icons.camera_alt_rounded, size: 18),
-            label: const Text('Take/Upload Photo'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
-          ),
-        ],
-      ),
-    );
-  } catch (e) {
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
-    }
-  }
-}
-
-Future<void> _uploadVisitPhoto(BuildContext context, WidgetRef ref, Visit visit) async {
-  final picker = ImagePicker();
-  final file = await picker.pickImage(source: ImageSource.gallery, imageQuality: 85);
-  if (!context.mounted) return;
-  if (file == null) return;
-  final caption = TextEditingController();
-  await showDialog<void>(
-    context: context,
-    builder: (dialogContext) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text('Upload Visit Photo'),
-      content: TextField(
-        controller: caption,
-        decoration: InputDecoration(
-          labelText: 'Caption (e.g., Shelf display, store front)',
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
-      actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
-        FilledButton(
-          style: FilledButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-          onPressed: () async {
-            try {
-              await ref.read(businessApiProvider).uploadVisitPhotoBytes(
-                    visit.id,
-                    await file.readAsBytes(),
-                    file.name,
-                    caption: caption.text,
-                  );
-              if (dialogContext.mounted) Navigator.pop(dialogContext);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Photo uploaded successfully!')));
-              }
-            } catch (e) {
-              if (dialogContext.mounted) {
-                ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
-              }
-            }
-          },
-          child: const Text('Upload Photo'),
-        ),
-      ],
-    ),
+  await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => VisitPhotosScreen(visit: visit)),
   );
-  caption.dispose();
 }
 
 Future<void> _showVisitProducts(BuildContext context, WidgetRef ref, Visit visit) async {
-  try {
-    final response = await ref.read(businessApiProvider).visitProducts(visit.id);
-    final payload = Map<String, dynamic>.from(response.data as Map);
-    final raw = payload['data'];
-    final items = (raw is List ? raw : const <dynamic>[]).map((e) => Map<String, dynamic>.from(e as Map)).toList();
-    if (!context.mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Visit #${visit.id} Products'),
-        content: SizedBox(
-          width: 420,
-          child: items.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Center(child: Text('No products checked during this visit')),
-                )
-              : ListView(
-                  shrinkWrap: true,
-                  children: items
-                      .map((item) => ListTile(
-                            title: Text('Product #${item['product_id']}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                            subtitle: Text('Quantity: ${item['quantity'] ?? 0}'),
-                          ))
-                      .toList(),
-                ),
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
-      ),
-    );
-  } catch (e) {
-    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
-  }
+  await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => VisitProductsScreen(visit: visit)),
+  );
 }
 
 Future<void> _showVisitCompetitors(BuildContext context, WidgetRef ref, Visit visit) async {
-  try {
-    final response = await ref.read(businessApiProvider).visitCompetitors(visit.id);
-    final payload = Map<String, dynamic>.from(response.data as Map);
-    final raw = payload['data'];
-    final items = (raw is List ? raw : const <dynamic>[]).map((e) => Map<String, dynamic>.from(e as Map)).toList();
-    if (!context.mounted) return;
-    await showDialog<void>(
-      context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Visit #${visit.id} Competitors'),
-        content: SizedBox(
-          width: 420,
-          child: items.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 20),
-                  child: Center(child: Text('No competitor data recorded')),
-                )
-              : ListView(
-                  shrinkWrap: true,
-                  children: items
-                      .map((item) => ListTile(
-                            title: Text('Competitor #${item['competitor_id']}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                            subtitle: Text('${item['notes'] ?? 'No notes'}'),
-                          ))
-                      .toList(),
-                ),
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(context), child: const Text('Close'))],
-      ),
-    );
-  } catch (e) {
-    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_apiErrorMessage(e))));
-  }
+  await Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => VisitCompetitorsScreen(visit: visit)),
+  );
 }
 
 Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
@@ -563,21 +617,23 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
   final latitude = TextEditingController();
   final longitude = TextEditingController();
 
-  await CellfinFormModal.show(
+  await CellfinFormScreen.push(
     context: context,
     title: 'Start Field Visit',
+    officerName: 'FIELD OFFICER INITIATION',
+    officerInfo: 'Real-time GPS Check-in',
     cards: const [
       CellfinCardItem(title: 'Routine', icon: Icons.storefront_rounded),
       CellfinCardItem(title: 'Sales Call', icon: Icons.trending_up_rounded),
       CellfinCardItem(title: 'Audit', icon: Icons.fact_check_outlined),
       CellfinCardItem(title: 'Collection', icon: Icons.receipt_long_rounded),
     ],
-    submitText: 'Submit',
+    submitText: 'Start Visit',
     fields: [
       StatefulBuilder(
         builder: (context, setDropState) => CellfinDropdownField<int>(
           value: selectedOutletId,
-          hint: 'Receiver Outlet Account',
+          hint: 'Select Outlet *',
           items: outlets
               .map((outlet) => DropdownMenuItem<int>(
                     value: outlet.id,
@@ -591,11 +647,13 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
         controller: latitude,
         hint: 'GPS Latitude (Optional)',
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        prefixIcon: const Icon(Icons.my_location_rounded, color: Color(0xFF6B7280)),
       ),
       CellfinInputField(
         controller: longitude,
         hint: 'GPS Longitude (Optional)',
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
       ),
     ],
     onSubmit: () async {
@@ -630,27 +688,31 @@ Future<void> _showVerifyLocation(BuildContext context, WidgetRef ref, Visit visi
   final latitude = TextEditingController(text: visit.latitude);
   final longitude = TextEditingController(text: visit.longitude);
 
-  await CellfinFormModal.show(
+  await CellfinFormScreen.push(
     context: context,
     title: 'Verify GPS Coordinates',
+    officerName: 'LOCATION VERIFICATION',
+    officerInfo: 'Visit #${visit.id} Geofence Check',
     cards: const [
       CellfinCardItem(title: 'GPS Auto', icon: Icons.my_location_rounded),
       CellfinCardItem(title: 'Manual Pin', icon: Icons.edit_location_alt_rounded),
       CellfinCardItem(title: 'Geofence', icon: Icons.fmd_good_outlined),
       CellfinCardItem(title: 'QR Match', icon: Icons.qr_code_2_rounded),
     ],
-    submitText: 'Submit',
+    submitText: 'Confirm Location',
     fields: [
       CellfinInputField(
         controller: latitude,
         hint: 'GPS Latitude *',
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        prefixIcon: const Icon(Icons.my_location_rounded, color: Color(0xFF6B7280)),
         validator: (v) => v == null || v.trim().isEmpty ? 'Latitude is required' : null,
       ),
       CellfinInputField(
         controller: longitude,
         hint: 'GPS Longitude *',
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
         validator: (v) => v == null || v.trim().isEmpty ? 'Longitude is required' : null,
       ),
     ],
@@ -679,21 +741,24 @@ Future<void> _showVerifyLocation(BuildContext context, WidgetRef ref, Visit visi
 Future<void> _showCompleteVisit(BuildContext context, WidgetRef ref, Visit visit) async {
   final remarks = TextEditingController();
 
-  await CellfinFormModal.show(
+  await CellfinFormScreen.push(
     context: context,
     title: 'Complete Field Visit',
+    officerName: 'VISIT SIGN-OFF',
+    officerInfo: 'Visit #${visit.id} Finalization',
     cards: const [
       CellfinCardItem(title: 'Completed', icon: Icons.check_circle_outline_rounded),
       CellfinCardItem(title: 'Partial', icon: Icons.published_with_changes_rounded),
       CellfinCardItem(title: 'Follow-up', icon: Icons.event_repeat_rounded),
       CellfinCardItem(title: 'Reschedule', icon: Icons.calendar_month_outlined),
     ],
-    submitText: 'Submit',
+    submitText: 'Complete Visit',
     fields: [
       CellfinInputField(
         controller: remarks,
-        hint: 'Note / Visit Observation',
-        maxLines: 3,
+        hint: 'Note / Visit Observation & Feedback',
+        maxLines: 4,
+        prefixIcon: const Icon(Icons.notes_rounded, color: Color(0xFF6B7280)),
       ),
     ],
     onSubmit: () async {

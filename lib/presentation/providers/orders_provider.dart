@@ -39,6 +39,10 @@ class OrdersNotifier extends StateNotifier<AsyncValue<List<Map<String, dynamic>>
     await api.createOrderItem(orderId, data);
   }
 
+  Future<void> updateItem(int orderId, int itemId, Map<String, dynamic> data) async {
+    await api.updateOrderItem(orderId, itemId, data);
+  }
+
   Future<void> deleteItem(int orderId, int itemId) async {
     await api.deleteOrderItem(orderId, itemId);
   }

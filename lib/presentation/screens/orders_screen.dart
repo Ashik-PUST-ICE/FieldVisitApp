@@ -359,23 +359,42 @@ Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async 
               : ListView(
                   shrinkWrap: true,
                   children: items.map((item) {
-                    return ListTile(
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(10),
+                    final itemId = (item['id'] as num).toInt();
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: ListTile(
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: const Icon(Icons.inventory_rounded, color: AppColors.primary),
                         ),
-                        child: const Icon(Icons.inventory_rounded, color: AppColors.primary),
-                      ),
-                      title: Text('Product #${item['product_id']}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                      subtitle: Text('Qty: ${item['quantity']} • Total: ৳${item['total_price']}'),
-                      trailing: IconButton(
-                        icon: const Icon(Icons.delete_outline_rounded, color: Colors.red),
-                        onPressed: () async {
-                          await ref.read(ordersProvider.notifier).deleteItem(orderId, (item['id'] as num).toInt());
-                          if (context.mounted) Navigator.pop(context);
-                        },
+                        title: Text('Product #${item['product_id']}', style: const TextStyle(fontWeight: FontWeight.w700)),
+                        subtitle: Text('Qty: ${item['quantity']} • Unit: ৳${item['unit_price'] ?? 0} • Total: ৳${item['total_price']}'),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit_rounded, color: AppColors.primary, size: 20),
+                              tooltip: 'Edit item',
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _showEditItem(context, ref, orderId, itemId, item);
+                              },
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 20),
+                              tooltip: 'Remove item',
+                              onPressed: () async {
+                                await ref.read(ordersProvider.notifier).deleteItem(orderId, itemId);
+                                if (context.mounted) Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   }).toList(),
@@ -470,6 +489,61 @@ Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) asyn
     },
   );
   productId.dispose();
+  quantity.dispose();
+  price.dispose();
+}
+
+Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId, int itemId, Map<String, dynamic> item) async {
+  final quantity = TextEditingController(text: '${item['quantity'] ?? 1}');
+  final price = TextEditingController(text: '${item['unit_price'] ?? 0}');
+
+  await CellfinFormModal.show(
+    context: context,
+    title: 'Edit Line Item #$itemId',
+    cards: const [
+      CellfinCardItem(title: 'Update Qty', icon: Icons.edit_rounded),
+      CellfinCardItem(title: 'Reprice', icon: Icons.price_change_rounded),
+      CellfinCardItem(title: 'Correction', icon: Icons.edit_note_rounded),
+      CellfinCardItem(title: 'Discount', icon: Icons.discount_outlined),
+    ],
+    submitText: 'Update Item',
+    fields: [
+      CellfinInputField(
+        controller: quantity,
+        keyboardType: TextInputType.number,
+        hint: 'Updated Quantity *',
+        prefixIcon: const Icon(Icons.format_list_numbered_rounded, color: Color(0xFF6B7280)),
+        validator: (v) => v == null || v.trim().isEmpty ? 'Quantity is required' : null,
+      ),
+      CellfinInputField(
+        controller: price,
+        keyboardType: TextInputType.number,
+        hint: 'Updated Unit Price',
+        suffixText: '৳',
+        validator: (v) => v == null || v.trim().isEmpty ? 'Price is required' : null,
+      ),
+    ],
+    onSubmit: () async {
+      final q = int.tryParse(quantity.text) ?? 0;
+      final u = int.tryParse(price.text) ?? 0;
+      if (q < 1) return;
+      try {
+        await ref.read(ordersProvider.notifier).updateItem(orderId, itemId, {
+          'quantity': q,
+          'unit_price': u,
+          'total_price': q * u,
+        });
+        if (context.mounted) {
+          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Item updated!'), backgroundColor: AppColors.cellfinGreen),
+          );
+        }
+      } catch (e) {
+        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+      }
+    },
+  );
   quantity.dispose();
   price.dispose();
 }

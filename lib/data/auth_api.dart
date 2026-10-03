@@ -15,6 +15,9 @@ class AuthApi {
   Future<Response> me() => userClient.get('/me');
   Future<Response> logout() => userClient.post('/logout');
   Future<Response> updateProfile(Map<String, dynamic> data) => userClient.put('/profile', data: data);
+  Future<Response> storageSettings() => userClient.get('/storage-settings');
+  Future<Response> updateStorageSettings(Map<String, dynamic> data) => userClient.put('/storage-settings', data: data);
+  Future<Response> testStorageSettings() => userClient.post('/storage-settings/test');
   Future<Response> updateProfileWithImage(
     Map<String, dynamic> data, {
     required List<int> bytes,

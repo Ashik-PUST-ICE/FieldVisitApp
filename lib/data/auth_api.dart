@@ -12,10 +12,25 @@ class AuthApi {
       publicClient.post('/auth/login', data: {'email': email, 'password': password});
   Future<Response> register(Map<String, dynamic> data) => publicClient.post('/auth/register', data: data);
   Future<Response> forgotPassword(String email) => publicClient.post('/auth/forgot-password', data: {'email': email});
-  Future<Response> changePassword(Map<String, dynamic> data) => userClient.post('/auth/change-password', data: data);
   Future<Response> me() => userClient.get('/me');
   Future<Response> logout() => userClient.post('/logout');
   Future<Response> updateProfile(Map<String, dynamic> data) => userClient.put('/profile', data: data);
+  Future<Response> updateProfileWithImage(
+    Map<String, dynamic> data, {
+    required List<int> bytes,
+    required String filename,
+  }) {
+    return userClient.put('/profile', data: FormData.fromMap({
+      ...data,
+      'image': MultipartFile.fromBytes(bytes, filename: filename),
+    }));
+  }
+  Future<Response> securitySettings() => userClient.get('/security-settings');
+  Future<Response> changePin(Map<String, dynamic> data) => userClient.post('/security-settings/change-pin', data: data);
+  Future<Response> updateMnp(String mnp) => userClient.put('/security-settings/mnp', data: {'mnp': mnp});
+  Future<Response> updateOtpChannel(String channel) => userClient.put('/security-settings/otp-channel', data: {'channel': channel});
+  Future<Response> updateBiometric(bool enabled) => userClient.put('/security-settings/biometric', data: {'enabled': enabled});
+  Future<Response> updateRandomPinKeyboard(bool enabled) => userClient.put('/security-settings/randomize-pin-keyboard', data: {'enabled': enabled});
 
   Future<Response> roles({Map<String, dynamic>? query}) => userClient.get('/settings/roles', queryParameters: query);
   Future<Response> role(int id) => userClient.get('/settings/roles/$id');

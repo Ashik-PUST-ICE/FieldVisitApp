@@ -63,10 +63,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       result.when(
         data: (user) {
           if (mounted && user != null) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (_) => const MainScreen()),
-            );
+            _finishLogin();
           }
         },
         loading: () {},
@@ -80,6 +77,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         },
       );
     }
+  }
+
+  Future<void> _finishLogin() async {
+    final notifier = ref.read(authProvider.notifier);
+    final alreadyEnabled = await notifier.isBiometricLoginEnabled();
+    final supported = await notifier.canUseBiometrics();
+    if (!mounted) return;
+    if (!alreadyEnabled && supported) {
+      final enable = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          title: const Text('Enable biometric login?'),
+          content: const Text('Use fingerprint or Face ID for faster and safer sign-in on this device.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Not now')),
+            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Enable')),
+          ],
+        ),
+      );
+      if (enable == true) await notifier.enableBiometricLogin();
+    }
+    if (!mounted) return;
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainScreen()));
   }
 
   @override
@@ -137,6 +157,28 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                   color: Color(0xFF1F2937),
                                   letterSpacing: -0.5,
                                 ),
+                              ),
+                              const SizedBox(height: 12),
+                              FutureBuilder<bool>(
+                                future: ref.read(authProvider.notifier).isBiometricLoginEnabled(),
+                                builder: (context, snapshot) {
+                                  if (snapshot.data != true) return const SizedBox.shrink();
+                                  return OutlinedButton.icon(
+                                    onPressed: authState.isLoading ? null : () async {
+                                      final result = await ref.read(authProvider.notifier).biometricLogin();
+                                      if (!mounted) return;
+                                      result.when(
+                                        data: (user) {
+                                          if (user != null) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainScreen()));
+                                        },
+                                        loading: () {},
+                                        error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString()))),
+                                      );
+                                    },
+                                    icon: const Icon(Icons.fingerprint_rounded),
+                                    label: const Text('Sign in with biometrics'),
+                                  );
+                                },
                               ),
                               const SizedBox(height: 4),
                               const Text(

@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:dio/dio.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
@@ -92,8 +93,92 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
 
   Future<void> _checkAuthStatus() async {
     final token = await secureStorage.read(key: AppConstants.accessTokenKey);
-    if (token != null) {
+    final biometricEnabled = await isBiometricLoginEnabled();
+    // When biometric login is enabled, do not silently open the app with a
+    // cached token. The device must unlock the session first.
+    if (token != null && !biometricEnabled) {
       await getProfile();
+    }
+  }
+
+  Future<bool> isBiometricLoginEnabled() async {
+    return (await secureStorage.read(key: AppConstants.biometricLoginEnabledKey)) == 'true';
+  }
+
+  Future<bool> canUseBiometrics() async {
+    final auth = LocalAuthentication();
+    try {
+      return await auth.canCheckBiometrics && await auth.isDeviceSupported();
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<bool> enableBiometricLogin() async {
+    final auth = LocalAuthentication();
+    try {
+      if (!await auth.canCheckBiometrics || !await auth.isDeviceSupported()) return false;
+      final verified = await auth.authenticate(
+        localizedReason: 'Verify your identity to enable biometric login',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+          useErrorDialogs: true,
+          sensitiveTransaction: true,
+        ),
+      );
+      if (!verified) return false;
+
+      await secureStorage.write(key: AppConstants.biometricLoginEnabledKey, value: 'true');
+      try {
+        await authUserApiClient.put('/security-settings/biometric', data: {'enabled': true});
+      } catch (_) {
+        // Device unlock remains local-first; the preference syncs next time.
+      }
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Future<void> disableBiometricLogin() async {
+    await secureStorage.delete(key: AppConstants.biometricLoginEnabledKey);
+    try {
+      await authUserApiClient.put('/security-settings/biometric', data: {'enabled': false});
+    } catch (_) {}
+  }
+
+  Future<AsyncValue<User?>> biometricLogin() async {
+    state = const AsyncValue.loading();
+    try {
+      if (!await isBiometricLoginEnabled()) {
+        state = const AsyncValue.data(null);
+        return state;
+      }
+      final token = await secureStorage.read(key: AppConstants.accessTokenKey);
+      if (token == null || token.isEmpty) {
+        await disableBiometricLogin();
+        state = const AsyncValue.data(null);
+        return state;
+      }
+      final auth = LocalAuthentication();
+      final verified = await auth.authenticate(
+        localizedReason: 'Verify your identity to unlock Field Visit',
+        options: const AuthenticationOptions(
+          biometricOnly: true,
+          stickyAuth: true,
+          useErrorDialogs: true,
+          sensitiveTransaction: true,
+        ),
+      );
+      if (!verified) {
+        state = const AsyncValue.data(null);
+        return state;
+      }
+      return await getProfile();
+    } catch (e, st) {
+      state = AsyncValue.error(e, st);
+      return state;
     }
   }
 
@@ -127,6 +212,10 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
         final user = User.fromJson(data['user']);
 
         await secureStorage.write(key: AppConstants.accessTokenKey, value: token);
+        final refreshToken = data['token']['refresh_token'];
+        if (refreshToken is String && refreshToken.isNotEmpty) {
+          await secureStorage.write(key: AppConstants.refreshTokenKey, value: refreshToken);
+        }
         await secureStorage.write(key: AppConstants.userKey, value: user.toJson().toString());
 
         state = AsyncValue.data(user);

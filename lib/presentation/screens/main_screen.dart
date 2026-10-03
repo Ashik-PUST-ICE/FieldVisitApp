@@ -12,6 +12,7 @@ import 'package:field_visit_app/presentation/screens/kpi_screen.dart';
 import 'package:field_visit_app/presentation/screens/outlets_screen.dart';
 import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
+import 'package:field_visit_app/presentation/screens/security_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/visits_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
@@ -450,7 +451,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   _buildDrawerTile(Icons.fact_check_rounded, 'Target & KPIs', () => _openScreen(const KpiScreen())),
                   _buildDrawerTile(Icons.map_rounded, 'Field Route & Map', () => _openScreen(const MapScreen())),
                   _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports', () => _openScreen(const ReportsScreen())),
-                  _buildDrawerTile(Icons.settings_rounded, 'Settings & Profile', () => _openScreen(const AccountScreen())),
+                  _buildDrawerTile(Icons.settings_rounded, 'Settings', () => _openScreen(const SecuritySettingsScreen())),
+                  _buildDrawerTile(Icons.person_outline_rounded, 'My Profile', () => _openScreen(const AccountScreen())),
                   _buildDrawerTile(Icons.logout_rounded, 'Logout', () => ref.read(authProvider.notifier).logout()),
                 ],
               ),

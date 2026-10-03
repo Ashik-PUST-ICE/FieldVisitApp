@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
@@ -17,15 +18,9 @@ class _AccountState extends ConsumerState<AccountScreen> {
   final first = TextEditingController();
   final last = TextEditingController();
   final mobile = TextEditingController();
-  final current = TextEditingController();
-  final password = TextEditingController();
-  final confirm = TextEditingController();
 
   bool _isUpdatingProfile = false;
-  bool _isChangingPassword = false;
-  bool _obscureCurrent = true;
-  bool _obscureNew = true;
-  bool _obscureConfirm = true;
+  bool _isUploadingImage = false;
 
   @override
   void initState() {
@@ -43,10 +38,32 @@ class _AccountState extends ConsumerState<AccountScreen> {
     first.dispose();
     last.dispose();
     mobile.dispose();
-    current.dispose();
-    password.dispose();
-    confirm.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadImage() async {
+    final picked = await ImagePicker().pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 82,
+      maxWidth: 1200,
+    );
+    if (picked == null) return;
+    setState(() => _isUploadingImage = true);
+    try {
+      await ref.read(authApiProvider).updateProfileWithImage(
+        {},
+        bytes: await picked.readAsBytes(),
+        filename: picked.name,
+      );
+      await ref.read(authProvider.notifier).getProfile();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile image updated successfully')));
+      }
+    } catch (e) {
+      _show(e);
+    } finally {
+      if (mounted) setState(() => _isUploadingImage = false);
+    }
   }
 
   Future<void> profile() async {
@@ -67,33 +84,6 @@ class _AccountState extends ConsumerState<AccountScreen> {
       _show(e);
     } finally {
       if (mounted) setState(() => _isUpdatingProfile = false);
-    }
-  }
-
-  Future<void> changePassword() async {
-    if (password.text.length < 8 || password.text != confirm.text) {
-      _show('Password must be at least 8 characters and match confirmation');
-      return;
-    }
-    setState(() => _isChangingPassword = true);
-    try {
-      await ref.read(authApiProvider).changePassword({
-        'current_password': current.text,
-        'password': password.text,
-        'password_confirmation': confirm.text,
-      });
-      current.clear();
-      password.clear();
-      confirm.clear();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Password changed successfully!')),
-        );
-      }
-    } catch (e) {
-      _show(e);
-    } finally {
-      if (mounted) setState(() => _isChangingPassword = false);
     }
   }
 
@@ -119,7 +109,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile & Security', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('My Profile', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -144,16 +134,27 @@ class _AccountState extends ConsumerState<AccountScreen> {
             ),
             child: Row(
               children: [
-                CircleAvatar(
-                  radius: 32,
-                  backgroundColor: Colors.white,
-                  child: Text(
-                    initials,
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: Color(0xFF0D9488),
-                    ),
+                GestureDetector(
+                  onTap: _isUploadingImage ? null : _pickAndUploadImage,
+                  child: Stack(
+                    alignment: Alignment.bottomRight,
+                    children: [
+                      CircleAvatar(
+                        radius: 32,
+                        backgroundColor: Colors.white,
+                        backgroundImage: user?.image?.isNotEmpty == true ? NetworkImage(user!.image!) : null,
+                        child: user?.image?.isNotEmpty == true
+                            ? null
+                            : Text(initials, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF0D9488))),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        child: _isUploadingImage
+                            ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF136B3E)))
+                            : const Icon(Icons.camera_alt_rounded, size: 16, color: Color(0xFF136B3E)),
+                      ),
+                    ],
                   ),
                 ),
                 const SizedBox(width: 16),
@@ -239,63 +240,6 @@ class _AccountState extends ConsumerState<AccountScreen> {
             ],
           ),
           const SizedBox(height: 20),
-
-          // Security & Password Section
-          _buildSectionCard(
-            context,
-            isDark: isDark,
-            title: 'Security & Password',
-            icon: Icons.lock_outline_rounded,
-            children: [
-              CellfinInputField(
-                controller: current,
-                obscureText: _obscureCurrent,
-                hint: 'Current Password',
-                prefixIcon: const Icon(Icons.lock_clock_outlined, color: Color(0xFF6B7280)),
-                suffixIcon: IconButton(
-                  icon: Icon(_obscureCurrent ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280)),
-                  onPressed: () => setState(() => _obscureCurrent = !_obscureCurrent),
-                ),
-              ),
-              const SizedBox(height: 12),
-              CellfinInputField(
-                controller: password,
-                obscureText: _obscureNew,
-                hint: 'New Password (8+ chars)',
-                prefixIcon: const Icon(Icons.lock_open_rounded, color: Color(0xFF6B7280)),
-                suffixIcon: IconButton(
-                  icon: Icon(_obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280)),
-                  onPressed: () => setState(() => _obscureNew = !_obscureNew),
-                ),
-              ),
-              const SizedBox(height: 12),
-              CellfinInputField(
-                controller: confirm,
-                obscureText: _obscureConfirm,
-                hint: 'Confirm New Password',
-                prefixIcon: const Icon(Icons.check_circle_outline, color: Color(0xFF6B7280)),
-                suffixIcon: IconButton(
-                  icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280)),
-                  onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                ),
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF136B3E),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  elevation: 0,
-                ),
-                onPressed: _isChangingPassword ? null : changePassword,
-                child: _isChangingPassword
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Submit Password Change', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
 
           // Logout Action
           OutlinedButton.icon(

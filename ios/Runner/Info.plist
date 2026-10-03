@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Use Face ID to securely unlock your Field Visit account.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Field Visit</string>
 	<key>CFBundleExecutable</key>

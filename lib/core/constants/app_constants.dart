@@ -24,6 +24,7 @@ class AppConstants {
   static const String refreshTokenKey = 'refresh_token';
   static const String userKey = 'user';
   static const String isLoggedInKey = 'is_logged_in';
+  static const String biometricLoginEnabledKey = 'biometric_login_enabled';
 
   // App Info
   static const String appName = 'Field Visit';

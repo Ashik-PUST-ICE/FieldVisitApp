@@ -16,6 +16,8 @@ final authApiClientProvider = Provider<ApiClient>((ref) {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      // Host without port — required for Herd/Valet IP-access routing (see AppConstants).
+      'Host': AppConstants.devHost,
     },
   ));
 
@@ -55,6 +57,8 @@ final authUserApiClientProvider = Provider<ApiClient>((ref) {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      // Host without port — required for Herd/Valet IP-access routing (see AppConstants).
+      'Host': AppConstants.devHost,
     },
   ));
 
@@ -66,6 +70,14 @@ final authUserApiClientProvider = Provider<ApiClient>((ref) {
       }
       return handler.next(options);
     },
+  ));
+
+  // Dev visibility: settings/biometric requests were invisible in logs before.
+  dio.interceptors.add(PrettyDioLogger(
+    requestHeader: true,
+    requestBody: true,
+    responseBody: true,
+    error: true,
   ));
 
   return ApiClient(dio: dio, secureStorage: storage);

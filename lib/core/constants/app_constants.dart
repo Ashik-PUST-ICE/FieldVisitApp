@@ -1,13 +1,30 @@
 class AppConstants {
   AppConstants._();
 
+  // ---------------------------------------------------------------------------
+  // Local-dev server config (Laravel Herd on the laptop, reached from the phone
+  // via `adb reverse tcp:8080 tcp:80` — see run-app.bat).
+  //
+  // - URL uses http://127.0.0.1:8080 (adb reverse forwards to laptop:80).
+  // - The site name is embedded as the first path segment because Valet/Herd
+  //   extracts it when the Host header is an IP address (Server.php
+  //   `valetSiteFromIpAddressUri`).
+  // - The Host header MUST be sent without a port (see devHost below);
+  //   Dio's default would send "127.0.0.1:8080" which Valet wouldn't match.
+  // TODO(prod): switch back to https://fieldvisit-ecosystem-api-gateway.test/...
+  // and remove the Host header override before releasing.
+  // ---------------------------------------------------------------------------
+  static const String devHost = '127.0.0.1';
+  static const String devPort = '8080';
+  static const String gatewaySite = 'fieldvisit-ecosystem-api-gateway.test';
+
   // API Base URLs
   static const String authBaseUrl =
-      'https://fieldvisit-ecosystem-api-gateway.test/api/p/auth_service/v1';
+      'http://$devHost:$devPort/$gatewaySite/api/p/auth_service/v1';
   static const String authUserBaseUrl =
-      'https://fieldvisit-ecosystem-api-gateway.test/api/u/auth_service/v1';
+      'http://$devHost:$devPort/$gatewaySite/api/u/auth_service/v1';
   static const String businessBaseUrl =
-      'https://fieldvisit-ecosystem-api-gateway.test/api/u/business_service/v1';
+      'http://$devHost:$devPort/$gatewaySite/api/u/business_service/v1';
 
   // API Endpoints
   static const String login = '/auth/login';

@@ -17,6 +17,9 @@ class ApiClient {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
+            // Send Host WITHOUT port so Herd/Valet's IP-address site routing works
+            // through `adb reverse` (see AppConstants local-dev config).
+            'Host': AppConstants.devHost,
           },
         ));
 

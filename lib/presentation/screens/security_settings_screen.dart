@@ -60,27 +60,52 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
 
   Future<void> _setBiometric(bool value) async {
     if (biometricBusy) return;
-    setState(() => biometricBusy = true);
-    if (!value) {
-      await ref.read(authProvider.notifier).disableBiometricLogin();
+    // Instant touch feedback; rolled back below if verification/API fails.
+    setState(() {
+      biometricBusy = true;
+      settings['biometric_enabled'] = value;
+    });
+    try {
+      if (!value) {
+        await ref.read(authProvider.notifier).disableBiometricLogin();
+        await _load();
+        return;
+      }
+      if (!await ref.read(authProvider.notifier).canUseBiometrics()) {
+        _showError('No biometric (fingerprint/face) enrolled on this device. Add one in Android settings first.');
+        setState(() => settings['biometric_enabled'] = false);
+        return;
+      }
+      final enabledNow = await ref.read(authProvider.notifier).enableBiometricLogin();
+      if (!enabledNow) {
+        _showError('Biometric verification failed or was cancelled. Try again.');
+        setState(() => settings['biometric_enabled'] = false);
+        return;
+      }
       await _load();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Biometric login enabled')));
+      }
+    } catch (e) {
+      _showError(e);
+      if (mounted) setState(() => settings['biometric_enabled'] = !value);
+    } finally {
+      // Always unlock the switch — a thrown error used to leave it disabled forever.
       if (mounted) setState(() => biometricBusy = false);
-      return;
     }
-    if (!await ref.read(authProvider.notifier).canUseBiometrics()) {
-      _showError('This device does not have biometric authentication available.');
-      if (mounted) setState(() => biometricBusy = false);
-      return;
-    }
-    final enabledNow = await ref.read(authProvider.notifier).enableBiometricLogin();
-    if (!enabledNow) {
-      if (mounted) setState(() => biometricBusy = false);
-      return;
-    }
-    await _load();
-    if (mounted) {
-      setState(() => biometricBusy = false);
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Biometric login enabled')));
+  }
+
+  /// Instant switch feedback: flip UI immediately, roll back if the API rejects it.
+  Future<void> _toggle(String key, bool value, Future<Response> Function() action, String success) async {
+    final previous = settings[key];
+    setState(() => settings[key] = value);
+    try {
+      await action();
+      await _load();
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(success)));
+    } catch (e) {
+      if (mounted) setState(() => settings[key] = previous);
+      _showError(e);
     }
   }
 
@@ -105,7 +130,7 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
                   _settingCard(context, icon: Icons.dialpad_rounded, title: 'Update MNP', subtitle: settings['mnp']?.toString() ?? 'Not configured', onTap: _updateMnp),
                   _settingCard(context, icon: Icons.sms_outlined, title: 'Change SMS/OTP channel', subtitle: _channelLabel(settings['otp_channel']?.toString()), onTap: _updateOtpChannel),
                   _settingCard(context, icon: Icons.fingerprint_rounded, title: 'Manage biometric verification', subtitle: _settingBool('biometric_enabled') ? 'Enabled' : 'Disabled', trailing: Switch(value: _settingBool('biometric_enabled'), activeColor: AppColors.cellfinGreen, onChanged: biometricBusy ? null : _setBiometric)),
-                  _settingCard(context, icon: Icons.keyboard_alt_outlined, title: 'Randomize PIN keyboard', subtitle: 'Shuffle PIN keys for extra privacy', trailing: Switch(value: _settingBool('randomize_pin_keyboard'), activeColor: AppColors.cellfinGreen, onChanged: (value) => _run(() => ref.read(authApiProvider).updateRandomPinKeyboard(value), 'PIN keyboard preference updated'))),
+                  _settingCard(context, icon: Icons.keyboard_alt_outlined, title: 'Randomize PIN keyboard', subtitle: 'Shuffle PIN keys for extra privacy', trailing: Switch(value: _settingBool('randomize_pin_keyboard'), activeColor: AppColors.cellfinGreen, onChanged: (value) => _toggle('randomize_pin_keyboard', value, () => ref.read(authApiProvider).updateRandomPinKeyboard(value), 'PIN keyboard preference updated'))),
                 ],
               ),
             ),

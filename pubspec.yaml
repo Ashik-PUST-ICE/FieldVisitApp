@@ -54,6 +54,11 @@ dependencies:
   hive_flutter: ^1.1.0
   uuid: ^4.4.2
 
+# geolocator_android 4.6.2 has a broken build.gradle (flutter.compileSdkVersion)
+# that fails on Flutter 3.24.5. See https://github.com/Baseflow/flutter-geolocator/issues/1666
+dependency_overrides:
+  geolocator_android: 4.6.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

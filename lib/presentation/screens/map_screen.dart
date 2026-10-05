@@ -141,6 +141,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   myLocationButtonEnabled: true,
                 ),
       floatingActionButton: FloatingActionButton(
+        heroTag: 'map_refresh',
         onPressed: _loadOutlets,
         child: const Icon(Icons.refresh),
       ),

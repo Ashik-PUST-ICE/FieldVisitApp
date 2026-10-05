@@ -198,6 +198,7 @@ class _ProductList extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'products_add',
         backgroundColor: const Color(0xFF136B3E),
         foregroundColor: Colors.white,
         elevation: 3,
@@ -280,6 +281,7 @@ class _CategoryList extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'products_category_add',
         backgroundColor: const Color(0xFF136B3E),
         foregroundColor: Colors.white,
         elevation: 3,

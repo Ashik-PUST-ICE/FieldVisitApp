@@ -200,6 +200,7 @@ class _ReferenceList extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'reference_add',
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 3,

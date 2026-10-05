@@ -68,6 +68,7 @@ class OrdersScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'orders_add',
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 6,

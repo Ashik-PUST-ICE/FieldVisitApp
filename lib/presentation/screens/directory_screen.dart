@@ -219,6 +219,7 @@ class _DirectoryList extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'directory_add',
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 3,

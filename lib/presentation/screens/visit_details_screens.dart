@@ -232,6 +232,7 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'visit_details_photo',
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 3,
@@ -542,6 +543,7 @@ class _VisitCompetitorsScreenState extends ConsumerState<VisitCompetitorsScreen>
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'visit_details_competitor',
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 3,
@@ -912,6 +914,7 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
         },
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'visit_details_product',
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 3,

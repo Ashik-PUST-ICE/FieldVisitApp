@@ -86,6 +86,7 @@ class BeatsScreen extends ConsumerWidget {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'beats_add',
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 3,

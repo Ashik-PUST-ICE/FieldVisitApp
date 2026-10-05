@@ -190,11 +190,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                               const SizedBox(height: 24),
 
-                              // Receiver Account / Email Field
+                              // Email Address Field
                               CellfinInputField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                hint: 'Receiver Account / Email Address',
+                                hint: 'Email Address',
                                 prefixIcon: const Icon(Icons.account_circle_outlined, color: Color(0xFF6B7280), size: 22),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
@@ -205,11 +205,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                               const SizedBox(height: 14),
 
-                              // CellFin 6 Digit Pin / Password Field (Exact screenshot match!)
+                              // PIN / Password Field
                               CellfinInputField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
-                                hint: 'CellFin 6 Digit Pin / Password',
+                                hint: 'PIN or Password',
                                 prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF6B7280), size: 22),
                                 suffixIcon: IconButton(
                                   icon: Icon(

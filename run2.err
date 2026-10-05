@@ -1,0 +1,15 @@
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/C:/Users/ashik/.gradle/wrapper/dists/gradle-8.3-all/6en3ugtfdg5xnpx44z4qbwgas/gradle-8.3/lib/native-platform-0.22-milestone-24.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+Your project is configured to compile against Android SDK 34, but the following plugin(s) require to be compiled against a higher Android SDK version:
+- flutter_plugin_android_lifecycle compiles against Android SDK 35
+Fix this issue by compiling against the highest Android SDK version (they are backward compatible).
+Add the following to C:\FieldVisitApp\android\app\build.gradle:
+
+    android {
+        compileSdk = 35
+        ...
+    }
+

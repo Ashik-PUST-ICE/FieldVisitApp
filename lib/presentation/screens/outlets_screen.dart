@@ -132,6 +132,7 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'outlets_add',
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         elevation: 6,

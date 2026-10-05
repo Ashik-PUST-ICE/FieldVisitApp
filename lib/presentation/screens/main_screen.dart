@@ -51,9 +51,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: const Color(0xFFF1F5F2),
+      backgroundColor: isDark ? const Color(0xFF0B1220) : const Color(0xFFF1F5F2),
 
       // Top Green Header (Cellfin Layout with FieldVisit Branding)
       appBar: PreferredSize(
@@ -357,8 +358,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
   /// Side Drawer Menu with FieldVisit branding
   Widget _buildFieldVisitDrawer(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Drawer(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? const Color(0xFF0F172A) : Colors.white,
       child: SafeArea(
         child: Column(
           children: [
@@ -468,10 +470,10 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
+                  Text(
                     'Version 2.4.0 (Build 395)',
                     style: TextStyle(
-                      color: Color(0xFF6B7280),
+                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -490,13 +492,13 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                         child: const Icon(Icons.verified_user_rounded, color: Color(0xFF136B3E), size: 18),
                       ),
                       const SizedBox(width: 8),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'ফিল্ড ভিজিট এন্টারপ্রাইজ',
                             style: TextStyle(
-                              color: Color(0xFF136B3E),
+                              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF136B3E),
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
                             ),
@@ -504,7 +506,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           Text(
                             'ফিল্ড ফোর্স ও সেলস অটোমেশন সিস্টেম',
                             style: TextStyle(
-                              color: Color(0xFF4B5563),
+                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
                               fontSize: 9.5,
                               fontWeight: FontWeight.w500,
                             ),
@@ -524,18 +526,23 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   }
 
   Widget _buildDrawerTile(IconData icon, String title, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: const Color(0xFF374151), size: 24),
-      title: Text(
-        title,
-        style: const TextStyle(
-          color: Color(0xFF1F2937),
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
-      onTap: onTap,
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return ListTile(
+          leading: Icon(icon, color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151), size: 24),
+          title: Text(
+            title,
+            style: TextStyle(
+              color: isDark ? Colors.white : const Color(0xFF1F2937),
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
+          onTap: onTap,
+        );
+      },
     );
   }
 }

@@ -27,7 +27,9 @@ class DashboardScreen extends ConsumerWidget {
     final dashboard = ref.watch(dashboardProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F2), // Soft modern pale mint background
+      backgroundColor: Theme.of(context).brightness == Brightness.dark
+          ? const Color(0xFF0B1220) // Dark slate for dark mode
+          : const Color(0xFFF1F5F2), // Soft modern pale mint background
       body: dashboard.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: AppColors.cellfinGreen),
@@ -211,9 +213,10 @@ class DashboardScreen extends ConsumerWidget {
 
   /// First Card: 8 Field Operations (Start Visit, Outlets, Orders, Route Map, Photos, Products, Beats, QR Check-in)
   Widget _buildFirstFieldCard(BuildContext context, Map<String, dynamic> data) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF111827) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -287,9 +290,10 @@ class DashboardScreen extends ConsumerWidget {
 
   /// Second Card: 8 Management & Analytics Modules (Circular Mint Badges)
   Widget _buildSecondManagementCard(BuildContext context, Map<String, dynamic> data) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF111827) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -362,6 +366,7 @@ class DashboardScreen extends ConsumerWidget {
 
   /// Today's Field Performance Summary
   Widget _buildFieldPerformanceSummary(BuildContext context, Map<String, dynamic> data) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final visited = data['visited_today'] ?? 0;
     final pending = data['pending_today'] ?? 0;
     final total = data['total_outlets'] ?? 0;
@@ -371,7 +376,7 @@ class DashboardScreen extends ConsumerWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? const Color(0xFF111827) : Colors.white,
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
@@ -387,13 +392,17 @@ class DashboardScreen extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Row(
+              Row(
                 children: [
                   Icon(Icons.insights_rounded, color: AppColors.cellfinGreen, size: 20),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Text(
                     'Today\'s Field Summary',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800, color: Color(0xFF1F2937)),
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w800,
+                      color: isDark ? Colors.white : const Color(0xFF1F2937),
+                    ),
                   ),
                 ],
               ),
@@ -409,13 +418,13 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              _buildMetricPill('Visited', '$visited', const Color(0xFF136B3E), const Color(0xFFE8F5E9)),
+              _buildMetricPill('Visited', '$visited', const Color(0xFF136B3E), const Color(0xFFE8F5E9), isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Pending', '$pending', const Color(0xFFF59E0B), const Color(0xFFFEF3C7)),
+              _buildMetricPill('Pending', '$pending', const Color(0xFFF59E0B), const Color(0xFFFEF3C7), isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Total Outlets', '$total', const Color(0xFF1E88E5), const Color(0xFFE3F2FD)),
+              _buildMetricPill('Total Outlets', '$total', const Color(0xFF1E88E5), const Color(0xFFE3F2FD), isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Orders', '$orders', const Color(0xFF7E57C2), const Color(0xFFEDE7F6)),
+              _buildMetricPill('Orders', '$orders', const Color(0xFF7E57C2), const Color(0xFFEDE7F6), isDark: isDark),
             ],
           ),
         ],
@@ -423,12 +432,12 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricPill(String label, String value, Color textColor, Color bgColor) {
+  Widget _buildMetricPill(String label, String value, Color textColor, Color bgColor, {bool isDark = false}) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
         decoration: BoxDecoration(
-          color: bgColor,
+          color: isDark ? bgColor.withOpacity(0.16) : bgColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -436,7 +445,7 @@ class DashboardScreen extends ConsumerWidget {
             Text(
               value,
               style: TextStyle(
-                color: textColor,
+                color: isDark ? Color.lerp(textColor, Colors.white, 0.35) : textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
@@ -445,7 +454,7 @@ class DashboardScreen extends ConsumerWidget {
             Text(
               label,
               style: TextStyle(
-                color: textColor.withOpacity(0.85),
+                color: (isDark ? Color.lerp(textColor, Colors.white, 0.35) : textColor)?.withOpacity(0.85),
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
               ),
@@ -465,54 +474,59 @@ class DashboardScreen extends ConsumerWidget {
     required VoidCallback onTap,
     bool hasBadge = false,
   }) {
-    return SizedBox(
-      width: 76,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Icon(icon, size: 36, color: const Color(0xFF136B3E)),
-                    if (hasBadge)
-                      Positioned(
-                        right: 4,
-                        bottom: 4,
-                        child: Container(
-                          padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: Color(0xFFFFB300),
-                            shape: BoxShape.circle,
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return SizedBox(
+          width: 76,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Icon(icon, size: 36, color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF136B3E)),
+                        if (hasBadge)
+                          Positioned(
+                            right: 4,
+                            bottom: 4,
+                            child: Container(
+                              padding: const EdgeInsets.all(2),
+                              decoration: const BoxDecoration(
+                                color: Color(0xFFFFB300),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.check, size: 10, color: Colors.white),
+                            ),
                           ),
-                          child: const Icon(Icons.check, size: 10, color: Colors.white),
-                        ),
-                      ),
-                  ],
-                ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white70 : const Color(0xFF263238),
+                      height: 1.15,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF263238),
-                  height: 1.15,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -522,44 +536,49 @@ class DashboardScreen extends ConsumerWidget {
     required String title,
     required VoidCallback onTap,
   }) {
-    return SizedBox(
-      width: 76,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 4),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFD7EEDD), // Soft mint circle
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(
-                  icon,
-                  color: const Color(0xFF136B3E),
-                  size: 24,
-                ),
+    return Builder(
+      builder: (context) {
+        final isDark = Theme.of(context).brightness == Brightness.dark;
+        return SizedBox(
+          width: 76,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: isDark ? const Color(0xFF14532D) : const Color(0xFFD7EEDD), // Soft mint circle
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      icon,
+                      color: isDark ? const Color(0xFF6EE7A0) : const Color(0xFF136B3E),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    title,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: isDark ? Colors.white70 : const Color(0xFF263238),
+                      height: 1.15,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8),
-              Text(
-                title,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF263238),
-                  height: 1.15,
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

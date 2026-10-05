@@ -17,6 +17,44 @@ class AppConstants {
   static const String devHost = '127.0.0.1';
   static const String devPort = '8080';
   static const String gatewaySite = 'fieldvisit-ecosystem-api-gateway.test';
+  static const String authServiceSite =
+      'fieldvisit-ecosystem-auth-service.test';
+
+  /// When true, media URLs coming back from the API are rewritten onto the
+  /// local `adb reverse` tunnel so the phone can actually load them.
+  ///
+  /// The auth-service returns absolute URLs like
+  /// `https://fieldvisit-ecosystem-auth-service.test/storage/users/x.jpg`.
+  /// That host only resolves on the laptop (Herd/Valet `.test` domain), and
+  /// nginx binds port 80 to 127.0.0.1 only - so the phone cannot fetch it.
+  /// Herd routes by URI prefix, so `http://127.0.0.1:8080/<site>/storage/...`
+  /// reaches the same file through the tunnel.
+  // TODO(prod): set to false once the API serves media from a real domain.
+  static const bool useLocalDevMedia = true;
+
+  /// Rewrites a media URL so the device can load it.
+  /// Returns an empty string for null/empty input.
+  static String resolveMediaUrl(String? url) {
+    if (url == null) return '';
+    final trimmed = url.trim();
+    if (trimmed.isEmpty) return '';
+
+    if (!useLocalDevMedia) return trimmed;
+
+    final uri = Uri.tryParse(trimmed);
+    // Relative paths (e.g. "/storage/users/x.jpg") need no host handling.
+    if (uri == null || !uri.hasScheme) {
+      var path = trimmed;
+      if (!path.startsWith('/')) path = '/$path';
+      return 'http://$devHost:$devPort/$authServiceSite$path';
+    }
+
+    // Absolute URL: keep the path (+query) but re-host it onto the tunnel.
+    var path = uri.path;
+    if (path.isEmpty) path = '/';
+    final query = uri.hasQuery ? '?${uri.query}' : '';
+    return 'http://$devHost:$devPort/$authServiceSite$path$query';
+  }
 
   // API Base URLs
   static const String authBaseUrl =

@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/constants/app_constants.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
@@ -50,15 +51,28 @@ class _AccountState extends ConsumerState<AccountScreen> {
     if (picked == null) return;
     setState(() => _isUploadingImage = true);
     try {
+      final user = ref.read(authProvider).valueOrNull;
+      // `name` + `email` are REQUIRED by the backend's ProfileUpdateRequest,
+      // so an image-only request would 422 and silently never persist.
       await ref.read(authApiProvider).updateProfileWithImage(
         {},
         bytes: await picked.readAsBytes(),
         filename: picked.name,
+        name: user?.fullName,
+        email: user?.email,
       );
       await ref.read(authProvider.notifier).getProfile();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile image updated successfully')));
-      }
+      if (!mounted) return;
+      final updated = ref.read(authProvider).valueOrNull;
+      final hasImage = (updated?.image ?? '').isNotEmpty;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(hasImage
+              ? 'Profile image updated successfully'
+              : 'Image uploaded but not returned by server'),
+          backgroundColor: hasImage ? AppColors.success : AppColors.warning,
+        ),
+      );
     } catch (e) {
       _show(e);
     } finally {
@@ -93,7 +107,9 @@ class _AccountState extends ConsumerState<AccountScreen> {
         SnackBar(
           content: Text(
             e is DioException && e.response?.data is Map
-                ? ((e.response!.data as Map)['message'] ?? (e.response!.data as Map)['errors']).toString()
+                ? ((e.response!.data as Map)['message'] ??
+                        (e.response!.data as Map)['errors'])
+                    .toString()
                 : e.toString(),
           ),
         ),
@@ -105,11 +121,18 @@ class _AccountState extends ConsumerState<AccountScreen> {
   Widget build(BuildContext context) {
     final user = ref.watch(authProvider).valueOrNull;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final initials = user != null && user.fullName.isNotEmpty ? user.fullName[0].toUpperCase() : 'U';
+    final initials = user != null && user.fullName.isNotEmpty
+        ? user.fullName[0].toUpperCase()
+        : 'U';
+    // The API returns a laptop-only absolute URL; rewrite it onto the local
+    // tunnel so the device can actually fetch the bytes.
+    final imageUrl = AppConstants.resolveMediaUrl(user?.image);
+    final hasImage = imageUrl.isNotEmpty;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('My Profile',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -119,7 +142,11 @@ class _AccountState extends ConsumerState<AccountScreen> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [Color(0xFF0D9488), Color(0xFF0891B2), Color(0xFF0284C7)],
+                colors: [
+                  Color(0xFF0D9488),
+                  Color(0xFF0891B2),
+                  Color(0xFF0284C7)
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -142,17 +169,35 @@ class _AccountState extends ConsumerState<AccountScreen> {
                       CircleAvatar(
                         radius: 32,
                         backgroundColor: Colors.white,
-                        backgroundImage: user?.image?.isNotEmpty == true ? NetworkImage(user!.image!) : null,
-                        child: user?.image?.isNotEmpty == true
+                        // `errorBuilder` keeps the initials visible if the
+                        // image is missing/unreachable instead of showing a
+                        // blank grey circle.
+                        backgroundImage:
+                            hasImage ? NetworkImage(imageUrl) : null,
+                        onBackgroundImageError: hasImage ? (_, __) {} : null,
+                        child: hasImage
                             ? null
-                            : Text(initials, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: Color(0xFF0D9488))),
+                            : Text(
+                                initials,
+                                style: const TextStyle(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.w800,
+                                  color: Color(0xFF0D9488),
+                                ),
+                              ),
                       ),
                       Container(
                         padding: const EdgeInsets.all(5),
-                        decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                        decoration: const BoxDecoration(
+                            color: Colors.white, shape: BoxShape.circle),
                         child: _isUploadingImage
-                            ? const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF136B3E)))
-                            : const Icon(Icons.camera_alt_rounded, size: 16, color: Color(0xFF136B3E)),
+                            ? const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                    strokeWidth: 2, color: Color(0xFF136B3E)))
+                            : const Icon(Icons.camera_alt_rounded,
+                                size: 16, color: Color(0xFF136B3E)),
                       ),
                     ],
                   ),
@@ -180,14 +225,20 @@ class _AccountState extends ConsumerState<AccountScreen> {
                       ),
                       const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 3),
                         decoration: BoxDecoration(
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
-                          user?.roles?.isNotEmpty == true ? (user!.roles as List).join(' • ') : 'Field Operations Specialist',
-                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                          user?.roles?.isNotEmpty == true
+                              ? (user!.roles as List).join(' • ')
+                              : 'Field Operations Specialist',
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 11,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
@@ -208,20 +259,23 @@ class _AccountState extends ConsumerState<AccountScreen> {
               CellfinInputField(
                 controller: first,
                 hint: 'First Name',
-                prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280)),
+                prefixIcon: const Icon(Icons.person_outline_rounded,
+                    color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 12),
               CellfinInputField(
                 controller: last,
                 hint: 'Last Name',
-                prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280)),
+                prefixIcon: const Icon(Icons.person_outline_rounded,
+                    color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 12),
               CellfinInputField(
                 controller: mobile,
                 keyboardType: TextInputType.phone,
                 hint: 'Mobile Number',
-                prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF6B7280)),
+                prefixIcon:
+                    const Icon(Icons.phone_outlined, color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -229,13 +283,20 @@ class _AccountState extends ConsumerState<AccountScreen> {
                   backgroundColor: const Color(0xFF136B3E),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(double.infinity, 50),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                   elevation: 0,
                 ),
                 onPressed: _isUpdatingProfile ? null : profile,
                 child: _isUpdatingProfile
-                    ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                    : const Text('Submit Profile Changes', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2))
+                    : const Text('Submit Profile Changes',
+                        style: TextStyle(
+                            fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             ],
           ),
@@ -247,10 +308,12 @@ class _AccountState extends ConsumerState<AccountScreen> {
               foregroundColor: Colors.red,
               side: const BorderSide(color: Colors.redAccent),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
             ),
             icon: const Icon(Icons.logout_rounded),
-            label: const Text('Log Out of FieldVisit', style: TextStyle(fontWeight: FontWeight.w700)),
+            label: const Text('Log Out of FieldVisit',
+                style: TextStyle(fontWeight: FontWeight.w700)),
             onPressed: () => ref.read(authProvider.notifier).logout(),
           ),
           const SizedBox(height: 40),
@@ -298,7 +361,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
               const SizedBox(width: 10),
               Text(
                 title,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
               ),
             ],
           ),

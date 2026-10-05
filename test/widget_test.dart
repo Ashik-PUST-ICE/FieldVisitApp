@@ -5,18 +5,70 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
+import 'package:field_visit_app/core/constants/app_constants.dart';
 import 'package:field_visit_app/data/models/role_permission_models.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-/// Regression tests for the Role & Permissions parsers.
+/// Regression tests for the profile image URL.
 ///
-/// Bug 1: `/settings/roles/list` returns `select('id','title')`, so reading a
-/// `name` key produced "Unnamed role" for every entry.
-///
-/// Bug 2: `/settings/permissions/list` returns a NESTED tree
-/// (`[{name, groups:[{name, permissions:[...]}]}]`), but the old screen parsed
-/// it as a flat list, so the checklist came back empty.
+/// `AuthResource` returns `Storage::disk('public')->url(...)`, i.e.
+/// `https://fieldvisit-ecosystem-auth-service.test/storage/users/x.jpg`.
+/// That host resolves only on the laptop (Herd `.test` domain) and nginx
+/// binds :80 to 127.0.0.1, so the phone could never load it - which is why an
+/// uploaded avatar stayed blank. [AppConstants.resolveMediaUrl] re-hosts the
+/// path onto the `adb reverse` tunnel.
 void main() {
+  group('resolveMediaUrl', () {
+    test('re-hosts the absolute API url onto the local tunnel', () {
+      final resolved = AppConstants.resolveMediaUrl(
+        'https://fieldvisit-ecosystem-auth-service.test/storage/users/abc.jpg',
+      );
+      expect(
+        resolved,
+        'http://127.0.0.1:8080/fieldvisit-ecosystem-auth-service.test'
+        '/storage/users/abc.jpg',
+      );
+    });
+
+    test('works for an already-relative path', () {
+      expect(
+        AppConstants.resolveMediaUrl('/storage/users/abc.jpg'),
+        'http://127.0.0.1:8080/fieldvisit-ecosystem-auth-service.test'
+        '/storage/users/abc.jpg',
+      );
+    });
+
+    test('adds a missing leading slash', () {
+      expect(
+        AppConstants.resolveMediaUrl('storage/users/abc.jpg'),
+        'http://127.0.0.1:8080/fieldvisit-ecosystem-auth-service.test'
+        '/storage/users/abc.jpg',
+      );
+    });
+
+    test('preserves a query string (cache-busting tokens)', () {
+      final resolved = AppConstants.resolveMediaUrl(
+        'https://fieldvisit-ecosystem-auth-service.test/storage/users/a.jpg?v=2',
+      );
+      expect(resolved.endsWith('/storage/users/a.jpg?v=2'), isTrue);
+    });
+
+    test('drops any real host so the phone never hits an unreachable domain',
+        () {
+      final resolved = AppConstants.resolveMediaUrl(
+        'https://fieldvisit-ecosystem-auth-service.test/storage/users/a.jpg',
+      );
+      expect(resolved.contains('https://'), isFalse);
+      expect(resolved.startsWith('http://127.0.0.1:8080/'), isTrue);
+    });
+
+    test('returns empty string for null / blank input', () {
+      expect(AppConstants.resolveMediaUrl(null), '');
+      expect(AppConstants.resolveMediaUrl(''), '');
+      expect(AppConstants.resolveMediaUrl('   '), '');
+    });
+  });
+
   group('parseRoles', () {
     test('falls back to the `title` key used by /roles/list', () {
       final roles = parseRoles([

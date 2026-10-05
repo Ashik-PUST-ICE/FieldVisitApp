@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/widgets/app_dropdown.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/visit.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
@@ -815,13 +816,17 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
     submitText: 'Start Visit',
     fields: [
       StatefulBuilder(
-        builder: (context, setDropState) => CellfinDropdownField<int>(
-          value: selectedOutletId,
+        builder: (context, setDropState) => AppDropdownField<int>(
+          label: 'Outlet',
           hint: 'Select Outlet *',
-          items: outlets
-              .map((outlet) => DropdownMenuItem<int>(
+          icon: Icons.storefront_rounded,
+          value: selectedOutletId,
+          options: outlets
+              .map((outlet) => AppDropdownOption<int>(
                     value: outlet.id,
-                    child: Text('${outlet.name} (#${outlet.id})'),
+                    title: outlet.name,
+                    subtitle: 'Outlet #${outlet.id}',
+                    leadingIcon: Icons.storefront_rounded,
                   ))
               .toList(),
           onChanged: (value) => setDropState(() => selectedOutletId = value),

@@ -5,6 +5,7 @@ import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/orders_provider.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
+import 'package:field_visit_app/core/widgets/app_dropdown.dart';
 
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
@@ -15,7 +16,8 @@ class OrdersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Field Orders', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('Field Orders',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
             tooltip: 'Refresh',
@@ -28,7 +30,8 @@ class OrdersScreen extends ConsumerWidget {
         color: AppColors.primary,
         onRefresh: () => ref.read(ordersProvider.notifier).refresh(),
         child: orders.when(
-          loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+          loading: () => const Center(
+              child: CircularProgressIndicator(color: AppColors.primary)),
           error: (error, _) => _ErrorView(
             message: _errorMessage(error),
             onRetry: () => ref.read(ordersProvider.notifier).refresh(),
@@ -47,12 +50,17 @@ class OrdersScreen extends ConsumerWidget {
                             color: AppColors.primary.withOpacity(0.08),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.shopping_bag_outlined, size: 48, color: AppColors.primary),
+                          child: const Icon(Icons.shopping_bag_outlined,
+                              size: 48, color: AppColors.primary),
                         ),
                         const SizedBox(height: 16),
-                        const Text('No orders found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                        const Text('No orders found',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 6),
-                        const Text('Tap "Book Order" below to create your first order', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                        const Text(
+                            'Tap "Book Order" below to create your first order',
+                            style: TextStyle(color: Colors.grey, fontSize: 13)),
                       ],
                     ),
                   ),
@@ -74,7 +82,8 @@ class OrdersScreen extends ConsumerWidget {
         elevation: 6,
         onPressed: () => _showOrderForm(context, ref),
         icon: const Icon(Icons.add_shopping_cart_rounded, size: 22),
-        label: const Text('Book Order', style: TextStyle(fontWeight: FontWeight.w700)),
+        label: const Text('Book Order',
+            style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -139,7 +148,8 @@ class _OrderCard extends ConsumerWidget {
                     color: const Color(0xFF6366F1).withOpacity(0.12),
                     borderRadius: BorderRadius.circular(14),
                   ),
-                  child: const Icon(Icons.receipt_long_rounded, color: Color(0xFF6366F1), size: 24),
+                  child: const Icon(Icons.receipt_long_rounded,
+                      color: Color(0xFF6366F1), size: 24),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -149,16 +159,25 @@ class _OrderCard extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Order #$id', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+                          Text('Order #$id',
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w800, fontSize: 16)),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 4),
                             decoration: BoxDecoration(
-                              color: isDark ? statusColor.withOpacity(0.2) : statusBg,
+                              color: isDark
+                                  ? statusColor.withOpacity(0.2)
+                                  : statusBg,
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Text(
                               statusLabel,
-                              style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                              style: TextStyle(
+                                  color: statusColor,
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 0.5),
                             ),
                           ),
                         ],
@@ -168,7 +187,9 @@ class _OrderCard extends ConsumerWidget {
                         'Outlet ID: ${order['outlet_id'] ?? '-'}',
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
                         ),
                       ),
                       const SizedBox(height: 4),
@@ -177,7 +198,8 @@ class _OrderCard extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w800,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color:
+                              isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                       ),
                     ],
@@ -196,7 +218,9 @@ class _OrderCard extends ConsumerWidget {
               ),
               border: Border(
                 top: BorderSide(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
                 ),
               ),
             ),
@@ -211,9 +235,14 @@ class _OrderCard extends ConsumerWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.inventory_2_outlined, size: 16, color: Color(0xFF0D9488)),
+                        Icon(Icons.inventory_2_outlined,
+                            size: 16, color: Color(0xFF0D9488)),
                         SizedBox(width: 4),
-                        Text('Order Line Items', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF0D9488))),
+                        Text('Order Line Items',
+                            style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Color(0xFF0D9488))),
                       ],
                     ),
                   ),
@@ -227,13 +256,19 @@ class _OrderCard extends ConsumerWidget {
                       try {
                         await ref.read(ordersProvider.notifier).remove(id);
                       } catch (e) {
-                        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+                        if (context.mounted)
+                          ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(_errorMessage(e))));
                       }
                     }
                   },
                   itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'status', child: Text('Update Status')),
-                    PopupMenuItem(value: 'delete', child: Text('Delete Order', style: TextStyle(color: Colors.red))),
+                    PopupMenuItem(
+                        value: 'status', child: Text('Update Status')),
+                    PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete Order',
+                            style: TextStyle(color: Colors.red))),
                   ],
                 ),
               ],
@@ -248,7 +283,8 @@ class _OrderCard extends ConsumerWidget {
 Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
   final outlets = ref.read(outletsProvider).valueOrNull ?? const [];
   if (outlets.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Please create an outlet first')));
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please create an outlet first')));
     return;
   }
   int selectedOutlet = outlets.first.id;
@@ -269,15 +305,20 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
         builder: (context, setDropState) => CellfinDropdownField<int>(
           value: selectedOutlet,
           hint: 'Receiver Outlet Account *',
-          items: outlets.map((outlet) => DropdownMenuItem(value: outlet.id, child: Text(outlet.name))).toList(),
-          onChanged: (value) => setDropState(() => selectedOutlet = value ?? selectedOutlet),
+          items: outlets
+              .map((outlet) =>
+                  DropdownMenuItem(value: outlet.id, child: Text(outlet.name)))
+              .toList(),
+          onChanged: (value) =>
+              setDropState(() => selectedOutlet = value ?? selectedOutlet),
         ),
       ),
       CellfinInputField(
         controller: notes,
         maxLines: 2,
         hint: 'Note / Order Delivery Specifics',
-        prefixIcon: const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
+        prefixIcon:
+            const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
       ),
     ],
     onSubmit: () async {
@@ -289,12 +330,15 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Order booked successfully!'), backgroundColor: AppColors.cellfinGreen),
+            const SnackBar(
+                content: Text('Order booked successfully!'),
+                backgroundColor: AppColors.cellfinGreen),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
         }
       }
     },
@@ -309,21 +353,29 @@ Future<void> _updateStatus(BuildContext context, WidgetRef ref, int id) async {
     builder: (dialogContext) => StatefulBuilder(
       builder: (context, setState) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Update Order Status', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: DropdownButtonFormField<String>(
+        title: const Text('Update Order Status',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        content: AppDropdownField<String>(
+          label: 'Status',
+          icon: Icons.local_shipping_rounded,
           value: status,
-          decoration: InputDecoration(border: OutlineInputBorder(borderRadius: BorderRadius.circular(12))),
-          items: const ['pending', 'confirmed', 'delivered', 'cancelled']
-              .map((v) => DropdownMenuItem(value: v, child: Text(v.toUpperCase())))
+          options: const ['pending', 'confirmed', 'delivered', 'cancelled']
+              .map((v) => AppDropdownOption<String>(
+                    value: v,
+                    title: v.toUpperCase(),
+                  ))
               .toList(),
           onChanged: (v) => setState(() => status = v ?? status),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Cancel')),
+          TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: const Text('Cancel')),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(dialogContext, true),
             child: const Text('Save Status'),
@@ -336,12 +388,15 @@ Future<void> _updateStatus(BuildContext context, WidgetRef ref, int id) async {
     try {
       await ref.read(ordersProvider.notifier).update(id, {'status': status});
     } catch (e) {
-      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+      if (context.mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
     }
   }
 }
 
-Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async {
+Future<void> _showItems(
+    BuildContext context, WidgetRef ref, int orderId) async {
   try {
     final items = await ref.read(ordersProvider.notifier).items(orderId);
     if (!context.mounted) return;
@@ -349,13 +404,15 @@ Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async 
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Order #$orderId Line Items', style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Order #$orderId Line Items',
+            style: const TextStyle(fontWeight: FontWeight.bold)),
         content: SizedBox(
           width: 420,
           child: items.isEmpty
               ? const Padding(
                   padding: EdgeInsets.symmetric(vertical: 24),
-                  child: Center(child: Text('No line items recorded for this order')),
+                  child: Center(
+                      child: Text('No line items recorded for this order')),
                 )
               : ListView(
                   shrinkWrap: true,
@@ -363,7 +420,8 @@ Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async 
                     final itemId = (item['id'] as num).toInt();
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                       child: ListTile(
                         leading: Container(
                           padding: const EdgeInsets.all(8),
@@ -371,26 +429,35 @@ Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async 
                             color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(10),
                           ),
-                          child: const Icon(Icons.inventory_rounded, color: AppColors.primary),
+                          child: const Icon(Icons.inventory_rounded,
+                              color: AppColors.primary),
                         ),
-                        title: Text('Product #${item['product_id']}', style: const TextStyle(fontWeight: FontWeight.w700)),
-                        subtitle: Text('Qty: ${item['quantity']} • Unit: ৳${item['unit_price'] ?? 0} • Total: ৳${item['total_price']}'),
+                        title: Text('Product #${item['product_id']}',
+                            style:
+                                const TextStyle(fontWeight: FontWeight.w700)),
+                        subtitle: Text(
+                            'Qty: ${item['quantity']} • Unit: ৳${item['unit_price'] ?? 0} • Total: ৳${item['total_price']}'),
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             IconButton(
-                              icon: const Icon(Icons.edit_rounded, color: AppColors.primary, size: 20),
+                              icon: const Icon(Icons.edit_rounded,
+                                  color: AppColors.primary, size: 20),
                               tooltip: 'Edit item',
                               onPressed: () {
                                 Navigator.pop(context);
-                                _showEditItem(context, ref, orderId, itemId, item);
+                                _showEditItem(
+                                    context, ref, orderId, itemId, item);
                               },
                             ),
                             IconButton(
-                              icon: const Icon(Icons.delete_outline_rounded, color: Colors.red, size: 20),
+                              icon: const Icon(Icons.delete_outline_rounded,
+                                  color: Colors.red, size: 20),
                               tooltip: 'Remove item',
                               onPressed: () async {
-                                await ref.read(ordersProvider.notifier).deleteItem(orderId, itemId);
+                                await ref
+                                    .read(ordersProvider.notifier)
+                                    .deleteItem(orderId, itemId);
                                 if (context.mounted) Navigator.pop(context);
                               },
                             ),
@@ -405,7 +472,8 @@ Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async 
           FilledButton.icon(
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () {
               Navigator.pop(context);
@@ -422,11 +490,14 @@ Future<void> _showItems(BuildContext context, WidgetRef ref, int orderId) async 
       ),
     );
   } catch (e) {
-    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+    if (context.mounted)
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
   }
 }
 
-Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) async {
+Future<void> _showAddItem(
+    BuildContext context, WidgetRef ref, int orderId) async {
   final productId = TextEditingController();
   final quantity = TextEditingController(text: '1');
   final price = TextEditingController(text: '0');
@@ -438,7 +509,8 @@ Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) asyn
       CellfinCardItem(title: 'Item Units', icon: Icons.inventory_2_outlined),
       CellfinCardItem(title: 'Master Box', icon: Icons.all_inbox_rounded),
       CellfinCardItem(title: 'Sample Free', icon: Icons.card_giftcard_rounded),
-      CellfinCardItem(title: 'Urgent Dispatch', icon: Icons.local_shipping_outlined),
+      CellfinCardItem(
+          title: 'Urgent Dispatch', icon: Icons.local_shipping_outlined),
     ],
     submitText: 'Submit',
     fields: [
@@ -446,22 +518,27 @@ Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) asyn
         controller: productId,
         keyboardType: TextInputType.number,
         hint: 'Product ID *',
-        prefixIcon: const Icon(Icons.inventory_2_outlined, color: Color(0xFF6B7280)),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Product ID is required' : null,
+        prefixIcon:
+            const Icon(Icons.inventory_2_outlined, color: Color(0xFF6B7280)),
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Product ID is required' : null,
       ),
       CellfinInputField(
         controller: quantity,
         keyboardType: TextInputType.number,
         hint: 'Quantity (Pcs / Units) *',
-        prefixIcon: const Icon(Icons.format_list_numbered_rounded, color: Color(0xFF6B7280)),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Quantity is required' : null,
+        prefixIcon: const Icon(Icons.format_list_numbered_rounded,
+            color: Color(0xFF6B7280)),
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Quantity is required' : null,
       ),
       CellfinInputField(
         controller: price,
         keyboardType: TextInputType.number,
         hint: 'Amount / Unit Price',
         suffixText: '৳',
-        validator: (v) => v == null || v.trim().isEmpty ? 'Price is required' : null,
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Price is required' : null,
       ),
     ],
     onSubmit: () async {
@@ -479,12 +556,15 @@ Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) asyn
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Item added to order!'), backgroundColor: AppColors.cellfinGreen),
+            const SnackBar(
+                content: Text('Item added to order!'),
+                backgroundColor: AppColors.cellfinGreen),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
         }
       }
     },
@@ -494,7 +574,8 @@ Future<void> _showAddItem(BuildContext context, WidgetRef ref, int orderId) asyn
   price.dispose();
 }
 
-Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId, int itemId, Map<String, dynamic> item) async {
+Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId,
+    int itemId, Map<String, dynamic> item) async {
   final quantity = TextEditingController(text: '${item['quantity'] ?? 1}');
   final price = TextEditingController(text: '${item['unit_price'] ?? 0}');
 
@@ -513,15 +594,18 @@ Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId, int
         controller: quantity,
         keyboardType: TextInputType.number,
         hint: 'Updated Quantity *',
-        prefixIcon: const Icon(Icons.format_list_numbered_rounded, color: Color(0xFF6B7280)),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Quantity is required' : null,
+        prefixIcon: const Icon(Icons.format_list_numbered_rounded,
+            color: Color(0xFF6B7280)),
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Quantity is required' : null,
       ),
       CellfinInputField(
         controller: price,
         keyboardType: TextInputType.number,
         hint: 'Updated Unit Price',
         suffixText: '৳',
-        validator: (v) => v == null || v.trim().isEmpty ? 'Price is required' : null,
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Price is required' : null,
       ),
     ],
     onSubmit: () async {
@@ -537,11 +621,15 @@ Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId, int
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Item updated!'), backgroundColor: AppColors.cellfinGreen),
+            const SnackBar(
+                content: Text('Item updated!'),
+                backgroundColor: AppColors.cellfinGreen),
           );
         }
       } catch (e) {
-        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+        if (context.mounted)
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
       }
     },
   );
@@ -569,8 +657,10 @@ class _ErrorView extends StatelessWidget {
           children: [
             Container(
               padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
-              child: const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+              decoration: BoxDecoration(
+                  color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
+              child: const Icon(Icons.error_outline_rounded,
+                  size: 48, color: Colors.red),
             ),
             const SizedBox(height: 16),
             Text(message, textAlign: TextAlign.center),
@@ -579,7 +669,8 @@ class _ErrorView extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: onRetry,
               child: const Text('Retry'),

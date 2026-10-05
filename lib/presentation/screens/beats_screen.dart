@@ -5,6 +5,7 @@ import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/beat.dart';
 import 'package:field_visit_app/presentation/providers/beats_provider.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
+import 'package:field_visit_app/core/widgets/app_dropdown.dart';
 
 const _green = Color(0xFF136B3E);
 const _golden = Color(0xFFFFB300);
@@ -37,7 +38,8 @@ class BeatsScreen extends ConsumerWidget {
         color: _green,
         onRefresh: () => ref.read(beatsProvider.notifier).refresh(),
         child: beats.when(
-          loading: () => const Center(child: CircularProgressIndicator(color: _green)),
+          loading: () =>
+              const Center(child: CircularProgressIndicator(color: _green)),
           error: (error, _) => _ErrorView(
             message: _errorMessage(error),
             onRetry: () => ref.read(beatsProvider.notifier).refresh(),
@@ -56,7 +58,8 @@ class BeatsScreen extends ConsumerWidget {
                               color: const Color(0xFFE8F5E9),
                               borderRadius: BorderRadius.circular(18),
                             ),
-                            child: const Icon(Icons.route_rounded, color: _green, size: 36),
+                            child: const Icon(Icons.route_rounded,
+                                color: _green, size: 36),
                           ),
                           const SizedBox(height: 16),
                           const Text(
@@ -70,7 +73,8 @@ class BeatsScreen extends ConsumerWidget {
                           const SizedBox(height: 6),
                           const Text(
                             'Tap + below to add your first beat route',
-                            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                            style: TextStyle(
+                                fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                         ],
                       ),
@@ -93,7 +97,8 @@ class BeatsScreen extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: () => _showBeatForm(context, ref),
         icon: const Icon(Icons.add_road_rounded),
-        label: const Text('Add Beat', style: TextStyle(fontWeight: FontWeight.w700)),
+        label: const Text('Add Beat',
+            style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -162,9 +167,16 @@ class _BeatCard extends ConsumerWidget {
                         spacing: 8,
                         children: [
                           if (beat.code != null)
-                            _Badge(label: beat.code!, bg: const Color(0xFFF3F4F6), text: const Color(0xFF4B5563)),
+                            _Badge(
+                                label: beat.code!,
+                                bg: const Color(0xFFF3F4F6),
+                                text: const Color(0xFF4B5563)),
                           if (beat.date != null)
-                            _Badge(label: beat.date!, bg: const Color(0xFFFFF8E1), text: const Color(0xFFB45309), icon: Icons.calendar_today_outlined),
+                            _Badge(
+                                label: beat.date!,
+                                bg: const Color(0xFFFFF8E1),
+                                text: const Color(0xFFB45309),
+                                icon: Icons.calendar_today_outlined),
                         ],
                       ),
                     ],
@@ -176,17 +188,20 @@ class _BeatCard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.list_alt_rounded, size: 20, color: Color(0xFF0284C7)),
+                      icon: const Icon(Icons.list_alt_rounded,
+                          size: 20, color: Color(0xFF0284C7)),
                       tooltip: 'Beat Outlets',
                       onPressed: () => _showBeatOutlets(context, ref, beat),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 20, color: _green),
+                      icon: const Icon(Icons.edit_outlined,
+                          size: 20, color: _green),
                       tooltip: 'Edit Beat',
                       onPressed: () => _showBeatForm(context, ref, beat: beat),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Color(0xFFEF4444)),
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          size: 20, color: Color(0xFFEF4444)),
                       tooltip: 'Delete Beat',
                       onPressed: () => _confirmDelete(context, ref, beat),
                     ),
@@ -206,12 +221,14 @@ class _Badge extends StatelessWidget {
   final Color bg;
   final Color text;
   final IconData? icon;
-  const _Badge({required this.label, required this.bg, required this.text, this.icon});
+  const _Badge(
+      {required this.label, required this.bg, required this.text, this.icon});
 
   @override
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-        decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
+        decoration:
+            BoxDecoration(color: bg, borderRadius: BorderRadius.circular(6)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -219,29 +236,36 @@ class _Badge extends StatelessWidget {
               Icon(icon, size: 11, color: text),
               const SizedBox(width: 4),
             ],
-            Text(label, style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.w600, color: text)),
+            Text(label,
+                style: TextStyle(
+                    fontSize: 11.5, fontWeight: FontWeight.w600, color: text)),
           ],
         ),
       );
 }
 
-Future<void> _confirmDelete(BuildContext context, WidgetRef ref, Beat beat) async {
+Future<void> _confirmDelete(
+    BuildContext context, WidgetRef ref, Beat beat) async {
   final confirmed = await showDialog<bool>(
     context: context,
     builder: (ctx) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      title: const Text('Delete Beat Route?', style: TextStyle(fontWeight: FontWeight.w700)),
-      content: Text('Remove "${beat.name}" from beat routes? This cannot be undone.'),
+      title: const Text('Delete Beat Route?',
+          style: TextStyle(fontWeight: FontWeight.w700)),
+      content: Text(
+          'Remove "${beat.name}" from beat routes? This cannot be undone.'),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          child:
+              const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFDC2626),
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             elevation: 0,
           ),
           onPressed: () => Navigator.pop(ctx, true),
@@ -255,18 +279,21 @@ Future<void> _confirmDelete(BuildContext context, WidgetRef ref, Beat beat) asyn
       await ref.read(beatsProvider.notifier).remove(beat.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Beat route deleted'), backgroundColor: _green),
+          const SnackBar(
+              content: Text('Beat route deleted'), backgroundColor: _green),
         );
       }
     } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
       }
     }
   }
 }
 
-Future<void> _showBeatOutlets(BuildContext context, WidgetRef ref, Beat beat) async {
+Future<void> _showBeatOutlets(
+    BuildContext context, WidgetRef ref, Beat beat) async {
   try {
     final items = await ref.read(beatsProvider.notifier).outlets(beat.id);
     if (!context.mounted) return;
@@ -289,7 +316,8 @@ Future<void> _showBeatOutlets(BuildContext context, WidgetRef ref, Beat beat) as
             Expanded(
               child: Text(
                 '${beat.name} Outlets',
-                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -300,7 +328,9 @@ Future<void> _showBeatOutlets(BuildContext context, WidgetRef ref, Beat beat) as
           child: items.isEmpty
               ? const Padding(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  child: Center(child: Text('No outlets assigned to this beat', style: TextStyle(color: Color(0xFF6B7280)))),
+                  child: Center(
+                      child: Text('No outlets assigned to this beat',
+                          style: TextStyle(color: Color(0xFF6B7280)))),
                 )
               : ListView.separated(
                   shrinkWrap: true,
@@ -318,17 +348,21 @@ Future<void> _showBeatOutlets(BuildContext context, WidgetRef ref, Beat beat) as
                           color: const Color(0xFFE8F5E9),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.store_rounded, color: _green, size: 18),
+                        child: const Icon(Icons.store_rounded,
+                            color: _green, size: 18),
                       ),
                       title: Text('Outlet #${item['outlet_id']}',
-                          style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.w600, fontSize: 14)),
                       subtitle: Text('Sequence: ${item['sequence'] ?? '-'}',
                           style: const TextStyle(fontSize: 12)),
                       trailing: IconButton(
-                        icon: const Icon(Icons.remove_circle_outline_rounded, color: Color(0xFFEF4444), size: 20),
+                        icon: const Icon(Icons.remove_circle_outline_rounded,
+                            color: Color(0xFFEF4444), size: 20),
                         tooltip: 'Remove from beat',
                         onPressed: () async {
-                          await ref.read(beatsProvider.notifier).removeOutlet(beat.id, (item['id'] as num).toInt());
+                          await ref.read(beatsProvider.notifier).removeOutlet(
+                              beat.id, (item['id'] as num).toInt());
                           if (ctx.mounted) Navigator.pop(ctx);
                         },
                       ),
@@ -339,13 +373,15 @@ Future<void> _showBeatOutlets(BuildContext context, WidgetRef ref, Beat beat) as
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Close', style: TextStyle(color: Color(0xFF6B7280))),
+            child:
+                const Text('Close', style: TextStyle(color: Color(0xFF6B7280))),
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               backgroundColor: _green,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               elevation: 0,
             ),
             icon: const Icon(Icons.add_rounded, size: 18),
@@ -359,14 +395,18 @@ Future<void> _showBeatOutlets(BuildContext context, WidgetRef ref, Beat beat) as
       ),
     );
   } catch (e) {
-    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+    if (context.mounted)
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
   }
 }
 
-Future<void> _addBeatOutlet(BuildContext context, WidgetRef ref, Beat beat) async {
+Future<void> _addBeatOutlet(
+    BuildContext context, WidgetRef ref, Beat beat) async {
   final outlets = ref.read(outletsProvider).valueOrNull ?? const [];
   if (outlets.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Create an outlet first')));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(const SnackBar(content: Text('Create an outlet first')));
     return;
   }
   int outletId = outlets.first.id;
@@ -377,56 +417,58 @@ Future<void> _addBeatOutlet(BuildContext context, WidgetRef ref, Beat beat) asyn
     builder: (dialogContext) => StatefulBuilder(
       builder: (context, setLocalState) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('Add Outlet to Beat', style: TextStyle(fontWeight: FontWeight.w700)),
+        title: const Text('Add Outlet to Beat',
+            style: TextStyle(fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Outlet Dropdown with Cellfin styling
-            Container(
-              height: 52,
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: const Color(0xFFC4C4C4)),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<int>(
-                  value: outletId,
-                  isExpanded: true,
-                  hint: const Text('Select Outlet', style: TextStyle(color: Color(0xFF757575))),
-                  items: outlets.map((o) => DropdownMenuItem(value: o.id, child: Text(o.name))).toList(),
-                  onChanged: (v) => setLocalState(() => outletId = v ?? outletId),
-                ),
-              ),
+            // Outlet Dropdown (shared app style)
+            AppDropdownField<int>(
+              label: 'Outlet',
+              icon: Icons.storefront_rounded,
+              value: outletId,
+              options: outlets
+                  .map((o) => AppDropdownOption<int>(
+                        value: o.id,
+                        title: o.name,
+                        leadingIcon: Icons.storefront_rounded,
+                      ))
+                  .toList(),
+              onChanged: (v) => setLocalState(() => outletId = v ?? outletId),
             ),
             const SizedBox(height: 12),
             CellfinInputField(
               controller: sequence,
               hint: 'Sequence Order (e.g. 1)',
               keyboardType: TextInputType.number,
-              prefixIcon: const Icon(Icons.format_list_numbered_rounded, color: Color(0xFF6B7280)),
+              prefixIcon: const Icon(Icons.format_list_numbered_rounded,
+                  color: Color(0xFF6B7280)),
             ),
           ],
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+            child: const Text('Cancel',
+                style: TextStyle(color: Color(0xFF6B7280))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: _green,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
               elevation: 0,
             ),
             onPressed: () async {
               try {
-                await ref.read(beatsProvider.notifier).addOutlet(beat.id, outletId, int.tryParse(sequence.text) ?? 1);
+                await ref.read(beatsProvider.notifier).addOutlet(
+                    beat.id, outletId, int.tryParse(sequence.text) ?? 1);
                 if (dialogContext.mounted) Navigator.pop(dialogContext);
               } catch (e) {
-                if (dialogContext.mounted) ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+                if (dialogContext.mounted)
+                  ScaffoldMessenger.of(dialogContext)
+                      .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
               }
             },
             child: const Text('Add Outlet'),
@@ -438,7 +480,8 @@ Future<void> _addBeatOutlet(BuildContext context, WidgetRef ref, Beat beat) asyn
   sequence.dispose();
 }
 
-Future<void> _showBeatForm(BuildContext context, WidgetRef ref, {Beat? beat}) async {
+Future<void> _showBeatForm(BuildContext context, WidgetRef ref,
+    {Beat? beat}) async {
   final name = TextEditingController(text: beat?.name);
   final code = TextEditingController(text: beat?.code);
   final date = TextEditingController(text: beat?.date);
@@ -460,7 +503,9 @@ Future<void> _showBeatForm(BuildContext context, WidgetRef ref, {Beat? beat}) as
         controller: name,
         hint: 'Beat Route Name *',
         prefixIcon: const Icon(Icons.route_rounded, color: Color(0xFF6B7280)),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Beat route name is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? 'Beat route name is required'
+            : null,
       ),
       CellfinInputField(
         controller: code,
@@ -470,7 +515,8 @@ Future<void> _showBeatForm(BuildContext context, WidgetRef ref, {Beat? beat}) as
       CellfinInputField(
         controller: date,
         hint: 'Scheduled Date (YYYY-MM-DD)',
-        prefixIcon: const Icon(Icons.calendar_today_rounded, color: Color(0xFF6B7280)),
+        prefixIcon:
+            const Icon(Icons.calendar_today_rounded, color: Color(0xFF6B7280)),
         keyboardType: TextInputType.datetime,
       ),
     ],
@@ -490,14 +536,16 @@ Future<void> _showBeatForm(BuildContext context, WidgetRef ref, {Beat? beat}) as
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(beat == null ? 'Beat route created!' : 'Beat route updated!'),
+              content: Text(
+                  beat == null ? 'Beat route created!' : 'Beat route updated!'),
               backgroundColor: _green,
             ),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_errorMessage(e))));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
         }
       }
     },
@@ -511,7 +559,8 @@ Future<void> _showBeatForm(BuildContext context, WidgetRef ref, {Beat? beat}) as
 String _errorMessage(Object error) {
   if (error is DioException) {
     final data = error.response?.data;
-    if (data is Map && data['message'] != null) return data['message'].toString();
+    if (data is Map && data['message'] != null)
+      return data['message'].toString();
     if (data is Map && data['errors'] is Map) return data['errors'].toString();
   }
   return error.toString();
@@ -535,16 +584,21 @@ class _ErrorView extends StatelessWidget {
                   color: Colors.red.withOpacity(0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.error_outline_rounded, color: Colors.red, size: 40),
+                child: const Icon(Icons.error_outline_rounded,
+                    color: Colors.red, size: 40),
               ),
               const SizedBox(height: 14),
-              Text(message, textAlign: TextAlign.center, style: const TextStyle(color: Color(0xFF374151), fontSize: 14)),
+              Text(message,
+                  textAlign: TextAlign.center,
+                  style:
+                      const TextStyle(color: Color(0xFF374151), fontSize: 14)),
               const SizedBox(height: 16),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: _green,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
                 ),
                 onPressed: onRetry,
                 child: const Text('Try Again'),

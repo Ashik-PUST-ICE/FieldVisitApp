@@ -28,9 +28,18 @@ class AuthApi {
     Map<String, dynamic> data, {
     required List<int> bytes,
     required String filename,
+    String? name,
+    String? email,
   }) {
+    // `ProfileUpdateRequest` declares `name` and `email` as REQUIRED, so they
+    // must accompany every call. Sending only the multipart image fails
+    // validation (422) and the picture is never saved - which is exactly why
+    // the avatar used to stay blank. The service only writes the fields that
+    // are present, so resending the current values is safe.
     return userClient.put('/profile',
         data: FormData.fromMap({
+          if (name != null) 'name': name,
+          if (email != null) 'email': email,
           ...data,
           'image': MultipartFile.fromBytes(bytes, filename: filename),
         }));

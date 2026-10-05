@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
@@ -22,8 +24,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   GoogleMapController? _mapController;
   final Set<Marker> _markers = {};
   Position? _currentPosition;
-  bool _isLoading = true;
   String _search = '';
+  int? _selectedOutletId;
+  bool _sheetCollapsed = false;
   double _nearbyRadius = 5000;
 
   /// Why the map has no blue dot, or null while everything is fine.
@@ -103,7 +106,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     if (!mounted) return;
     setState(() {
       _locationProblem = message;
-      _isLoading = false;
     });
   }
 
@@ -117,7 +119,6 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       setState(() {
         _currentPosition = position;
         _locationProblem = null;
-        _isLoading = false;
       });
     } catch (e) {
       // Keep the map usable - fall back to the city view rather than hiding it.
@@ -208,6 +209,53 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     );
   }
 
+  /// Great-circle distance in metres from the device to an outlet (haversine).
+  double? _distanceTo(Outlet outlet) {
+    final me = _currentPosition;
+    if (me == null || outlet.latitude == null || outlet.longitude == null) {
+      return null;
+    }
+    const earthRadius = 6371000.0;
+    final dLat = _rad(outlet.latitude! - me.latitude);
+    final dLng = _rad(outlet.longitude! - me.longitude);
+    final a = _sin(dLat / 2) * _sin(dLat / 2) +
+        _cos(_rad(me.latitude)) *
+            _cos(_rad(outlet.latitude!)) *
+            _sin(dLng / 2) *
+            _sin(dLng / 2);
+    return earthRadius * 2 * _atan2(_sqrt(a), _sqrt(1 - a));
+  }
+
+  static double _rad(double deg) => deg * 3.141592653589793 / 180.0;
+  static double _sin(double v) => math.sin(v);
+  static double _cos(double v) => math.cos(v);
+  static double _sqrt(double v) => math.sqrt(v);
+  static double _atan2(double y, double x) => math.atan2(y, x);
+
+  static String formatDistance(double metres) => _formatDistance(metres);
+
+  static String _formatDistance(double metres) {
+    if (metres < 1000) return '${metres.round()} m';
+    return '${(metres / 1000).toStringAsFixed(1)} km';
+  }
+
+  /// Centres the map on one outlet and highlights it.
+  Future<void> _focusOutlet(Outlet outlet) async {
+    if (outlet.latitude == null || outlet.longitude == null) return;
+    final controller = _mapController;
+    if (controller != null) {
+      await controller.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(
+            target: LatLng(outlet.latitude!, outlet.longitude!),
+            zoom: 16,
+          ),
+        ),
+      );
+    }
+    setState(() => _selectedOutletId = outlet.id);
+  }
+
   Future<void> _loadNearby() async {
     final position = _currentPosition;
     if (position == null) return;
@@ -257,18 +305,40 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         ? LatLng(_currentPosition!.latitude, _currentPosition!.longitude)
         : _fallbackCenter;
 
+    final all = ref.watch(outletsProvider).valueOrNull ?? const [];
+    final located = all.where((o) => o.latitude != null && o.longitude != null);
+    final query = _search.trim().toLowerCase();
+    final matches = query.isEmpty
+        ? located.toList()
+        : located
+            .where((o) =>
+                o.name.toLowerCase().contains(query) ||
+                (o.address ?? '').toLowerCase().contains(query))
+            .toList();
+
     return Scaffold(
       appBar: AppBar(
-        leading: Navigator.of(context).canPop()
-            ? IconButton(
-                tooltip: 'Back',
-                icon: const Icon(Icons.arrow_back_rounded),
-                onPressed: () => Navigator.of(context).pop(),
-              )
-            : null,
-        title: const Text(
-          'Live Route',
-          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18),
+        elevation: 0,
+        backgroundColor: const Color(0xFF136B3E),
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Live Route',
+                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+            Text(
+              '${located.length} of ${all.length} outlets located',
+              style: const TextStyle(
+                  fontSize: 11.5,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
         actions: [
           if (_apiKey == null)
@@ -281,40 +351,14 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   .then((_) => _loadApiKey()),
             ),
           IconButton(
-            tooltip: 'Fit all outlets',
-            icon: const Icon(Icons.zoom_out_map_rounded),
-            onPressed: _fitOutlets,
-          ),
-          IconButton(
-            tooltip: 'Recenter on me',
-            icon: const Icon(Icons.my_location_rounded),
-            onPressed: hasLocation ? _recenter : null,
-          ),
-          PopupMenuButton<double>(
-            tooltip: 'Outlets near me',
-            icon: const Icon(Icons.travel_explore_rounded),
-            onSelected: (r) {
-              setState(() => _nearbyRadius = r);
-              _loadNearby();
-            },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 1000, child: Text('Within 1 km')),
-              PopupMenuItem(value: 3000, child: Text('Within 3 km')),
-              PopupMenuItem(value: 5000, child: Text('Within 5 km')),
-              PopupMenuItem(value: 10000, child: Text('Within 10 km')),
-            ],
+            tooltip: 'Refresh',
+            icon: const Icon(Icons.refresh, color: Colors.white),
+            onPressed: _buildMarkers,
           ),
         ],
       ),
       body: Stack(
         children: [
-          // Search floats above the map and filters the pins live.
-          Positioned(
-            top: 10,
-            left: 12,
-            right: 12,
-            child: _searchBar(context),
-          ),
           // The credential decides how the map renders:
           //  - key saved -> WebView + Maps JS API, so a key typed into Map
           //    Settings applies immediately, with no rebuild
@@ -344,80 +388,172 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   centerLng: initialTarget.longitude,
                   zoom: hasLocation ? 14 : 11,
                 ),
-          if (_isLoading) const LinearProgressIndicator(minHeight: 3),
+
+          // ── Search (top) ────────────────────────────────────────────────
+          Positioned(top: 12, left: 14, right: 74, child: _searchBar(matches)),
+
+          // ── Action rail (top-right) ─────────────────────────────────────
+          Positioned(
+            top: 12,
+            right: 14,
+            child: Column(
+              children: [
+                _MapAction(
+                  icon: Icons.fit_screen_outlined,
+                  tooltip: 'Fit all outlets',
+                  onTap: _fitOutlets,
+                ),
+                const SizedBox(height: 8),
+                _MapAction(
+                  icon: Icons.my_location_rounded,
+                  tooltip: 'Recenter on me',
+                  onTap: hasLocation ? _recenter : null,
+                ),
+                const SizedBox(height: 8),
+                _NearbyButton(
+                  radius: _nearbyRadius,
+                  enabled: hasLocation,
+                  onChanged: (r) {
+                    setState(() => _nearbyRadius = r);
+                    _loadNearby();
+                  },
+                ),
+              ],
+            ),
+          ),
+
           if (_locationProblem != null)
             Positioned(
-              left: 12,
-              right: 12,
-              bottom: 12,
+              left: 14,
+              right: 14,
+              bottom: 150,
               child: _Notice(message: _locationProblem!),
             ),
-          if (_search.trim().isNotEmpty)
-            Positioned(
-              left: 12,
-              right: 12,
-              bottom: 12,
-              child: _ResultStrip(
-                count: _pins.length,
-                total: (ref.watch(outletsProvider).valueOrNull ?? const [])
-                    .where((o) => o.latitude != null)
-                    .length,
-                onClear: () => setState(() => _search = ''),
-              ),
-            ),
+
+          // ── Outlet list (bottom sheet) ──────────────────────────────────
+          _OutletSheet(
+            outlets: matches,
+            selectedId: _selectedOutletId,
+            collapsed: _sheetCollapsed,
+            distanceOf: _distanceTo,
+            onTap: (o) {
+              _focusOutlet(o);
+              _collapseSheet();
+            },
+          ),
         ],
       ),
-      floatingActionButton: _search.trim().isEmpty
-          ? FloatingActionButton(
-              heroTag: 'map_refresh',
-              onPressed: _buildMarkers,
-              child: const Icon(Icons.refresh),
-            )
-          : null,
     );
   }
 
-  /// Floating search field with a live match counter.
-  Widget _searchBar(BuildContext context) {
-    final total = (ref.watch(outletsProvider).valueOrNull ?? const [])
-        .where((o) => o.latitude != null)
-        .length;
+  /// Drag the outlet sheet back down so it does not cover the map.
+  void _collapseSheet() {
+    // DraggableScrollableSheet owns its own controller; snapping back keeps the
+    // map visible after the user picks an outlet.
+    setState(() => _sheetCollapsed = true);
+  }
 
-    return Material(
-      elevation: 3,
-      borderRadius: BorderRadius.circular(14),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 12),
-        child: TextField(
-          style: const TextStyle(fontSize: 14.5),
-          onChanged: (v) {
-            setState(() => _search = v);
-            // Keep the native map in sync with the filtered set.
-            _buildMarkers();
-          },
-          decoration: InputDecoration(
-            hintText: 'Search outlets by name',
-            hintStyle: TextStyle(fontSize: 14, color: Colors.grey.shade500),
-            prefixIcon: const Icon(Icons.search_rounded, size: 20),
-            suffixIcon: _search.isEmpty
-                ? (total > 0
-                    ? Padding(
-                        padding: const EdgeInsets.only(right: 12),
-                        child: Center(
-                          widthFactor: 1,
-                          child: Text('$total',
-                              style: const TextStyle(
-                                  fontSize: 12, color: Colors.grey)),
-                        ),
-                      )
-                    : null)
-                : IconButton(
-                    icon: const Icon(Icons.close_rounded, size: 18),
-                    onPressed: () => setState(() => _search = ''),
-                  ),
-            border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+  /// Compact floating search field. Filters the map pins and the outlet list.
+  ///
+  /// Kept deliberately slim (~44px tall): the earlier version was padded out to
+  /// ~60px and, sitting above the outlet bottom sheet, the two boxes together
+  /// read as one oversized double input.
+  Widget _searchBar(List<Outlet> matches) {
+    return Container(
+      height: 44,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.22),
+            blurRadius: 10,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Row(
+        children: [
+          const Icon(Icons.search_rounded, size: 18, color: Color(0xFF136B3E)),
+          const SizedBox(width: 8),
+          Expanded(
+            child: TextField(
+              style: const TextStyle(fontSize: 13.5),
+              onChanged: (v) {
+                setState(() => _search = v);
+                // Keep the native map in sync with the filtered set.
+                _buildMarkers();
+              },
+              decoration: InputDecoration(
+                hintText: 'Search outlet',
+                hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          if (_search.isNotEmpty)
+            GestureDetector(
+              onTap: () => setState(() => _search = ''),
+              child: const Icon(Icons.close_rounded, size: 16),
+            )
+          else if (matches.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE8F5E9),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text('${matches.length}',
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: Color(0xFF136B3E))),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Rounded square map control used in the top-right rail.
+class _MapAction extends StatelessWidget {
+  final IconData icon;
+  final String tooltip;
+  final VoidCallback? onTap;
+
+  const _MapAction({
+    required this.icon,
+    required this.tooltip,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: tooltip,
+      child: Material(
+        color: Colors.white,
+        elevation: 6,
+        shadowColor: Colors.black26,
+        borderRadius: BorderRadius.circular(12),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Icon(
+              icon,
+              size: 21,
+              color: onTap == null
+                  ? Colors.grey.shade400
+                  : const Color(0xFF136B3E),
+            ),
           ),
         ),
       ),
@@ -425,46 +561,276 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   }
 }
 
-/// Shows how many outlets the current search matched.
-class _ResultStrip extends StatelessWidget {
-  final int count;
-  final int total;
-  final VoidCallback onClear;
+/// Nearby-radius picker shown as a third control in the rail.
+class _NearbyButton extends StatelessWidget {
+  final double radius;
+  final bool enabled;
+  final ValueChanged<double> onChanged;
 
-  const _ResultStrip({
-    required this.count,
-    required this.total,
-    required this.onClear,
+  const _NearbyButton({
+    required this.radius,
+    required this.enabled,
+    required this.onChanged,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: Colors.black.withOpacity(0.75),
-      borderRadius: BorderRadius.circular(12),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
-        child: Row(
-          children: [
-            Icon(
-              count > 0 ? Icons.place_rounded : Icons.search_off_rounded,
-              color: Colors.white,
-              size: 18,
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                count > 0
-                    ? '$count of $total outlets on the map'
-                    : 'No outlet matches this search',
-                style: const TextStyle(color: Colors.white, fontSize: 12.5),
+    return PopupMenuButton<double>(
+      tooltip: 'Outlets near me',
+      enabled: enabled,
+      offset: const Offset(0, 46),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      onSelected: onChanged,
+      itemBuilder: (_) => const [
+        PopupMenuItem(value: 1000, child: Text('Within 1 km')),
+        PopupMenuItem(value: 3000, child: Text('Within 3 km')),
+        PopupMenuItem(value: 5000, child: Text('Within 5 km')),
+        PopupMenuItem(value: 10000, child: Text('Within 10 km')),
+      ],
+      child: Material(
+        color: Colors.white,
+        elevation: 6,
+        shadowColor: Colors.black26,
+        borderRadius: BorderRadius.circular(12),
+        child: SizedBox(
+          width: 44,
+          height: 44,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.travel_explore_rounded,
+                size: 20,
+                color: enabled ? const Color(0xFF136B3E) : Colors.grey.shade400,
               ),
-            ),
-            TextButton(
-              onPressed: onClear,
-              child: const Text('Clear',
-                  style: TextStyle(color: Colors.white, fontSize: 12.5)),
-            ),
+              Text(
+                '${(radius / 1000).round()}k',
+                style: TextStyle(
+                  fontSize: 9,
+                  fontWeight: FontWeight.w800,
+                  color:
+                      enabled ? const Color(0xFF136B3E) : Colors.grey.shade400,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Draggable bottom sheet listing every outlet the search matched.
+class _OutletSheet extends StatelessWidget {
+  final List<Outlet> outlets;
+  final int? selectedId;
+  final bool collapsed;
+  final double? Function(Outlet) distanceOf;
+  final void Function(Outlet) onTap;
+
+  const _OutletSheet({
+    required this.outlets,
+    required this.selectedId,
+    required this.collapsed,
+    required this.distanceOf,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: collapsed ? 0.11 : 0.18,
+      // Must be <= the smallest snapSize below, otherwise Flutter asserts:
+      // "snapSize >= widget.minChildSize && snapSize <= widget.maxChildSize".
+      minChildSize: 0.11,
+      maxChildSize: 0.75,
+      snap: true,
+      snapSizes: const [0.11, 0.18, 0.75],
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.18),
+                blurRadius: 16,
+                offset: const Offset(0, -3),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              const SizedBox(height: 10),
+              Container(
+                width: 42,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+                child: Row(
+                  children: [
+                    const Icon(Icons.place_rounded,
+                        size: 18, color: Color(0xFF136B3E)),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        outlets.isEmpty
+                            ? 'No outlets on the map'
+                            : '${outlets.length} outlet'
+                                '${outlets.length == 1 ? '' : 's'} on map',
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 14.5),
+                      ),
+                    ),
+                    const Text('drag to expand',
+                        style: TextStyle(fontSize: 10.5, color: Colors.grey)),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: outlets.isEmpty
+                    ? const _EmptyOutlets()
+                    : ListView.separated(
+                        controller: scrollController,
+                        padding: const EdgeInsets.fromLTRB(12, 0, 12, 24),
+                        itemCount: outlets.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 6),
+                        itemBuilder: (_, i) {
+                          final o = outlets[i];
+                          return _OutletTile(
+                            outlet: o,
+                            distance: distanceOf(o),
+                            selected: o.id == selectedId,
+                            onTap: () => onTap(o),
+                          );
+                        },
+                      ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// One outlet row inside the bottom sheet.
+class _OutletTile extends StatelessWidget {
+  final Outlet outlet;
+  final double? distance;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _OutletTile({
+    required this.outlet,
+    required this.distance,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const green = Color(0xFF136B3E);
+    final coords = '${outlet.latitude!.toStringAsFixed(4)}, '
+        '${outlet.longitude!.toStringAsFixed(4)}';
+
+    return Material(
+      color: selected ? green.withOpacity(0.08) : const Color(0xFFF7F9F8),
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: selected ? green : green.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.storefront_rounded,
+                    size: 18, color: selected ? Colors.white : green),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      outlet.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13.5,
+                        color: selected ? green : const Color(0xFF1F2937),
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      (outlet.address?.isNotEmpty ?? false)
+                          ? outlet.address!
+                          : coords,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style:
+                          const TextStyle(fontSize: 11.5, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+              if (distance != null)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: green.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    _MapScreenState.formatDistance(distance!),
+                    style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w800,
+                        color: green),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shown when no outlet matches the search.
+class _EmptyOutlets extends StatelessWidget {
+  const _EmptyOutlets();
+
+  @override
+  Widget build(BuildContext context) {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.location_off_rounded, size: 34, color: Colors.grey),
+            SizedBox(height: 8),
+            Text('No outlet matches your search',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+            SizedBox(height: 4),
+            Text('Try a different name, or clear the search box.',
+                style: TextStyle(fontSize: 11.5, color: Colors.grey),
+                textAlign: TextAlign.center),
           ],
         ),
       ),

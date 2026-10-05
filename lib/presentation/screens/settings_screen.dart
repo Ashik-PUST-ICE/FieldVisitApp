@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 import 'package:field_visit_app/presentation/screens/map_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/security_settings_screen.dart';

@@ -6,6 +6,16 @@
 	<string>en</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to securely unlock your Field Visit account.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Field Visit needs your location while you use the app to verify outlet visits, record your beat route, and show nearby outlets on the map.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Field Visit needs background location to keep recording your beat route and visit check-ins while you move between outlets.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Field Visit needs camera access to capture visit photos and outlet evidence.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Field Visit needs photo library access so you can attach existing visit photos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Field Visit needs permission to save visit photos and QR codes to your gallery.</string>
 	<key>CFBundleDisplayName</key>
 	<string>Field Visit</string>
 	<key>CFBundleExecutable</key>

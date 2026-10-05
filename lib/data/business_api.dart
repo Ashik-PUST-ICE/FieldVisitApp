@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'dart:typed_data';
 import 'package:field_visit_app/core/utils/api_client.dart';
+import 'package:field_visit_app/data/models/location.dart';
 
 /// Gateway-backed API for the business service.
 /// All paths are relative to /api/u/business_service/v1.
@@ -26,6 +27,50 @@ class BusinessApi {
       client.post('/outlets/$id/deactivate-qr');
   Future<Response> verifyQr(String qrToken) =>
       client.post('/outlets/verify-qr', data: {'qr_token': qrToken});
+
+  /// Children of one node in the location hierarchy.
+  Future<List<Location>> locations({String? type, int? parentId}) async {
+    final res = await client.get('/locations', queryParameters: {
+      if (type != null) 'type': type,
+      if (parentId != null) 'parent_id': parentId,
+    });
+
+    return Location.listFromResponse(res);
+  }
+
+  Future<Location> createLocation(Map<String, dynamic> data) async {
+    final res = await client.post('/locations', data: data);
+
+    return Location.fromJson(
+        Map<String, dynamic>.from(res.data['data'] as Map));
+  }
+
+  Future<Location> updateLocation(int id, Map<String, dynamic> data) async {
+    final res = await client.put('/locations/$id', data: data);
+
+    return Location.fromJson(
+        Map<String, dynamic>.from(res.data['data'] as Map));
+  }
+
+  Future<void> deleteLocation(int id) => client.delete('/locations/$id');
+
+  /// Pastes a list of names in one go. Blank lines and names that already
+  /// exist under the parent are ignored server side.
+  Future<int> bulkCreateLocations({
+    required int parentId,
+    required String type,
+    required List<String> names,
+  }) async {
+    final res = await client.post('/locations/bulk', data: {
+      'parent_id': parentId,
+      'type': type,
+      'items': [
+        for (final n in names) {'name': n},
+      ],
+    });
+
+    return (res.data['data']?['created'] as num?)?.toInt() ?? 0;
+  }
 
   Future<Response> assignments({Map<String, dynamic>? query}) =>
       client.get('/outlet-assignments', queryParameters: query);

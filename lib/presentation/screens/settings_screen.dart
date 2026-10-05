@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
+import 'package:field_visit_app/presentation/screens/location_management_screen.dart';
 import 'package:field_visit_app/presentation/screens/map_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/security_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/storage_settings_screen.dart';
@@ -49,6 +50,15 @@ class SettingsScreen extends ConsumerWidget {
           if (isAdmin) ...[
             const SizedBox(height: 20),
             _groupLabel(context, 'ADMINISTRATION'),
+            _tile(
+              context,
+              icon: Icons.account_tree_rounded,
+              color: const Color(0xFF0F766E),
+              title: 'Location Master',
+              subtitle: 'Add or edit villages, wards and unions',
+              screen: const LocationManagementScreen(),
+            ),
+            const SizedBox(height: 12),
             _tile(
               context,
               icon: Icons.cloud_outlined,

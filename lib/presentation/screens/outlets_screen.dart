@@ -8,6 +8,7 @@ import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
+import 'package:field_visit_app/presentation/widgets/location_cascade.dart';
 
 class OutletsScreen extends ConsumerStatefulWidget {
   const OutletsScreen({super.key});
@@ -998,43 +999,13 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
                 letterSpacing: 1,
                 color: Color(0xFF6B7280))),
       ),
-      CellfinInputField(
-        controller: division,
-        hint: 'Division (e.g. Dhaka)',
-        prefixIcon: const Icon(Icons.public_rounded, color: Color(0xFF6B7280)),
-      ),
-      const SizedBox(height: 10),
-      CellfinInputField(
-        controller: district,
-        hint: 'District (e.g. Dhaka)',
-        prefixIcon: const Icon(Icons.map_rounded, color: Color(0xFF6B7280)),
-      ),
-      const SizedBox(height: 10),
-      CellfinInputField(
-        controller: upazila,
-        hint: 'Upazila (e.g. Gulshan)',
-        prefixIcon:
-            const Icon(Icons.account_tree_rounded, color: Color(0xFF6B7280)),
-      ),
-      const SizedBox(height: 10),
-      CellfinInputField(
-        controller: unionCtrl,
-        hint: 'Union (Optional)',
-        prefixIcon: const Icon(Icons.hub_outlined, color: Color(0xFF6B7280)),
-      ),
-      const SizedBox(height: 10),
-      CellfinInputField(
-        controller: ward,
-        hint: 'Ward (e.g. Ward 12)',
-        prefixIcon:
-            const Icon(Icons.grid_view_rounded, color: Color(0xFF6B7280)),
-      ),
-      const SizedBox(height: 10),
-      CellfinInputField(
-        controller: village,
-        hint: 'Village / Para (e.g. Gulshan Para)',
-        prefixIcon:
-            const Icon(Icons.home_work_outlined, color: Color(0xFF6B7280)),
+      LocationCascadeField(
+        division: division,
+        district: district,
+        upazila: upazila,
+        union: unionCtrl,
+        ward: ward,
+        village: village,
       ),
       CellfinInputField(
         controller: phone,

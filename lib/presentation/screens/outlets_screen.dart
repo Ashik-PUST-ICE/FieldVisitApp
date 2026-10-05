@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -469,11 +471,50 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
 
   String get qrToken => outlet.qrToken ?? 'OUTLET-${outlet.id}';
 
+  /// Structured QR payload.
+  ///
+  /// A bare token told a field officer nothing at the shop door. This carries
+  /// the outlet name and its full administrative hierarchy, so scanning it (or
+  /// reading the card) answers "which outlet, in which village?" immediately.
+  String get qrPayload => jsonEncode({
+        't': qrToken,
+        'n': outlet.name,
+        'c': outlet.code,
+        'dv': _clean(outlet.division),
+        'd': _clean(outlet.district),
+        'u': _clean(outlet.upazila),
+        'un': _clean(outlet.union),
+        'w': _clean(outlet.ward),
+        'v': _clean(outlet.village),
+        'a': _clean(outlet.address),
+        if (outlet.phone != null) 'p': outlet.phone,
+        if (outlet.ownerName != null) 'o': outlet.ownerName,
+        if (outlet.latitude != null) 'lat': outlet.latitude,
+        if (outlet.longitude != null) 'lng': outlet.longitude,
+      });
+
+  static String _clean(String? v) =>
+      (v == null || v.trim().isEmpty) ? '' : v.trim();
+
+  /// Rows shown under the QR so the info is readable without scanning.
+  List<(String, String)> get infoRows => [
+        if (_clean(outlet.code) != '') ('Code', outlet.code!),
+        if (_clean(outlet.division) != '') ('Division', outlet.division!),
+        if (_clean(outlet.district) != '') ('District', outlet.district!),
+        if (_clean(outlet.upazila) != '') ('Upazila', outlet.upazila!),
+        if (_clean(outlet.union) != '') ('Union', outlet.union!),
+        if (_clean(outlet.ward) != '') ('Ward', outlet.ward!),
+        if (_clean(outlet.village) != '') ('Village', outlet.village!),
+        if (_clean(outlet.address) != '') ('Address', outlet.address!),
+        if (_clean(outlet.ownerName) != '') ('Owner', outlet.ownerName!),
+        if (_clean(outlet.phone) != '') ('Phone', outlet.phone!),
+      ];
+
   String get qrUrl =>
-      'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${Uri.encodeComponent(qrToken)}';
+      'https://api.qrserver.com/v1/create-qr-code/?size=300x300&ecc=H&margin=10&data=${Uri.encodeComponent(qrPayload)}';
 
   String get downloadUrl =>
-      'https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&download=1&data=${Uri.encodeComponent(qrToken)}';
+      'https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&download=1&ecc=H&margin=16&data=${Uri.encodeComponent(qrPayload)}';
 
   @override
   Widget build(BuildContext ctx) {
@@ -508,151 +549,245 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
         ],
       ),
       content: SizedBox(
-        width: 300,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
-                boxShadow: [
-                  BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
-                      blurRadius: 6,
-                      offset: const Offset(0, 2)),
-                ],
-              ),
-              child: Image.network(
-                qrUrl,
-                width: 200,
-                height: 200,
-                loadingBuilder: (_, child, progress) => progress == null
-                    ? child
-                    : const SizedBox(
-                        width: 200,
-                        height: 200,
-                        child: Center(
-                            child: CircularProgressIndicator(
-                                color: Color(0xFF136B3E))),
-                      ),
-                errorBuilder: (_, __, ___) => const SizedBox(
+        // Wider now that the location breakdown is shown; still scrollable so
+        // a long hierarchy can never overflow the dialog.
+        width: 340,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 6,
+                        offset: const Offset(0, 2)),
+                  ],
+                ),
+                child: Image.network(
+                  qrUrl,
                   width: 200,
                   height: 200,
-                  child: Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.broken_image_rounded,
-                            size: 40, color: Colors.grey),
-                        SizedBox(height: 8),
-                        Text('Unable to load QR image',
-                            style: TextStyle(fontSize: 12, color: Colors.grey)),
-                      ],
+                  loadingBuilder: (_, child, progress) => progress == null
+                      ? child
+                      : const SizedBox(
+                          width: 200,
+                          height: 200,
+                          child: Center(
+                              child: CircularProgressIndicator(
+                                  color: Color(0xFF136B3E))),
+                        ),
+                  errorBuilder: (_, __, ___) => const SizedBox(
+                    width: 200,
+                    height: 200,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.broken_image_rounded,
+                              size: 40, color: Colors.grey),
+                          SizedBox(height: 8),
+                          Text('Unable to load QR image',
+                              style:
+                                  TextStyle(fontSize: 12, color: Colors.grey)),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                'Token: $qrToken',
-                style: const TextStyle(
-                    fontSize: 11,
-                    fontFamily: 'monospace',
-                    color: Color(0xFF334155)),
-                textAlign: TextAlign.center,
-              ),
-            ),
-            const SizedBox(height: 16),
-            // All three actions share one row with identical height and width.
-            // They used to be TextButton + OutlinedButton + FilledButton, whose
-            // different heights made the row look ragged.
-            Row(
-              children: [
-                Expanded(
-                  child: _QrActionButton(
-                    icon: Icons.close_rounded,
-                    label: 'Close',
-                    onTap: () => Navigator.pop(ctx),
-                  ),
+              const SizedBox(height: 12),
+
+              // Outlet name printed large, straight on the QR card, so the
+              // officer knows which shop this belongs to without scanning.
+              Container(
+                width: double.infinity,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF136B3E),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _QrActionButton(
-                    icon: Icons.download_rounded,
-                    label: 'Download',
-                    onTap: () async {
-                      // Do NOT gate on canLaunchUrl(): on Android 11+ it
-                      // returns false even for a plain https link unless the
-                      // manifest declares a matching <queries> intent, so the
-                      // button used to do nothing. Just try, and report.
-                      final uri = Uri.parse(downloadUrl);
-                      var opened = false;
-                      try {
-                        opened = await launchUrl(
-                          uri,
-                          mode: LaunchMode.externalApplication,
-                        );
-                      } catch (_) {
-                        opened = false;
-                      }
-                      if (!ctx.mounted) return;
-                      ScaffoldMessenger.of(ctx).showSnackBar(
-                        SnackBar(
-                          content: Text(opened
-                              ? 'Browser opened - the PNG will download'
-                              : 'Could not open the download link'),
-                          backgroundColor:
-                              opened ? const Color(0xFF136B3E) : null,
-                        ),
-                      );
-                    },
-                  ),
+                child: Column(
+                  children: [
+                    Text(
+                      outlet.name,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.white,
+                      ),
+                    ),
+                    if (outlet.locationLine.isNotEmpty) ...[
+                      const SizedBox(height: 3),
+                      Text(
+                        outlet.locationLine,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                            fontSize: 11.5, color: Colors.white70),
+                      ),
+                    ],
+                  ],
                 ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: _QrActionButton(
-                    icon: Icons.refresh_rounded,
-                    label: 'Regenerate',
-                    filled: true,
-                    busy: regenerating,
-                    onTap: regenerating
-                        ? null
-                        : () async {
-                            setState(() => regenerating = true);
-                            try {
-                              await ref
-                                  .read(outletsProvider.notifier)
-                                  .regenerateQr(outlet.id);
-                              if (ctx.mounted) Navigator.pop(ctx);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text('QR token regenerated!'),
-                                    backgroundColor: Color(0xFF136B3E),
+              ),
+              const SizedBox(height: 10),
+
+              // Administrative breakdown.
+              if (infoRows.isNotEmpty)
+                Container(
+                  width: double.infinity,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF7F9F8),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                  ),
+                  child: Column(
+                    children: [
+                      for (final row in infoRows)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 2),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              SizedBox(
+                                width: 74,
+                                child: Text(
+                                  row.$1,
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w700,
+                                    color: Color(0xFF6B7280),
                                   ),
-                                );
-                              }
-                            } finally {
-                              if (mounted) {
-                                setState(() => regenerating = false);
-                              }
-                            }
-                          },
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  row.$2,
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF1F2937),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
                   ),
                 ),
-              ],
-            ),
-          ],
+
+              const SizedBox(height: 8),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF1F5F9),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  'Token: $qrToken',
+                  style: const TextStyle(
+                      fontSize: 11,
+                      fontFamily: 'monospace',
+                      color: Color(0xFF334155)),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              const SizedBox(height: 16),
+              // All three actions share one row with identical height and width.
+              // They used to be TextButton + OutlinedButton + FilledButton, whose
+              // different heights made the row look ragged.
+              Row(
+                children: [
+                  Expanded(
+                    child: _QrActionButton(
+                      icon: Icons.close_rounded,
+                      label: 'Close',
+                      onTap: () => Navigator.pop(ctx),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _QrActionButton(
+                      icon: Icons.download_rounded,
+                      label: 'Download',
+                      onTap: () async {
+                        // Do NOT gate on canLaunchUrl(): on Android 11+ it
+                        // returns false even for a plain https link unless the
+                        // manifest declares a matching <queries> intent, so the
+                        // button used to do nothing. Just try, and report.
+                        final uri = Uri.parse(downloadUrl);
+                        var opened = false;
+                        try {
+                          opened = await launchUrl(
+                            uri,
+                            mode: LaunchMode.externalApplication,
+                          );
+                        } catch (_) {
+                          opened = false;
+                        }
+                        if (!ctx.mounted) return;
+                        ScaffoldMessenger.of(ctx).showSnackBar(
+                          SnackBar(
+                            content: Text(opened
+                                ? 'Browser opened - the PNG will download'
+                                : 'Could not open the download link'),
+                            backgroundColor:
+                                opened ? const Color(0xFF136B3E) : null,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: _QrActionButton(
+                      icon: Icons.refresh_rounded,
+                      label: 'Regenerate',
+                      filled: true,
+                      busy: regenerating,
+                      onTap: regenerating
+                          ? null
+                          : () async {
+                              setState(() => regenerating = true);
+                              try {
+                                await ref
+                                    .read(outletsProvider.notifier)
+                                    .regenerateQr(outlet.id);
+                                if (ctx.mounted) Navigator.pop(ctx);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text('QR token regenerated!'),
+                                      backgroundColor: Color(0xFF136B3E),
+                                    ),
+                                  );
+                                }
+                              } finally {
+                                if (mounted) {
+                                  setState(() => regenerating = false);
+                                }
+                              }
+                            },
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -809,6 +944,15 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
   final radius =
       TextEditingController(text: outlet?.geofenceRadius?.toString());
 
+  // Administrative hierarchy: division -> district -> upazila -> union ->
+  // ward -> village. Lets a field officer place the shop without GPS.
+  final division = TextEditingController(text: outlet?.division);
+  final district = TextEditingController(text: outlet?.district);
+  final upazila = TextEditingController(text: outlet?.upazila);
+  final unionCtrl = TextEditingController(text: outlet?.union);
+  final ward = TextEditingController(text: outlet?.ward);
+  final village = TextEditingController(text: outlet?.village);
+
   await CellfinFormScreen.push(
     context: context,
     title: outlet == null ? 'Add Retail Outlet' : 'Edit Outlet Details',
@@ -842,6 +986,55 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
             const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
         validator: (v) =>
             v == null || v.trim().isEmpty ? 'Address is required' : null,
+      ),
+      const SizedBox(height: 10),
+      // ── Administrative hierarchy ────────────────────────────────────
+      const Padding(
+        padding: EdgeInsets.only(top: 6, bottom: 8),
+        child: Text('LOCATION HIERARCHY',
+            style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1,
+                color: Color(0xFF6B7280))),
+      ),
+      CellfinInputField(
+        controller: division,
+        hint: 'Division (e.g. Dhaka)',
+        prefixIcon: const Icon(Icons.public_rounded, color: Color(0xFF6B7280)),
+      ),
+      const SizedBox(height: 10),
+      CellfinInputField(
+        controller: district,
+        hint: 'District (e.g. Dhaka)',
+        prefixIcon: const Icon(Icons.map_rounded, color: Color(0xFF6B7280)),
+      ),
+      const SizedBox(height: 10),
+      CellfinInputField(
+        controller: upazila,
+        hint: 'Upazila (e.g. Gulshan)',
+        prefixIcon:
+            const Icon(Icons.account_tree_rounded, color: Color(0xFF6B7280)),
+      ),
+      const SizedBox(height: 10),
+      CellfinInputField(
+        controller: unionCtrl,
+        hint: 'Union (Optional)',
+        prefixIcon: const Icon(Icons.hub_outlined, color: Color(0xFF6B7280)),
+      ),
+      const SizedBox(height: 10),
+      CellfinInputField(
+        controller: ward,
+        hint: 'Ward (e.g. Ward 12)',
+        prefixIcon:
+            const Icon(Icons.grid_view_rounded, color: Color(0xFF6B7280)),
+      ),
+      const SizedBox(height: 10),
+      CellfinInputField(
+        controller: village,
+        hint: 'Village / Para (e.g. Gulshan Para)',
+        prefixIcon:
+            const Icon(Icons.home_work_outlined, color: Color(0xFF6B7280)),
       ),
       CellfinInputField(
         controller: phone,
@@ -886,6 +1079,13 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
         'name': name.text.trim(),
         if (code.text.trim().isNotEmpty) 'code': code.text.trim(),
         if (address.text.trim().isNotEmpty) 'address': address.text.trim(),
+        // Administrative hierarchy.
+        if (division.text.trim().isNotEmpty) 'division': division.text.trim(),
+        if (district.text.trim().isNotEmpty) 'district': district.text.trim(),
+        if (upazila.text.trim().isNotEmpty) 'upazila': upazila.text.trim(),
+        if (unionCtrl.text.trim().isNotEmpty) 'union': unionCtrl.text.trim(),
+        if (ward.text.trim().isNotEmpty) 'ward': ward.text.trim(),
+        if (village.text.trim().isNotEmpty) 'village': village.text.trim(),
         if (phone.text.trim().isNotEmpty) 'phone': phone.text.trim(),
         if (latitude.text.trim().isNotEmpty) 'latitude': latitude.text.trim(),
         if (longitude.text.trim().isNotEmpty)
@@ -921,6 +1121,12 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
   latitude.dispose();
   longitude.dispose();
   radius.dispose();
+  division.dispose();
+  district.dispose();
+  upazila.dispose();
+  unionCtrl.dispose();
+  ward.dispose();
+  village.dispose();
 }
 
 class _ErrorView extends StatelessWidget {

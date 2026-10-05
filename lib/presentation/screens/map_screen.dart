@@ -784,6 +784,20 @@ class _OutletTile extends StatelessWidget {
                       style:
                           const TextStyle(fontSize: 11.5, color: Colors.grey),
                     ),
+                    // Administrative hierarchy, so the officer can recognise
+                    // the area without relying on the map pin.
+                    if (outlet.locationLine.isNotEmpty) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        outlet.locationLine,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: selected ? green : Colors.grey.shade600,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

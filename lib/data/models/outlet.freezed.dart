@@ -20,24 +20,45 @@ Outlet _$OutletFromJson(Map<String, dynamic> json) {
 
 /// @nodoc
 mixin _$Outlet {
+  @JsonKey(fromJson: _outletInt)
   int get id => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletRequiredString)
   String get name => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
   String? get code => throw _privateConstructorUsedError;
-  @JsonKey(name: 'qr_token')
+  @JsonKey(name: 'qr_token', fromJson: _outletString)
   String? get qrToken => throw _privateConstructorUsedError;
-  String? get address => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get address =>
+      throw _privateConstructorUsedError; // Administrative hierarchy, most general first.
+  @JsonKey(fromJson: _outletString)
+  String? get division => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get district => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get upazila => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get union => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get ward => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get village => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletDouble)
   double? get latitude => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletDouble)
   double? get longitude => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
   String? get phone => throw _privateConstructorUsedError;
-  @JsonKey(name: 'owner_name')
+  @JsonKey(name: 'owner_name', fromJson: _outletString)
   String? get ownerName => throw _privateConstructorUsedError;
   dynamic get category => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
   String? get status => throw _privateConstructorUsedError;
-  @JsonKey(name: 'geofence_radius')
+  @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
   int? get geofenceRadius => throw _privateConstructorUsedError;
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _outletString)
   String? get createdAt => throw _privateConstructorUsedError;
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _outletString)
   String? get updatedAt => throw _privateConstructorUsedError;
 
   /// Serializes this Outlet to a JSON map.
@@ -55,20 +76,27 @@ abstract class $OutletCopyWith<$Res> {
       _$OutletCopyWithImpl<$Res, Outlet>;
   @useResult
   $Res call(
-      {int id,
-      String name,
-      String? code,
-      @JsonKey(name: 'qr_token') String? qrToken,
-      String? address,
-      double? latitude,
-      double? longitude,
-      String? phone,
-      @JsonKey(name: 'owner_name') String? ownerName,
+      {@JsonKey(fromJson: _outletInt) int id,
+      @JsonKey(fromJson: _outletRequiredString) String name,
+      @JsonKey(fromJson: _outletString) String? code,
+      @JsonKey(name: 'qr_token', fromJson: _outletString) String? qrToken,
+      @JsonKey(fromJson: _outletString) String? address,
+      @JsonKey(fromJson: _outletString) String? division,
+      @JsonKey(fromJson: _outletString) String? district,
+      @JsonKey(fromJson: _outletString) String? upazila,
+      @JsonKey(fromJson: _outletString) String? union,
+      @JsonKey(fromJson: _outletString) String? ward,
+      @JsonKey(fromJson: _outletString) String? village,
+      @JsonKey(fromJson: _outletDouble) double? latitude,
+      @JsonKey(fromJson: _outletDouble) double? longitude,
+      @JsonKey(fromJson: _outletString) String? phone,
+      @JsonKey(name: 'owner_name', fromJson: _outletString) String? ownerName,
       dynamic category,
-      String? status,
-      @JsonKey(name: 'geofence_radius') int? geofenceRadius,
-      @JsonKey(name: 'created_at') String? createdAt,
-      @JsonKey(name: 'updated_at') String? updatedAt});
+      @JsonKey(fromJson: _outletString) String? status,
+      @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
+      int? geofenceRadius,
+      @JsonKey(name: 'created_at', fromJson: _outletString) String? createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _outletString) String? updatedAt});
 }
 
 /// @nodoc
@@ -91,6 +119,12 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
     Object? code = freezed,
     Object? qrToken = freezed,
     Object? address = freezed,
+    Object? division = freezed,
+    Object? district = freezed,
+    Object? upazila = freezed,
+    Object? union = freezed,
+    Object? ward = freezed,
+    Object? village = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? phone = freezed,
@@ -121,6 +155,30 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      division: freezed == division
+          ? _value.division
+          : division // ignore: cast_nullable_to_non_nullable
+              as String?,
+      district: freezed == district
+          ? _value.district
+          : district // ignore: cast_nullable_to_non_nullable
+              as String?,
+      upazila: freezed == upazila
+          ? _value.upazila
+          : upazila // ignore: cast_nullable_to_non_nullable
+              as String?,
+      union: freezed == union
+          ? _value.union
+          : union // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ward: freezed == ward
+          ? _value.ward
+          : ward // ignore: cast_nullable_to_non_nullable
+              as String?,
+      village: freezed == village
+          ? _value.village
+          : village // ignore: cast_nullable_to_non_nullable
               as String?,
       latitude: freezed == latitude
           ? _value.latitude
@@ -170,20 +228,27 @@ abstract class _$$OutletImplCopyWith<$Res> implements $OutletCopyWith<$Res> {
   @override
   @useResult
   $Res call(
-      {int id,
-      String name,
-      String? code,
-      @JsonKey(name: 'qr_token') String? qrToken,
-      String? address,
-      double? latitude,
-      double? longitude,
-      String? phone,
-      @JsonKey(name: 'owner_name') String? ownerName,
+      {@JsonKey(fromJson: _outletInt) int id,
+      @JsonKey(fromJson: _outletRequiredString) String name,
+      @JsonKey(fromJson: _outletString) String? code,
+      @JsonKey(name: 'qr_token', fromJson: _outletString) String? qrToken,
+      @JsonKey(fromJson: _outletString) String? address,
+      @JsonKey(fromJson: _outletString) String? division,
+      @JsonKey(fromJson: _outletString) String? district,
+      @JsonKey(fromJson: _outletString) String? upazila,
+      @JsonKey(fromJson: _outletString) String? union,
+      @JsonKey(fromJson: _outletString) String? ward,
+      @JsonKey(fromJson: _outletString) String? village,
+      @JsonKey(fromJson: _outletDouble) double? latitude,
+      @JsonKey(fromJson: _outletDouble) double? longitude,
+      @JsonKey(fromJson: _outletString) String? phone,
+      @JsonKey(name: 'owner_name', fromJson: _outletString) String? ownerName,
       dynamic category,
-      String? status,
-      @JsonKey(name: 'geofence_radius') int? geofenceRadius,
-      @JsonKey(name: 'created_at') String? createdAt,
-      @JsonKey(name: 'updated_at') String? updatedAt});
+      @JsonKey(fromJson: _outletString) String? status,
+      @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
+      int? geofenceRadius,
+      @JsonKey(name: 'created_at', fromJson: _outletString) String? createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _outletString) String? updatedAt});
 }
 
 /// @nodoc
@@ -204,6 +269,12 @@ class __$$OutletImplCopyWithImpl<$Res>
     Object? code = freezed,
     Object? qrToken = freezed,
     Object? address = freezed,
+    Object? division = freezed,
+    Object? district = freezed,
+    Object? upazila = freezed,
+    Object? union = freezed,
+    Object? ward = freezed,
+    Object? village = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? phone = freezed,
@@ -234,6 +305,30 @@ class __$$OutletImplCopyWithImpl<$Res>
       address: freezed == address
           ? _value.address
           : address // ignore: cast_nullable_to_non_nullable
+              as String?,
+      division: freezed == division
+          ? _value.division
+          : division // ignore: cast_nullable_to_non_nullable
+              as String?,
+      district: freezed == district
+          ? _value.district
+          : district // ignore: cast_nullable_to_non_nullable
+              as String?,
+      upazila: freezed == upazila
+          ? _value.upazila
+          : upazila // ignore: cast_nullable_to_non_nullable
+              as String?,
+      union: freezed == union
+          ? _value.union
+          : union // ignore: cast_nullable_to_non_nullable
+              as String?,
+      ward: freezed == ward
+          ? _value.ward
+          : ward // ignore: cast_nullable_to_non_nullable
+              as String?,
+      village: freezed == village
+          ? _value.village
+          : village // ignore: cast_nullable_to_non_nullable
               as String?,
       latitude: freezed == latitude
           ? _value.latitude
@@ -279,61 +374,95 @@ class __$$OutletImplCopyWithImpl<$Res>
 @JsonSerializable()
 class _$OutletImpl implements _Outlet {
   const _$OutletImpl(
-      {required this.id,
-      required this.name,
-      this.code,
-      @JsonKey(name: 'qr_token') this.qrToken,
-      this.address,
-      this.latitude,
-      this.longitude,
-      this.phone,
-      @JsonKey(name: 'owner_name') this.ownerName,
+      {@JsonKey(fromJson: _outletInt) required this.id,
+      @JsonKey(fromJson: _outletRequiredString) required this.name,
+      @JsonKey(fromJson: _outletString) this.code,
+      @JsonKey(name: 'qr_token', fromJson: _outletString) this.qrToken,
+      @JsonKey(fromJson: _outletString) this.address,
+      @JsonKey(fromJson: _outletString) this.division,
+      @JsonKey(fromJson: _outletString) this.district,
+      @JsonKey(fromJson: _outletString) this.upazila,
+      @JsonKey(fromJson: _outletString) this.union,
+      @JsonKey(fromJson: _outletString) this.ward,
+      @JsonKey(fromJson: _outletString) this.village,
+      @JsonKey(fromJson: _outletDouble) this.latitude,
+      @JsonKey(fromJson: _outletDouble) this.longitude,
+      @JsonKey(fromJson: _outletString) this.phone,
+      @JsonKey(name: 'owner_name', fromJson: _outletString) this.ownerName,
       this.category,
-      this.status,
-      @JsonKey(name: 'geofence_radius') this.geofenceRadius,
-      @JsonKey(name: 'created_at') this.createdAt,
-      @JsonKey(name: 'updated_at') this.updatedAt});
+      @JsonKey(fromJson: _outletString) this.status,
+      @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
+      this.geofenceRadius,
+      @JsonKey(name: 'created_at', fromJson: _outletString) this.createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _outletString) this.updatedAt});
 
   factory _$OutletImpl.fromJson(Map<String, dynamic> json) =>
       _$$OutletImplFromJson(json);
 
   @override
+  @JsonKey(fromJson: _outletInt)
   final int id;
   @override
+  @JsonKey(fromJson: _outletRequiredString)
   final String name;
   @override
+  @JsonKey(fromJson: _outletString)
   final String? code;
   @override
-  @JsonKey(name: 'qr_token')
+  @JsonKey(name: 'qr_token', fromJson: _outletString)
   final String? qrToken;
   @override
+  @JsonKey(fromJson: _outletString)
   final String? address;
+// Administrative hierarchy, most general first.
   @override
+  @JsonKey(fromJson: _outletString)
+  final String? division;
+  @override
+  @JsonKey(fromJson: _outletString)
+  final String? district;
+  @override
+  @JsonKey(fromJson: _outletString)
+  final String? upazila;
+  @override
+  @JsonKey(fromJson: _outletString)
+  final String? union;
+  @override
+  @JsonKey(fromJson: _outletString)
+  final String? ward;
+  @override
+  @JsonKey(fromJson: _outletString)
+  final String? village;
+  @override
+  @JsonKey(fromJson: _outletDouble)
   final double? latitude;
   @override
+  @JsonKey(fromJson: _outletDouble)
   final double? longitude;
   @override
+  @JsonKey(fromJson: _outletString)
   final String? phone;
   @override
-  @JsonKey(name: 'owner_name')
+  @JsonKey(name: 'owner_name', fromJson: _outletString)
   final String? ownerName;
   @override
   final dynamic category;
   @override
+  @JsonKey(fromJson: _outletString)
   final String? status;
   @override
-  @JsonKey(name: 'geofence_radius')
+  @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
   final int? geofenceRadius;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _outletString)
   final String? createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _outletString)
   final String? updatedAt;
 
   @override
   String toString() {
-    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, division: $division, district: $district, upazila: $upazila, union: $union, ward: $ward, village: $village, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -346,6 +475,14 @@ class _$OutletImpl implements _Outlet {
             (identical(other.code, code) || other.code == code) &&
             (identical(other.qrToken, qrToken) || other.qrToken == qrToken) &&
             (identical(other.address, address) || other.address == address) &&
+            (identical(other.division, division) ||
+                other.division == division) &&
+            (identical(other.district, district) ||
+                other.district == district) &&
+            (identical(other.upazila, upazila) || other.upazila == upazila) &&
+            (identical(other.union, union) || other.union == union) &&
+            (identical(other.ward, ward) || other.ward == ward) &&
+            (identical(other.village, village) || other.village == village) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
@@ -365,22 +502,29 @@ class _$OutletImpl implements _Outlet {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType,
-      id,
-      name,
-      code,
-      qrToken,
-      address,
-      latitude,
-      longitude,
-      phone,
-      ownerName,
-      const DeepCollectionEquality().hash(category),
-      status,
-      geofenceRadius,
-      createdAt,
-      updatedAt);
+  int get hashCode => Object.hashAll([
+        runtimeType,
+        id,
+        name,
+        code,
+        qrToken,
+        address,
+        division,
+        district,
+        upazila,
+        union,
+        ward,
+        village,
+        latitude,
+        longitude,
+        phone,
+        ownerName,
+        const DeepCollectionEquality().hash(category),
+        status,
+        geofenceRadius,
+        createdAt,
+        updatedAt
+      ]);
 
   /// Create a copy of Outlet
   /// with the given fields replaced by the non-null parameter values.
@@ -400,55 +544,91 @@ class _$OutletImpl implements _Outlet {
 
 abstract class _Outlet implements Outlet {
   const factory _Outlet(
-      {required final int id,
-      required final String name,
-      final String? code,
-      @JsonKey(name: 'qr_token') final String? qrToken,
-      final String? address,
-      final double? latitude,
-      final double? longitude,
-      final String? phone,
-      @JsonKey(name: 'owner_name') final String? ownerName,
+      {@JsonKey(fromJson: _outletInt) required final int id,
+      @JsonKey(fromJson: _outletRequiredString) required final String name,
+      @JsonKey(fromJson: _outletString) final String? code,
+      @JsonKey(name: 'qr_token', fromJson: _outletString) final String? qrToken,
+      @JsonKey(fromJson: _outletString) final String? address,
+      @JsonKey(fromJson: _outletString) final String? division,
+      @JsonKey(fromJson: _outletString) final String? district,
+      @JsonKey(fromJson: _outletString) final String? upazila,
+      @JsonKey(fromJson: _outletString) final String? union,
+      @JsonKey(fromJson: _outletString) final String? ward,
+      @JsonKey(fromJson: _outletString) final String? village,
+      @JsonKey(fromJson: _outletDouble) final double? latitude,
+      @JsonKey(fromJson: _outletDouble) final double? longitude,
+      @JsonKey(fromJson: _outletString) final String? phone,
+      @JsonKey(name: 'owner_name', fromJson: _outletString)
+      final String? ownerName,
       final dynamic category,
-      final String? status,
-      @JsonKey(name: 'geofence_radius') final int? geofenceRadius,
-      @JsonKey(name: 'created_at') final String? createdAt,
-      @JsonKey(name: 'updated_at') final String? updatedAt}) = _$OutletImpl;
+      @JsonKey(fromJson: _outletString) final String? status,
+      @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
+      final int? geofenceRadius,
+      @JsonKey(name: 'created_at', fromJson: _outletString)
+      final String? createdAt,
+      @JsonKey(name: 'updated_at', fromJson: _outletString)
+      final String? updatedAt}) = _$OutletImpl;
 
   factory _Outlet.fromJson(Map<String, dynamic> json) = _$OutletImpl.fromJson;
 
   @override
+  @JsonKey(fromJson: _outletInt)
   int get id;
   @override
+  @JsonKey(fromJson: _outletRequiredString)
   String get name;
   @override
+  @JsonKey(fromJson: _outletString)
   String? get code;
   @override
-  @JsonKey(name: 'qr_token')
+  @JsonKey(name: 'qr_token', fromJson: _outletString)
   String? get qrToken;
   @override
-  String? get address;
+  @JsonKey(fromJson: _outletString)
+  String? get address; // Administrative hierarchy, most general first.
   @override
+  @JsonKey(fromJson: _outletString)
+  String? get division;
+  @override
+  @JsonKey(fromJson: _outletString)
+  String? get district;
+  @override
+  @JsonKey(fromJson: _outletString)
+  String? get upazila;
+  @override
+  @JsonKey(fromJson: _outletString)
+  String? get union;
+  @override
+  @JsonKey(fromJson: _outletString)
+  String? get ward;
+  @override
+  @JsonKey(fromJson: _outletString)
+  String? get village;
+  @override
+  @JsonKey(fromJson: _outletDouble)
   double? get latitude;
   @override
+  @JsonKey(fromJson: _outletDouble)
   double? get longitude;
   @override
+  @JsonKey(fromJson: _outletString)
   String? get phone;
   @override
-  @JsonKey(name: 'owner_name')
+  @JsonKey(name: 'owner_name', fromJson: _outletString)
   String? get ownerName;
   @override
   dynamic get category;
   @override
+  @JsonKey(fromJson: _outletString)
   String? get status;
   @override
-  @JsonKey(name: 'geofence_radius')
+  @JsonKey(name: 'geofence_radius', fromJson: _outletInt)
   int? get geofenceRadius;
   @override
-  @JsonKey(name: 'created_at')
+  @JsonKey(name: 'created_at', fromJson: _outletString)
   String? get createdAt;
   @override
-  @JsonKey(name: 'updated_at')
+  @JsonKey(name: 'updated_at', fromJson: _outletString)
   String? get updatedAt;
 
   /// Create a copy of Outlet

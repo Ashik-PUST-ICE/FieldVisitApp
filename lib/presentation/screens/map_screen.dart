@@ -308,6 +308,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       ),
       body: Stack(
         children: [
+          // Search floats above the map and filters the pins live.
+          Positioned(
+            top: 10,
+            left: 12,
+            right: 12,
+            child: _searchBar(context),
+          ),
           // The credential decides how the map renders:
           //  - key saved -> WebView + Maps JS API, so a key typed into Map
           //    Settings applies immediately, with no rebuild
@@ -345,12 +352,121 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               bottom: 12,
               child: _Notice(message: _locationProblem!),
             ),
+          if (_search.trim().isNotEmpty)
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: _ResultStrip(
+                count: _pins.length,
+                total: (ref.watch(outletsProvider).valueOrNull ?? const [])
+                    .where((o) => o.latitude != null)
+                    .length,
+                onClear: () => setState(() => _search = ''),
+              ),
+            ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: 'map_refresh',
-        onPressed: _buildMarkers,
-        child: const Icon(Icons.refresh),
+      floatingActionButton: _search.trim().isEmpty
+          ? FloatingActionButton(
+              heroTag: 'map_refresh',
+              onPressed: _buildMarkers,
+              child: const Icon(Icons.refresh),
+            )
+          : null,
+    );
+  }
+
+  /// Floating search field with a live match counter.
+  Widget _searchBar(BuildContext context) {
+    final total = (ref.watch(outletsProvider).valueOrNull ?? const [])
+        .where((o) => o.latitude != null)
+        .length;
+
+    return Material(
+      elevation: 3,
+      borderRadius: BorderRadius.circular(14),
+      color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        child: TextField(
+          style: const TextStyle(fontSize: 14.5),
+          onChanged: (v) {
+            setState(() => _search = v);
+            // Keep the native map in sync with the filtered set.
+            _buildMarkers();
+          },
+          decoration: InputDecoration(
+            hintText: 'Search outlets by name',
+            hintStyle: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+            prefixIcon: const Icon(Icons.search_rounded, size: 20),
+            suffixIcon: _search.isEmpty
+                ? (total > 0
+                    ? Padding(
+                        padding: const EdgeInsets.only(right: 12),
+                        child: Center(
+                          widthFactor: 1,
+                          child: Text('$total',
+                              style: const TextStyle(
+                                  fontSize: 12, color: Colors.grey)),
+                        ),
+                      )
+                    : null)
+                : IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 18),
+                    onPressed: () => setState(() => _search = ''),
+                  ),
+            border: InputBorder.none,
+            contentPadding: const EdgeInsets.symmetric(vertical: 14),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shows how many outlets the current search matched.
+class _ResultStrip extends StatelessWidget {
+  final int count;
+  final int total;
+  final VoidCallback onClear;
+
+  const _ResultStrip({
+    required this.count,
+    required this.total,
+    required this.onClear,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.black.withOpacity(0.75),
+      borderRadius: BorderRadius.circular(12),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 8, 8, 8),
+        child: Row(
+          children: [
+            Icon(
+              count > 0 ? Icons.place_rounded : Icons.search_off_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                count > 0
+                    ? '$count of $total outlets on the map'
+                    : 'No outlet matches this search',
+                style: const TextStyle(color: Colors.white, fontSize: 12.5),
+              ),
+            ),
+            TextButton(
+              onPressed: onClear,
+              child: const Text('Clear',
+                  style: TextStyle(color: Colors.white, fontSize: 12.5)),
+            ),
+          ],
+        ),
       ),
     );
   }

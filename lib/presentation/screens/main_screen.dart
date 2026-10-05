@@ -12,9 +12,10 @@ import 'package:field_visit_app/presentation/screens/kpi_screen.dart';
 import 'package:field_visit_app/presentation/screens/outlets_screen.dart';
 import 'package:field_visit_app/presentation/screens/qr_scanner_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
-import 'package:field_visit_app/presentation/screens/security_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/storage_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/visits_screen.dart';
+import 'package:field_visit_app/presentation/screens/security_settings_screen.dart';
+import 'package:field_visit_app/presentation/screens/settings_screen.dart';
 
 class MainScreen extends ConsumerStatefulWidget {
   const MainScreen({super.key});
@@ -474,7 +475,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports',
                       () => _openScreen(const ReportsScreen())),
                   _buildDrawerTile(Icons.settings_rounded, 'Settings',
-                      () => _openScreen(const SecuritySettingsScreen())),
+                      () => _openScreen(const SettingsScreen())),
                   if ((ref.watch(authProvider).valueOrNull?.roles ?? []).any(
                       (role) =>
                           role == 'super-admin' ||

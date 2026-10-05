@@ -442,17 +442,42 @@ class _OutletCard extends ConsumerWidget {
   }
 }
 
+/// Opens the outlet QR dialog.
 Future<void> _showOutletQrDialog(
-    BuildContext context, WidgetRef ref, Outlet outlet) async {
-  final qrToken = outlet.qrToken ?? 'OUTLET-${outlet.id}';
-  final qrUrl =
+    BuildContext context, WidgetRef ref, Outlet outlet) {
+  return showDialog<void>(
+    context: context,
+    builder: (_) => _OutletQrDialog(outlet: outlet),
+  );
+}
+
+/// QR dialog shell. Regenerate needs its own [State] for the busy spinner, so
+/// the whole dialog is a StatefulWidget rather than a top-level function.
+class _OutletQrDialog extends ConsumerStatefulWidget {
+  final Outlet outlet;
+
+  const _OutletQrDialog({required this.outlet});
+
+  @override
+  ConsumerState<_OutletQrDialog> createState() => _OutletQrDialogState();
+}
+
+class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
+  bool regenerating = false;
+
+  Outlet get outlet => widget.outlet;
+
+  String get qrToken => outlet.qrToken ?? 'OUTLET-${outlet.id}';
+
+  String get qrUrl =>
       'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${Uri.encodeComponent(qrToken)}';
-  final downloadUrl =
+
+  String get downloadUrl =>
       'https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&download=1&data=${Uri.encodeComponent(qrToken)}';
 
-  await showDialog<void>(
-    context: context,
-    builder: (ctx) => AlertDialog(
+  @override
+  Widget build(BuildContext ctx) {
+    return AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
@@ -547,61 +572,176 @@ Future<void> _showOutletQrDialog(
                 textAlign: TextAlign.center,
               ),
             ),
+            const SizedBox(height: 16),
+            // All three actions share one row with identical height and width.
+            // They used to be TextButton + OutlinedButton + FilledButton, whose
+            // different heights made the row look ragged.
+            Row(
+              children: [
+                Expanded(
+                  child: _QrActionButton(
+                    icon: Icons.close_rounded,
+                    label: 'Close',
+                    onTap: () => Navigator.pop(ctx),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _QrActionButton(
+                    icon: Icons.download_rounded,
+                    label: 'Download',
+                    onTap: () async {
+                      // Do NOT gate on canLaunchUrl(): on Android 11+ it
+                      // returns false even for a plain https link unless the
+                      // manifest declares a matching <queries> intent, so the
+                      // button used to do nothing. Just try, and report.
+                      final uri = Uri.parse(downloadUrl);
+                      var opened = false;
+                      try {
+                        opened = await launchUrl(
+                          uri,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      } catch (_) {
+                        opened = false;
+                      }
+                      if (!ctx.mounted) return;
+                      ScaffoldMessenger.of(ctx).showSnackBar(
+                        SnackBar(
+                          content: Text(opened
+                              ? 'Browser opened - the PNG will download'
+                              : 'Could not open the download link'),
+                          backgroundColor:
+                              opened ? const Color(0xFF136B3E) : null,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: _QrActionButton(
+                    icon: Icons.refresh_rounded,
+                    label: 'Regenerate',
+                    filled: true,
+                    busy: regenerating,
+                    onTap: regenerating
+                        ? null
+                        : () async {
+                            setState(() => regenerating = true);
+                            try {
+                              await ref
+                                  .read(outletsProvider.notifier)
+                                  .regenerateQr(outlet.id);
+                              if (ctx.mounted) Navigator.pop(ctx);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('QR token regenerated!'),
+                                    backgroundColor: Color(0xFF136B3E),
+                                  ),
+                                );
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() => regenerating = false);
+                              }
+                            }
+                          },
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: const Text('Close'),
-        ),
-        // ── Download QR ──────────────────────────────────────────────
-        OutlinedButton.icon(
-          style: OutlinedButton.styleFrom(
-            foregroundColor: AppColors.primary,
-            side: const BorderSide(color: AppColors.primary),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+    );
+  }
+}
+
+/// One button in the QR dialog footer.
+///
+/// Every instance uses the same height, radius, border width and font size, so
+/// the three sit perfectly level regardless of icon or label length.
+class _QrActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback? onTap;
+  final bool filled;
+  final bool busy;
+
+  const _QrActionButton({
+    required this.icon,
+    required this.label,
+    this.onTap,
+    this.filled = false,
+    this.busy = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const green = Color(0xFF136B3E);
+    final enabled = onTap != null;
+
+    return SizedBox(
+      height: 44, // fixed so every button is exactly the same height
+      child: Material(
+        color: filled ? green : Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(10),
+          onTap: onTap,
+          child: Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: filled ? green : const Color(0xFFD5DEDA),
+                width: 1.2,
+              ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (busy)
+                  const SizedBox(
+                    width: 15,
+                    height: 15,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                else
+                  Icon(
+                    icon,
+                    size: 17,
+                    color: !enabled
+                        ? Colors.grey.shade400
+                        : (filled ? Colors.white : const Color(0xFF334155)),
+                  ),
+                const SizedBox(width: 6),
+                Flexible(
+                  child: Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: !enabled
+                          ? Colors.grey.shade400
+                          : (filled ? Colors.white : const Color(0xFF334155)),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
-          onPressed: () async {
-            final uri = Uri.parse(downloadUrl);
-            if (await canLaunchUrl(uri)) {
-              await launchUrl(uri, mode: LaunchMode.externalApplication);
-            } else {
-              if (ctx.mounted) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  const SnackBar(content: Text('Could not open download link')),
-                );
-              }
-            }
-          },
-          icon: const Icon(Icons.download_rounded, size: 16),
-          label: const Text('Download'),
         ),
-        // ── Regenerate ───────────────────────────────────────────────
-        FilledButton.icon(
-          style: FilledButton.styleFrom(
-            backgroundColor: const Color(0xFF136B3E),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-          ),
-          onPressed: () async {
-            await ref.read(outletsProvider.notifier).regenerateQr(outlet.id);
-            if (ctx.mounted) Navigator.pop(ctx);
-            if (context.mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                    content: Text('QR token regenerated!'),
-                    backgroundColor: Color(0xFF136B3E)),
-              );
-            }
-          },
-          icon: const Icon(Icons.refresh_rounded, size: 16),
-          label: const Text('Regenerate'),
-        ),
-      ],
-    ),
-  );
+      ),
+    );
+  }
 }
 
 Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {

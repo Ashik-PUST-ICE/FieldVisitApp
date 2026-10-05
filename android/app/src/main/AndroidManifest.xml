@@ -38,5 +38,18 @@
     </application>
     <queries>
         <package android:name="com.google.android.gms" />
+        <!--
+          Android 11+ (API 30) package visibility: without this, canLaunchUrl()
+          and launchUrl() both fail for https links, so the QR "Download"
+          button silently did nothing.
+        -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
     </queries>
 </manifest>

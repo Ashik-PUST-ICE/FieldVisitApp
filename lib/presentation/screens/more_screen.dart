@@ -14,6 +14,7 @@ import 'package:field_visit_app/presentation/screens/kpi_screen.dart';
 import 'package:field_visit_app/presentation/screens/reference_data_screen.dart';
 import 'package:field_visit_app/presentation/screens/reports_screen.dart';
 import 'package:field_visit_app/presentation/screens/role_permissions_screen.dart';
+import 'package:field_visit_app/presentation/screens/map_settings_screen.dart';
 
 class MoreScreen extends ConsumerWidget {
   const MoreScreen({super.key});
@@ -139,6 +140,13 @@ class MoreScreen extends ConsumerWidget {
                   icon: Icons.security_rounded,
                   gradient: [const Color(0xFF64748B), const Color(0xFF94A3B8)],
                   screen: const RolePermissionsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Map API Credential',
+                  subtitle: 'Google Maps key',
+                  icon: Icons.map_rounded,
+                  gradient: [const Color(0xFF0EA5E9), const Color(0xFF38BDF8)],
+                  screen: const MapSettingsScreen(),
                 ),
                 _ModuleItem(
                   title: 'Auth Settings',

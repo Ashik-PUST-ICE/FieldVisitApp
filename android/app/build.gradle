@@ -5,6 +5,22 @@ plugins {
     id "dev.flutter.flutter-gradle-plugin"
 }
 
+// Gradle does NOT expose android/local.properties as project properties, so the
+// key has to be read from the file directly. This closure is deliberately
+// self-contained: a `def` in the script body is NOT visible inside the
+// `android { defaultConfig { } }` DSL closure (Gradle resolves it against the
+// Project and throws "Could not get unknown property").
+ext.resolveGoogleMapsApiKey = { ->
+    def props = new Properties()
+    def file = rootProject.file("local.properties")
+    if (file.exists()) {
+        file.withReader("UTF-8") { reader -> props.load(reader) }
+    }
+    return (props.getProperty("GOOGLE_MAPS_API_KEY")
+            ?: System.getenv("GOOGLE_MAPS_API_KEY")
+            ?: "").toString().trim()
+}
+
 android {
     namespace = "com.fieldvisit.field_visit_app"
     compileSdk = flutter.compileSdkVersion
@@ -28,6 +44,13 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        // The Google Maps SDK refuses to render without a valid key, which shows
+        // up as a blank grey map. Key comes from android/local.properties (or the
+        // GOOGLE_MAPS_API_KEY env var) so the secret stays out of git.
+        // Merge into the existing map instead of replacing it: the Flutter Gradle
+        // plugin supplies its own placeholders (e.g. applicationName), and
+        // assigning a whole new map wipes them, which breaks the manifest merger.
+        manifestPlaceholders.googleMapsApiKey = resolveGoogleMapsApiKey()
     }
 
     buildTypes {

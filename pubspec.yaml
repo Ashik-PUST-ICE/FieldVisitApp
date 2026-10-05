@@ -36,6 +36,14 @@ dependencies:
   geolocator: ^13.0.1
   permission_handler: ^11.3.1
 
+  # Renders the Google map inside a WebView using the Maps JavaScript API.
+  # This is what allows the API key to be supplied at RUNTIME from the in-app
+  # Map Settings form. The native Android Maps SDK only reads the key from
+  # AndroidManifest.xml at process start (flutter/flutter#41244 is still an
+  # open proposal), so a WebView is the only way for an in-app credential to
+  # take effect without rebuilding the app.
+  webview_flutter: ^4.8.0
+
   # QR Code
   mobile_scanner: ^5.0.0
 

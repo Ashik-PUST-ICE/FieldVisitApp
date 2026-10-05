@@ -1,15 +1,34 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:field_visit_app/presentation/providers/assignments_provider.dart';
-import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/core/widgets/app_dropdown.dart';
+import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
+import 'package:field_visit_app/presentation/providers/assignments_provider.dart';
+import 'package:field_visit_app/presentation/providers/directory_provider.dart';
+import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 
 class AssignmentsScreen extends ConsumerWidget {
   const AssignmentsScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(assignmentsProvider);
+    // Resolve the ids the API returns into real names for the list.
+    final outlets = ref.watch(outletsProvider).valueOrNull ?? const [];
+    final users = ref.watch(usersProvider).valueOrNull ?? const [];
+
+    String outletName(Object? id) {
+      final match = outlets.where((o) => o.id == id).firstOrNull;
+      return match?.name ?? 'Outlet #$id';
+    }
+
+    String userName(Object? id) {
+      final match =
+          users.where((u) => (u['id'] as num?)?.toInt() == id).firstOrNull;
+      final name =
+          (match?['full_name'] ?? match?['name'] ?? '').toString().trim();
+      return name.isEmpty ? 'User #$id' : name;
+    }
+
     return Scaffold(
         appBar: AppBar(title: const Text('Outlet assignments')),
         body: RefreshIndicator(
@@ -27,12 +46,14 @@ class AssignmentsScreen extends ConsumerWidget {
                         itemCount: items.length,
                         itemBuilder: (_, i) {
                           final item = items[i];
+                          final outletId = (item['outlet_id'] as num?)?.toInt();
+                          final userId = (item['user_id'] as num?)?.toInt();
                           return Card(
                               child: ListTile(
                                   leading: const Icon(Icons.person_pin),
-                                  title: Text('Outlet #${item['outlet_id']}'),
+                                  title: Text(outletName(outletId)),
                                   subtitle: Text(
-                                      'User #${item['user_id']}  •  ${item['status'] ?? ''}'),
+                                      '${userName(userId)}${item['status'] != null ? '  •  ${item['status']}' : ''}'),
                                   trailing: IconButton(
                                       icon: const Icon(Icons.delete_outline),
                                       onPressed: () => ref
@@ -54,56 +75,84 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
         .showSnackBar(const SnackBar(content: Text('Create an outlet first')));
     return;
   }
-  final user = TextEditingController();
-  int outletId = outlets.first.id;
-  await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => StatefulBuilder(
-          builder: (context, setState) => AlertDialog(
-                  title: const Text('Assign outlet'),
-                  content: Column(mainAxisSize: MainAxisSize.min, children: [
-                    AppDropdownField<int>(
-                      label: 'Outlet',
-                      hint: 'Select outlet',
-                      value: outletId,
-                      options: outlets
-                          .map((o) => AppDropdownOption<int>(
-                                value: o.id,
-                                title: o.name,
-                                leadingIcon: Icons.storefront_outlined,
-                              ))
-                          .toList(),
-                      onChanged: (v) =>
-                          setState(() => outletId = v ?? outletId),
-                    ),
-                    TextField(
-                        controller: user,
-                        keyboardType: TextInputType.number,
-                        decoration: const InputDecoration(labelText: 'User ID'))
-                  ]),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(dialogContext),
-                        child: const Text('Cancel')),
-                    FilledButton(
-                        onPressed: () async {
-                          final userId = int.tryParse(user.text);
-                          if (userId == null) return;
-                          try {
-                            await ref.read(assignmentsProvider.notifier).save(
-                                {'outlet_id': outletId, 'user_id': userId},
-                                null);
-                            if (dialogContext.mounted)
-                              Navigator.pop(dialogContext);
-                          } catch (e) {
-                            if (dialogContext.mounted)
-                              ScaffoldMessenger.of(dialogContext).showSnackBar(
-                                  SnackBar(content: Text(_message(e))));
-                          }
-                        },
-                        child: const Text('Assign'))
-                  ])));
-  user.dispose();
+  final users = ref.read(usersProvider).valueOrNull ?? const [];
+  if (users.isEmpty) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No users available to assign')));
+    return;
+  }
+
+  final messenger = ScaffoldMessenger.of(context);
+  int? outletId = outlets.first.id;
+  int? userId;
+
+  await CellfinFormModal.show<void>(
+    context: context,
+    title: 'Assign Outlet',
+    officerName: 'OUTLET ALLOCATION',
+    officerInfo: 'Assign a field officer to an outlet',
+    cards: const [
+      CellfinCardItem(title: 'Outlet', icon: Icons.storefront_outlined),
+      CellfinCardItem(title: 'Officer', icon: Icons.badge_outlined),
+      CellfinCardItem(title: 'Confirm', icon: Icons.verified_outlined),
+      CellfinCardItem(title: 'Sync', icon: Icons.sync_rounded),
+    ],
+    submitText: 'Assign Outlet',
+    fields: [
+      StatefulBuilder(
+        builder: (context, setDropState) => AppDropdownField<int>(
+          label: 'Outlet',
+          hint: 'Select outlet',
+          value: outletId,
+          options: outlets
+              .map((o) => AppDropdownOption<int>(
+                    value: o.id,
+                    title: o.name,
+                    leadingIcon: Icons.storefront_outlined,
+                  ))
+              .toList(),
+          onChanged: (v) => setDropState(() => outletId = v),
+        ),
+      ),
+      StatefulBuilder(
+        builder: (context, setDropState) => AppDropdownField<int>(
+          label: 'Field Officer',
+          hint: 'Select officer',
+          value: userId,
+          options: users
+              .map((u) {
+                final id = (u['id'] as num?)?.toInt();
+                final name =
+                    (u['full_name'] ?? u['name'] ?? '').toString().trim();
+                return AppDropdownOption<int>(
+                  value: id ?? 0,
+                  title: name.isEmpty ? 'User #$id' : name,
+                  subtitle: (u['email'] ?? u['unique_id'])?.toString(),
+                  leadingIcon: Icons.person_outline_rounded,
+                );
+              })
+              .where((o) => o.value != 0)
+              .toList(),
+          onChanged: (v) => setDropState(() => userId = v),
+        ),
+      ),
+    ],
+    onSubmit: () async {
+      if (userId == null) {
+        messenger.showSnackBar(
+            const SnackBar(content: Text('Please select a field officer')));
+        return;
+      }
+      try {
+        await ref
+            .read(assignmentsProvider.notifier)
+            .save({'outlet_id': outletId, 'user_id': userId}, null);
+        if (context.mounted) Navigator.of(context).pop();
+      } catch (e) {
+        messenger.showSnackBar(SnackBar(content: Text(_message(e))));
+      }
+    },
+  );
 }
 
 String _message(Object e) => e is DioException && e.response?.data is Map

@@ -130,16 +130,32 @@ class AppDropdownField<T> extends StatelessWidget {
   }
 
   Future<void> _open(BuildContext context) async {
-    final picked = await showModalBottomSheet<T>(
+    // A top sheet (anchored to the top edge, sliding DOWN) instead of the
+    // default bottom sheet: the field usually sits at the top of a form, so
+    // growing upward from the bottom edge hid the field behind the scrim.
+    final picked = await showGeneralDialog<T>(
       context: context,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (_) => _DropdownSheet<T>(
+      barrierDismissible: true,
+      barrierLabel: label,
+      barrierColor: Colors.black.withOpacity(0.45),
+      transitionDuration: const Duration(milliseconds: 220),
+      pageBuilder: (_, __, ___) => _DropdownSheet<T>(
         label: label,
         options: options,
         selected: value,
         searchable: searchable,
       ),
+      transitionBuilder: (_, animation, __, child) {
+        final curved =
+            CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, -1),
+            end: Offset.zero,
+          ).animate(curved),
+          child: child,
+        );
+      },
     );
     if (picked != null) onChanged(picked);
   }
@@ -178,62 +194,100 @@ class _DropdownSheetState<T> extends State<_DropdownSheet<T>> {
             (o.subtitle ?? '').toLowerCase().contains(q))
         .toList();
 
-    return SafeArea(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-            maxHeight: MediaQuery.of(context).size.height * 0.75),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 4, 16, 6),
-              child: Text(
-                'Select ${widget.label.toLowerCase()}',
-                style: theme.textTheme.titleMedium
-                    ?.copyWith(fontWeight: FontWeight.w700),
-              ),
+    return Align(
+      alignment: Alignment.topCenter,
+      child: Material(
+        color: isDark ? AppColors.darkSurface : Colors.white,
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(AppTheme.radiusLg),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: SafeArea(
+          top: true,
+          bottom: false,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.7,
             ),
-            if (widget.searchable)
-              Padding(
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
-                child: TextField(
-                  onChanged: (v) => setState(() => _query = v),
-                  style: const TextStyle(fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: 'Search',
-                    prefixIcon: const Icon(Icons.search_rounded, size: 20),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 12),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Grab handle on the bottom edge, mirroring the sheet's anchor.
+                const SizedBox(height: 10),
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.darkBorder : AppColors.border,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
-            Flexible(
-              child: filtered.isEmpty
-                  ? Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 40),
-                      child: Text(
-                        widget.options.isEmpty
-                            ? 'Nothing available'
-                            : 'No match for "$_query"',
-                        style: theme.textTheme.bodyMedium,
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 6),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Select ${widget.label.toLowerCase()}',
+                          style: theme.textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
                       ),
-                    )
-                  : ListView.builder(
-                      shrinkWrap: true,
-                      padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                      itemCount: filtered.length,
-                      itemBuilder: (_, i) => _DropdownRow<T>(
-                        option: filtered[i],
-                        isSelected: filtered[i].value == widget.selected,
-                        isDark: isDark,
+                      IconButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        visualDensity: VisualDensity.compact,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+                if (widget.searchable)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 4, 16, 10),
+                    child: TextField(
+                      onChanged: (v) => setState(() => _query = v),
+                      style: const TextStyle(fontSize: 14),
+                      decoration: InputDecoration(
+                        hintText: 'Search',
+                        prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                        isDense: true,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
+                        border: OutlineInputBorder(
+                          borderRadius:
+                              BorderRadius.circular(AppTheme.radiusSm),
+                        ),
                       ),
                     ),
+                  ),
+                Flexible(
+                  child: filtered.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 40),
+                          child: Text(
+                            widget.options.isEmpty
+                                ? 'Nothing available'
+                                : 'No match for "$_query"',
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        )
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                          itemCount: filtered.length,
+                          itemBuilder: (_, i) => _DropdownRow<T>(
+                            option: filtered[i],
+                            isSelected: filtered[i].value == widget.selected,
+                            isDark: isDark,
+                          ),
+                        ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/constants/app_constants.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
+import 'package:field_visit_app/core/widgets/tunneled_image.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 
@@ -190,7 +191,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
                         radius: 32,
                         backgroundColor: Colors.white,
                         backgroundImage:
-                            showImage ? NetworkImage(imageUrl) : null,
+                            showImage ? TunneledNetworkImage(imageUrl) : null,
                         onBackgroundImageError: showImage
                             ? (_, __) {
                                 // Swap back to the initials instead of leaving

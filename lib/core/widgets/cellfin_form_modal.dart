@@ -296,6 +296,14 @@ class CellfinFormScreen extends StatefulWidget {
   final String submitText;
   final Future<void> Function() onSubmit;
 
+  /// Called when a card in the 4-card row is tapped, with its index.
+  ///
+  /// Previously every card did the exact same thing (only toggling the
+  /// highlight), which made the row pure decoration. Forms now use this to
+  /// give each card a distinct job - e.g. jump to a field, refresh a list, or
+  /// trigger the submit - so the row actually reflects the workflow.
+  final void Function(int index)? onCardTap;
+
   const CellfinFormScreen({
     super.key,
     required this.title,
@@ -305,6 +313,7 @@ class CellfinFormScreen extends StatefulWidget {
     required this.fields,
     this.submitText = 'Submit',
     required this.onSubmit,
+    this.onCardTap,
   });
 
   static Future<T?> push<T>({
@@ -316,6 +325,7 @@ class CellfinFormScreen extends StatefulWidget {
     required List<Widget> fields,
     String submitText = 'Submit',
     required Future<void> Function() onSubmit,
+    void Function(int index)? onCardTap,
   }) {
     return Navigator.push<T>(
       context,
@@ -328,6 +338,7 @@ class CellfinFormScreen extends StatefulWidget {
           fields: fields,
           submitText: submitText,
           onSubmit: onSubmit,
+          onCardTap: onCardTap,
         ),
       ),
     );
@@ -386,8 +397,11 @@ class _CellfinFormScreenState extends State<CellfinFormScreen> {
                 CellfinTopCardsRow(
                   cards: displayCards,
                   selectedIndex: _selectedCardIndex,
-                  onSelect: (index) =>
-                      setState(() => _selectedCardIndex = index),
+                  onSelect: (index) {
+                    setState(() => _selectedCardIndex = index);
+                    // Let the host give this specific card its own job.
+                    widget.onCardTap?.call(index);
+                  },
                 ),
 
                 const SizedBox(height: 14),
@@ -476,6 +490,7 @@ class CellfinFormModal {
     required List<Widget> fields,
     String submitText = 'Submit',
     required Future<void> Function() onSubmit,
+    void Function(int index)? onCardTap,
   }) {
     return CellfinFormScreen.push<T>(
       context: context,
@@ -486,6 +501,7 @@ class CellfinFormModal {
       fields: fields,
       submitText: submitText,
       onSubmit: onSubmit,
+      onCardTap: onCardTap,
     );
   }
 }

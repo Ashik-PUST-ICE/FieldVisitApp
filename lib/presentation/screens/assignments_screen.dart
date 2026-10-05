@@ -86,6 +86,47 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
   int? outletId = outlets.first.id;
   int? userId;
 
+  String outletLabel() =>
+      outlets.where((o) => o.id == outletId).map((o) => o.name).firstOrNull ??
+      'not selected';
+
+  String officerLabel() {
+    final match =
+        users.where((u) => (u['id'] as num?)?.toInt() == userId).firstOrNull;
+    final name =
+        (match?['full_name'] ?? match?['name'] ?? '').toString().trim();
+    return name.isEmpty ? 'not selected' : name;
+  }
+
+  Future<void> submit() async {
+    if (userId == null) {
+      messenger.showSnackBar(
+          const SnackBar(content: Text('Please select a field officer')));
+      return;
+    }
+    try {
+      await ref
+          .read(assignmentsProvider.notifier)
+          .save({'outlet_id': outletId, 'user_id': userId}, null);
+      if (context.mounted) Navigator.of(context).pop();
+    } catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text(_message(e))));
+    }
+  }
+
+  Future<void> refreshLists() async {
+    await Future.wait([
+      ref.read(outletsProvider.notifier).fetchOutlets(),
+      ref.read(usersProvider.notifier).fetch(),
+    ]);
+    messenger.showSnackBar(
+        const SnackBar(content: Text('Outlets and officers refreshed')));
+  }
+
+  void info(String message) {
+    messenger.showSnackBar(SnackBar(content: Text(message)));
+  }
+
   await CellfinFormModal.show<void>(
     context: context,
     title: 'Assign Outlet',
@@ -98,6 +139,27 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
       CellfinCardItem(title: 'Sync', icon: Icons.sync_rounded),
     ],
     submitText: 'Assign Outlet',
+    // Every card now does its OWN job instead of only highlighting:
+    //   0 Outlet  -> reports the outlet currently picked
+    //   1 Officer -> reports the officer currently picked
+    //   2 Confirm -> validates, and saves only when the form is complete
+    //   3 Sync    -> re-fetches outlets + officers so the lists are current
+    onCardTap: (index) {
+      switch (index) {
+        case 0:
+          info('Outlet: ${outletLabel()}');
+        case 1:
+          info('Field officer: ${officerLabel()}');
+        case 2:
+          if (userId == null) {
+            info('Pick a field officer to confirm');
+          } else {
+            submit();
+          }
+        case 3:
+          refreshLists();
+      }
+    },
     fields: [
       StatefulBuilder(
         builder: (context, setDropState) => AppDropdownField<int>(
@@ -137,21 +199,7 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
         ),
       ),
     ],
-    onSubmit: () async {
-      if (userId == null) {
-        messenger.showSnackBar(
-            const SnackBar(content: Text('Please select a field officer')));
-        return;
-      }
-      try {
-        await ref
-            .read(assignmentsProvider.notifier)
-            .save({'outlet_id': outletId, 'user_id': userId}, null);
-        if (context.mounted) Navigator.of(context).pop();
-      } catch (e) {
-        messenger.showSnackBar(SnackBar(content: Text(_message(e))));
-      }
-    },
+    onSubmit: submit,
   );
 }
 

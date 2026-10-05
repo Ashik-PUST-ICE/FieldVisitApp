@@ -32,7 +32,8 @@ class EmptyStateView extends StatelessWidget {
                 color: AppColors.primarySurface,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, size: 48, color: AppColors.primary.withOpacity(0.5)),
+              child: Icon(icon,
+                  size: 48, color: AppColors.primary.withOpacity(0.5)),
             ),
             const SizedBox(height: 20),
             Text(
@@ -98,7 +99,8 @@ class ErrorRetryView extends StatelessWidget {
                 color: AppColors.errorLight,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.cloud_off_rounded, size: 40, color: AppColors.error),
+              child: const Icon(Icons.cloud_off_rounded,
+                  size: 40, color: AppColors.error),
             ),
             const SizedBox(height: 20),
             Text(

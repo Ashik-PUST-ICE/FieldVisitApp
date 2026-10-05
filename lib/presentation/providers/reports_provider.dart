@@ -17,15 +17,22 @@ class ReportsFilter {
   static String _fmt(DateTime dt) =>
       '${dt.year.toString().padLeft(4, '0')}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
 
-  ReportsFilter copyWith({DateTime? from, DateTime? to, bool clearFrom = false, bool clearTo = false}) => ReportsFilter(
+  ReportsFilter copyWith(
+          {DateTime? from,
+          DateTime? to,
+          bool clearFrom = false,
+          bool clearTo = false}) =>
+      ReportsFilter(
         from: clearFrom ? null : (from ?? this.from),
         to: clearTo ? null : (to ?? this.to),
       );
 }
 
-final reportsFilterProvider = StateProvider<ReportsFilter>((ref) => const ReportsFilter());
+final reportsFilterProvider =
+    StateProvider<ReportsFilter>((ref) => const ReportsFilter());
 
-final reportsProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
+final reportsProvider =
+    FutureProvider.autoDispose<Map<String, dynamic>>((ref) async {
   final api = ref.watch(businessApiProvider);
   final filter = ref.watch(reportsFilterProvider);
   final q = filter.toQuery();
@@ -39,5 +46,10 @@ final reportsProvider = FutureProvider.autoDispose<Map<String, dynamic>>((ref) a
     final value = payload['data'];
     return value is Map ? Map<String, dynamic>.from(value) : {'rows': value};
   }
-  return {'visits': data(results[0]), 'orders': data(results[1]), 'officers': data(results[2])};
+
+  return {
+    'visits': data(results[0]),
+    'orders': data(results[1]),
+    'officers': data(results[2])
+  };
 });

@@ -89,17 +89,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
         context: context,
         builder: (dialogContext) => AlertDialog(
           title: const Text('Enable biometric login?'),
-          content: const Text('Use fingerprint or Face ID for faster and safer sign-in on this device.'),
+          content: const Text(
+              'Use fingerprint or Face ID for faster and safer sign-in on this device.'),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext, false), child: const Text('Not now')),
-            FilledButton(onPressed: () => Navigator.pop(dialogContext, true), child: const Text('Enable')),
+            TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: const Text('Not now')),
+            FilledButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: const Text('Enable')),
           ],
         ),
       );
       if (enable == true) await notifier.enableBiometricLogin();
     }
     if (!mounted) return;
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainScreen()));
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (_) => const MainScreen()));
   }
 
   @override
@@ -160,23 +166,40 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               ),
                               const SizedBox(height: 12),
                               FutureBuilder<bool>(
-                                future: ref.read(authProvider.notifier).isBiometricLoginEnabled(),
+                                future: ref
+                                    .read(authProvider.notifier)
+                                    .isBiometricLoginEnabled(),
                                 builder: (context, snapshot) {
-                                  if (snapshot.data != true) return const SizedBox.shrink();
+                                  if (snapshot.data != true)
+                                    return const SizedBox.shrink();
                                   return OutlinedButton.icon(
-                                    onPressed: authState.isLoading ? null : () async {
-                                      final result = await ref.read(authProvider.notifier).biometricLogin();
-                                      if (!mounted) return;
-                                      result.when(
-                                        data: (user) {
-                                          if (user != null) Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const MainScreen()));
-                                        },
-                                        loading: () {},
-                                        error: (error, _) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(error.toString()))),
-                                      );
-                                    },
+                                    onPressed: authState.isLoading
+                                        ? null
+                                        : () async {
+                                            final result = await ref
+                                                .read(authProvider.notifier)
+                                                .biometricLogin();
+                                            if (!mounted) return;
+                                            result.when(
+                                              data: (user) {
+                                                if (user != null)
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (_) =>
+                                                              const MainScreen()));
+                                              },
+                                              loading: () {},
+                                              error: (error, _) =>
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(SnackBar(
+                                                          content: Text(error
+                                                              .toString()))),
+                                            );
+                                          },
                                     icon: const Icon(Icons.fingerprint_rounded),
-                                    label: const Text('Sign in with biometrics'),
+                                    label:
+                                        const Text('Sign in with biometrics'),
                                   );
                                 },
                               ),
@@ -195,7 +218,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
                                 hint: 'Email Address',
-                                prefixIcon: const Icon(Icons.account_circle_outlined, color: Color(0xFF6B7280), size: 22),
+                                prefixIcon: const Icon(
+                                    Icons.account_circle_outlined,
+                                    color: Color(0xFF6B7280),
+                                    size: 22),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
                                     return 'Please enter your email or user ID';
@@ -210,14 +236,20 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
                                 hint: 'PIN or Password',
-                                prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF6B7280), size: 22),
+                                prefixIcon: const Icon(
+                                    Icons.lock_outline_rounded,
+                                    color: Color(0xFF6B7280),
+                                    size: 22),
                                 suffixIcon: IconButton(
                                   icon: Icon(
-                                    _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                                    _obscurePassword
+                                        ? Icons.visibility_off_outlined
+                                        : Icons.visibility_outlined,
                                     color: const Color(0xFF6B7280),
                                     size: 20,
                                   ),
-                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  onPressed: () => setState(() =>
+                                      _obscurePassword = !_obscurePassword),
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
@@ -234,7 +266,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 child: TextButton(
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Contact your field administrator to reset password.')),
+                                      const SnackBar(
+                                          content: Text(
+                                              'Contact your field administrator to reset password.')),
                                     );
                                   },
                                   child: const Text(
@@ -265,7 +299,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     ? const SizedBox(
                                         width: 22,
                                         height: 22,
-                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2),
+                                        child: CircularProgressIndicator(
+                                            color: Colors.white,
+                                            strokeWidth: 2.2),
                                       )
                                     : const Text(
                                         'Submit',
@@ -288,13 +324,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                         children: [
                           const Text(
                             "Don't have an officer account? ",
-                            style: TextStyle(color: Colors.white70, fontSize: 13),
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 13),
                           ),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                                MaterialPageRoute(
+                                    builder: (_) => const RegisterScreen()),
                               );
                             },
                             child: const Text(
@@ -346,7 +384,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               borderRadius: BorderRadius.circular(12),
             ),
             child: const Center(
-              child: Icon(Icons.location_city_rounded, color: Colors.white, size: 28),
+              child: Icon(Icons.location_city_rounded,
+                  color: Colors.white, size: 28),
             ),
           ),
           const SizedBox(width: 12),

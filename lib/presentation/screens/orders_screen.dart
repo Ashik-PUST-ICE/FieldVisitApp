@@ -302,12 +302,16 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
     submitText: 'Submit',
     fields: [
       StatefulBuilder(
-        builder: (context, setDropState) => CellfinDropdownField<int>(
+        builder: (context, setDropState) => AppDropdownField<int>(
+          label: 'Receiver Outlet Account',
+          hint: 'Select outlet',
           value: selectedOutlet,
-          hint: 'Receiver Outlet Account *',
-          items: outlets
-              .map((outlet) =>
-                  DropdownMenuItem(value: outlet.id, child: Text(outlet.name)))
+          options: outlets
+              .map((outlet) => AppDropdownOption<int>(
+                    value: outlet.id,
+                    title: outlet.name,
+                    leadingIcon: Icons.storefront_outlined,
+                  ))
               .toList(),
           onChanged: (value) =>
               setDropState(() => selectedOutlet = value ?? selectedOutlet),

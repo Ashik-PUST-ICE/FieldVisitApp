@@ -48,7 +48,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
   Future<void> _getCurrentLocation() async {
     try {
       final position = await Geolocator.getCurrentPosition(
-        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high),
+        locationSettings:
+            const LocationSettings(accuracy: LocationAccuracy.high),
       );
       setState(() {
         _currentPosition = position;
@@ -93,19 +94,28 @@ class _MapScreenState extends ConsumerState<MapScreen> {
       final payload = Map<String, dynamic>.from(response.data as Map);
       final raw = payload['data'];
       final list = raw is Map ? raw['data'] : raw;
-      final outlets = (list as List<dynamic>? ?? const []).map((item) => Outlet.fromJson(Map<String, dynamic>.from(item as Map))).toList();
+      final outlets = (list as List<dynamic>? ?? const [])
+          .map(
+              (item) => Outlet.fromJson(Map<String, dynamic>.from(item as Map)))
+          .toList();
       if (!mounted) return;
       setState(() {
         _markers.clear();
         for (final outlet in outlets) {
           if (outlet.latitude != null && outlet.longitude != null) {
-            _markers.add(Marker(markerId: MarkerId('nearby_${outlet.id}'), position: LatLng(outlet.latitude!, outlet.longitude!), infoWindow: InfoWindow(title: outlet.name)));
+            _markers.add(Marker(
+                markerId: MarkerId('nearby_${outlet.id}'),
+                position: LatLng(outlet.latitude!, outlet.longitude!),
+                infoWindow: InfoWindow(title: outlet.name)));
           }
         }
       });
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${outlets.length} nearby outlets loaded')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${outlets.length} nearby outlets loaded')));
     } catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (mounted)
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
     }
   }
 
@@ -132,14 +142,15 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               : kIsWeb
                   ? _buildWebMapFallback(context)
                   : GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-                    zoom: 14,
-                  ),
-                  markers: _markers,
-                  myLocationEnabled: true,
-                  myLocationButtonEnabled: true,
-                ),
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(_currentPosition!.latitude,
+                            _currentPosition!.longitude),
+                        zoom: 14,
+                      ),
+                      markers: _markers,
+                      myLocationEnabled: true,
+                      myLocationButtonEnabled: true,
+                    ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'map_refresh',
         onPressed: _loadOutlets,
@@ -152,7 +163,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
     final allOutlets = ref.watch(outletsProvider).valueOrNull ?? const [];
     final outlets = _search.isEmpty
         ? allOutlets
-        : allOutlets.where((o) => o.name.toLowerCase().contains(_search.toLowerCase())).toList();
+        : allOutlets
+            .where((o) => o.name.toLowerCase().contains(_search.toLowerCase()))
+            .toList();
     final position = _currentPosition!;
     return Column(
       children: [
@@ -163,7 +176,10 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 3)),
+              BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 12,
+                  offset: const Offset(0, 3)),
             ],
           ),
           child: TextField(
@@ -180,14 +196,17 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         Padding(
           padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
           child: Card(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             child: ListTile(
               leading: const CircleAvatar(
                 backgroundColor: Color(0xFFE8F5E9),
                 child: Icon(Icons.my_location, color: Color(0xFF136B3E)),
               ),
-              title: const Text('Your current location', style: TextStyle(fontWeight: FontWeight.w700)),
-              subtitle: Text('${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}'),
+              title: const Text('Your current location',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
+              subtitle: Text(
+                  '${position.latitude.toStringAsFixed(5)}, ${position.longitude.toStringAsFixed(5)}'),
               trailing: PopupMenuButton<double>(
                 tooltip: 'Nearby radius',
                 icon: const Icon(Icons.radar, color: Color(0xFF136B3E)),
@@ -196,7 +215,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   const PopupMenuItem(value: 1000, child: Text('1 km radius')),
                   const PopupMenuItem(value: 3000, child: Text('3 km radius')),
                   const PopupMenuItem(value: 5000, child: Text('5 km radius')),
-                  const PopupMenuItem(value: 10000, child: Text('10 km radius')),
+                  const PopupMenuItem(
+                      value: 10000, child: Text('10 km radius')),
                 ],
                 onSelected: (r) {
                   setState(() => _nearbyRadius = r);
@@ -210,7 +230,8 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           padding: EdgeInsets.fromLTRB(16, 12, 16, 4),
           child: Align(
             alignment: Alignment.centerLeft,
-            child: Text('Outlet locations', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+            child: Text('Outlet locations',
+                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
           ),
         ),
         Expanded(
@@ -219,18 +240,21 @@ class _MapScreenState extends ConsumerState<MapScreen> {
             children: [
               if (outlets.isEmpty)
                 Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14)),
                   child: const ListTile(
                     leading: Icon(Icons.location_off, color: Colors.grey),
                     title: Text('No outlets found'),
-                    subtitle: Text('Try adjusting your search or add outlets with coordinates.'),
+                    subtitle: Text(
+                        'Try adjusting your search or add outlets with coordinates.'),
                   ),
                 )
               else
                 ...outlets.map(
                   (outlet) => Card(
                     margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14)),
                     child: ListTile(
                       leading: Container(
                         padding: const EdgeInsets.all(8),
@@ -238,21 +262,27 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                           color: const Color(0xFFE8F5E9),
                           borderRadius: BorderRadius.circular(10),
                         ),
-                        child: const Icon(Icons.place_rounded, color: Color(0xFF136B3E), size: 20),
+                        child: const Icon(Icons.place_rounded,
+                            color: Color(0xFF136B3E), size: 20),
                       ),
-                      title: Text(outlet.name, style: const TextStyle(fontWeight: FontWeight.w700)),
+                      title: Text(outlet.name,
+                          style: const TextStyle(fontWeight: FontWeight.w700)),
                       subtitle: Text(
                         outlet.latitude != null && outlet.longitude != null
                             ? '${outlet.latitude!.toStringAsFixed(5)}, ${outlet.longitude!.toStringAsFixed(5)}'
                             : 'Coordinates not set',
                         style: TextStyle(
-                          color: outlet.latitude != null ? Colors.grey[600] : Colors.red[300],
+                          color: outlet.latitude != null
+                              ? Colors.grey[600]
+                              : Colors.red[300],
                           fontSize: 12,
                         ),
                       ),
                       trailing: outlet.latitude != null
-                          ? const Icon(Icons.check_circle_rounded, color: Color(0xFF136B3E), size: 18)
-                          : const Icon(Icons.cancel_rounded, color: Colors.grey, size: 18),
+                          ? const Icon(Icons.check_circle_rounded,
+                              color: Color(0xFF136B3E), size: 18)
+                          : const Icon(Icons.cancel_rounded,
+                              color: Colors.grey, size: 18),
                     ),
                   ),
                 ),

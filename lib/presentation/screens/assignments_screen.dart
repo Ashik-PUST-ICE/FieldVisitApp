@@ -62,15 +62,19 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
           builder: (context, setState) => AlertDialog(
                   title: const Text('Assign outlet'),
                   content: Column(mainAxisSize: MainAxisSize.min, children: [
-                    DropdownButtonFormField<int>(
+                    AppDropdownField<int>(
+                      label: 'Outlet',
+                      hint: 'Select outlet',
                       value: outletId,
-                      items: outlets
-                          .map((o) => DropdownMenuItem(
-                              value: o.id, child: Text(o.name)))
+                      options: outlets
+                          .map((o) => AppDropdownOption<int>(
+                                value: o.id,
+                                title: o.name,
+                                leadingIcon: Icons.storefront_outlined,
+                              ))
                           .toList(),
                       onChanged: (v) =>
                           setState(() => outletId = v ?? outletId),
-                      decoration: const InputDecoration(labelText: 'Outlet'),
                     ),
                     TextField(
                         controller: user,

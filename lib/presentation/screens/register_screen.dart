@@ -139,7 +139,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           const SizedBox(height: 4),
                           const Text(
                             'Register as a new field operations specialist',
-                            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                            style: TextStyle(
+                                fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                           const SizedBox(height: 20),
 
@@ -150,8 +151,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 child: CellfinInputField(
                                   controller: first,
                                   hint: 'First Name *',
-                                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280), size: 20),
-                                  validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+                                  prefixIcon: const Icon(
+                                      Icons.person_outline_rounded,
+                                      color: Color(0xFF6B7280),
+                                      size: 20),
+                                  validator: (v) =>
+                                      v == null || v.trim().isEmpty
+                                          ? 'Required'
+                                          : null,
                                 ),
                               ),
                               const SizedBox(width: 10),
@@ -159,7 +166,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                 child: CellfinInputField(
                                   controller: last,
                                   hint: 'Last Name',
-                                  prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280), size: 20),
+                                  prefixIcon: const Icon(
+                                      Icons.person_outline_rounded,
+                                      color: Color(0xFF6B7280),
+                                      size: 20),
                                 ),
                               ),
                             ],
@@ -171,8 +181,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             controller: email,
                             keyboardType: TextInputType.emailAddress,
                             hint: 'Receiver / Work Email *',
-                            prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF6B7280), size: 20),
-                            validator: (v) => v == null || !v.contains('@') ? 'Enter a valid email' : null,
+                            prefixIcon: const Icon(Icons.email_outlined,
+                                color: Color(0xFF6B7280), size: 20),
+                            validator: (v) => v == null || !v.contains('@')
+                                ? 'Enter a valid email'
+                                : null,
                           ),
                           const SizedBox(height: 12),
 
@@ -181,12 +194,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             controller: password,
                             obscureText: _obscurePass,
                             hint: 'Password (8+ chars) *',
-                            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF6B7280), size: 20),
+                            prefixIcon: const Icon(Icons.lock_outline_rounded,
+                                color: Color(0xFF6B7280), size: 20),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscurePass ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280), size: 20),
-                              onPressed: () => setState(() => _obscurePass = !_obscurePass),
+                              icon: Icon(
+                                  _obscurePass
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  color: const Color(0xFF6B7280),
+                                  size: 20),
+                              onPressed: () =>
+                                  setState(() => _obscurePass = !_obscurePass),
                             ),
-                            validator: (v) => v == null || v.length < 8 ? 'Minimum 8 characters' : null,
+                            validator: (v) => v == null || v.length < 8
+                                ? 'Minimum 8 characters'
+                                : null,
                           ),
                           const SizedBox(height: 12),
 
@@ -195,12 +217,21 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             controller: confirm,
                             obscureText: _obscureConfirm,
                             hint: 'Confirm Password *',
-                            prefixIcon: const Icon(Icons.lock_reset_rounded, color: Color(0xFF6B7280), size: 20),
+                            prefixIcon: const Icon(Icons.lock_reset_rounded,
+                                color: Color(0xFF6B7280), size: 20),
                             suffixIcon: IconButton(
-                              icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: const Color(0xFF6B7280), size: 20),
-                              onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                              icon: Icon(
+                                  _obscureConfirm
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                  color: const Color(0xFF6B7280),
+                                  size: 20),
+                              onPressed: () => setState(
+                                  () => _obscureConfirm = !_obscureConfirm),
                             ),
-                            validator: (v) => v != password.text ? 'Passwords do not match' : null,
+                            validator: (v) => v != password.text
+                                ? 'Passwords do not match'
+                                : null,
                           ),
                           const SizedBox(height: 18),
 
@@ -211,14 +242,22 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                               backgroundColor: const Color(0xFF136B3E),
                               foregroundColor: Colors.white,
                               minimumSize: const Size(double.infinity, 50),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
                               elevation: 0,
                             ),
                             child: loading
-                                ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2))
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                        color: Colors.white, strokeWidth: 2.2))
                                 : const Text(
                                     'Submit',
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.white),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.white),
                                   ),
                           ),
                         ],
@@ -231,7 +270,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Already registered? ', style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      const Text('Already registered? ',
+                          style:
+                              TextStyle(color: Colors.white70, fontSize: 13)),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
                         child: const Text(

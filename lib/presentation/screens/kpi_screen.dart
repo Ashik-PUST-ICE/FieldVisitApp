@@ -16,7 +16,8 @@ class KpiScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Target & KPIs', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('Target & KPIs',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
             tooltip: 'Configure Goal',
@@ -41,9 +42,11 @@ class KpiScreen extends ConsumerWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                const Icon(Icons.error_outline_rounded,
+                    color: Colors.redAccent, size: 48),
                 const SizedBox(height: 12),
-                Text('Error loading KPI data: $err', textAlign: TextAlign.center),
+                Text('Error loading KPI data: $err',
+                    textAlign: TextAlign.center),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => ref.invalidate(kpiSummaryProvider),
@@ -76,12 +79,16 @@ class KpiScreen extends ConsumerWidget {
                   children: [
                     const Text(
                       'Core Field Targets',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                      style:
+                          TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                     ),
                     TextButton.icon(
-                      onPressed: () => _openTargetConfigModal(context, ref, kpi),
+                      onPressed: () =>
+                          _openTargetConfigModal(context, ref, kpi),
                       icon: const Icon(Icons.edit_note_rounded, size: 18),
-                      label: const Text('Edit Goal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700)),
+                      label: const Text('Edit Goal',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -115,7 +122,8 @@ class KpiScreen extends ConsumerWidget {
                   icon: Icons.monetization_on_rounded,
                   color: const Color(0xFF10B981),
                   isDark: isDark,
-                  bottomNote: 'Total orders placed in this period: ${kpi.ordersCount}',
+                  bottomNote:
+                      'Total orders placed in this period: ${kpi.ordersCount}',
                 ),
                 const SizedBox(height: 12),
 
@@ -125,12 +133,17 @@ class KpiScreen extends ConsumerWidget {
                   title: 'Outlet Coverage Ratio',
                   subtitle: 'Assigned beat coverage',
                   currentValue: '${kpi.coveragePercentage.toStringAsFixed(1)}%',
-                  targetValue: '${kpi.coverageTarget.toStringAsFixed(0)}% Target',
-                  percent: (kpi.coveragePercentage / (kpi.coverageTarget > 0 ? kpi.coverageTarget : 1) * 100).clamp(0, 150),
+                  targetValue:
+                      '${kpi.coverageTarget.toStringAsFixed(0)}% Target',
+                  percent: (kpi.coveragePercentage /
+                          (kpi.coverageTarget > 0 ? kpi.coverageTarget : 1) *
+                          100)
+                      .clamp(0, 150),
                   icon: Icons.pin_drop_rounded,
                   color: const Color(0xFF0EA5E9),
                   isDark: isDark,
-                  bottomNote: '${kpi.uniqueOutletsVisited} of ${kpi.totalAssignedOutlets} assigned outlets visited',
+                  bottomNote:
+                      '${kpi.uniqueOutletsVisited} of ${kpi.totalAssignedOutlets} assigned outlets visited',
                 ),
                 const SizedBox(height: 12),
 
@@ -140,8 +153,14 @@ class KpiScreen extends ConsumerWidget {
                   title: 'Order Strike Rate',
                   subtitle: 'Visits converted into orders',
                   currentValue: '${kpi.strikeRate.toStringAsFixed(1)}%',
-                  targetValue: '${kpi.strikeRateTarget.toStringAsFixed(0)}% Target',
-                  percent: (kpi.strikeRate / (kpi.strikeRateTarget > 0 ? kpi.strikeRateTarget : 1) * 100).clamp(0, 150),
+                  targetValue:
+                      '${kpi.strikeRateTarget.toStringAsFixed(0)}% Target',
+                  percent: (kpi.strikeRate /
+                          (kpi.strikeRateTarget > 0
+                              ? kpi.strikeRateTarget
+                              : 1) *
+                          100)
+                      .clamp(0, 150),
                   icon: Icons.bolt_rounded,
                   color: const Color(0xFFF59E0B),
                   isDark: isDark,
@@ -190,7 +209,9 @@ class KpiScreen extends ConsumerWidget {
                 const SizedBox(height: 6),
                 Text(
                   'Rankings based on total visits in ${kpi.periodType} period',
-                  style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54),
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white60 : Colors.black54),
                 ),
                 const SizedBox(height: 12),
 
@@ -198,11 +219,14 @@ class KpiScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF1E293B) : Colors.grey.shade100,
+                      color: isDark
+                          ? const Color(0xFF1E293B)
+                          : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: const Center(
-                      child: Text('No officer ranking data recorded for this period yet.'),
+                      child: Text(
+                          'No officer ranking data recorded for this period yet.'),
                     ),
                   )
                 else
@@ -221,7 +245,8 @@ class KpiScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPeriodToggle(BuildContext context, WidgetRef ref, KpiPeriod selected, bool isDark) {
+  Widget _buildPeriodToggle(
+      BuildContext context, WidgetRef ref, KpiPeriod selected, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -230,15 +255,19 @@ class KpiScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          _buildPeriodTab(ref, 'Today', KpiPeriod.today, selected == KpiPeriod.today, isDark),
-          _buildPeriodTab(ref, 'This Week', KpiPeriod.thisWeek, selected == KpiPeriod.thisWeek, isDark),
-          _buildPeriodTab(ref, 'This Month', KpiPeriod.thisMonth, selected == KpiPeriod.thisMonth, isDark),
+          _buildPeriodTab(ref, 'Today', KpiPeriod.today,
+              selected == KpiPeriod.today, isDark),
+          _buildPeriodTab(ref, 'This Week', KpiPeriod.thisWeek,
+              selected == KpiPeriod.thisWeek, isDark),
+          _buildPeriodTab(ref, 'This Month', KpiPeriod.thisMonth,
+              selected == KpiPeriod.thisMonth, isDark),
         ],
       ),
     );
   }
 
-  Widget _buildPeriodTab(WidgetRef ref, String title, KpiPeriod period, bool isSelected, bool isDark) {
+  Widget _buildPeriodTab(WidgetRef ref, String title, KpiPeriod period,
+      bool isSelected, bool isDark) {
     return Expanded(
       child: InkWell(
         onTap: () => ref.read(kpiPeriodProvider.notifier).state = period,
@@ -251,7 +280,12 @@ class KpiScreen extends ConsumerWidget {
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
             boxShadow: isSelected && !isDark
-                ? [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 4, offset: const Offset(0, 2))]
+                ? [
+                    BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2))
+                  ]
                 : null,
           ),
           child: Text(
@@ -270,7 +304,8 @@ class KpiScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeroPerformanceBanner(BuildContext context, KpiData kpi, bool isDark) {
+  Widget _buildHeroPerformanceBanner(
+      BuildContext context, KpiData kpi, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -299,7 +334,8 @@ class KpiScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.white.withOpacity(0.2),
                   borderRadius: BorderRadius.circular(20),
@@ -307,24 +343,35 @@ class KpiScreen extends ConsumerWidget {
                 child: const Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.workspace_premium_rounded, color: Colors.amberAccent, size: 16),
+                    Icon(Icons.workspace_premium_rounded,
+                        color: Colors.amberAccent, size: 16),
                     SizedBox(width: 4),
                     Text(
                       'PERFORMANCE SCORECARD',
-                      style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 0.5),
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5),
                     ),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: Colors.black26,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
-                  kpi.startDate.isNotEmpty ? kpi.startDate : DateFormat('yyyy-MM-dd').format(DateTime.now()),
-                  style: const TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600),
+                  kpi.startDate.isNotEmpty
+                      ? kpi.startDate
+                      : DateFormat('yyyy-MM-dd').format(DateTime.now()),
+                  style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600),
                 ),
               ),
             ],
@@ -332,12 +379,16 @@ class KpiScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           const Text(
             'Overall Standing',
-            style: TextStyle(color: Colors.white70, fontSize: 13, fontWeight: FontWeight.w500),
+            style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),
           Text(
             kpi.performanceGrade,
-            style: const TextStyle(color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
+            style: const TextStyle(
+                color: Colors.white, fontSize: 24, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 14),
           ClipRRect(
@@ -346,7 +397,8 @@ class KpiScreen extends ConsumerWidget {
               value: (kpi.visitPercentage / 100).clamp(0.0, 1.0),
               minHeight: 8,
               backgroundColor: Colors.white.withOpacity(0.25),
-              valueColor: const AlwaysStoppedAnimation<Color>(Colors.amberAccent),
+              valueColor:
+                  const AlwaysStoppedAnimation<Color>(Colors.amberAccent),
             ),
           ),
           const SizedBox(height: 10),
@@ -355,11 +407,17 @@ class KpiScreen extends ConsumerWidget {
             children: [
               Text(
                 'Visits Completed: ${kpi.completedVisits}/${kpi.visitTarget}',
-                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600),
               ),
               Text(
                 '${kpi.visitPercentage.toStringAsFixed(0)}% Achieved',
-                style: const TextStyle(color: Colors.amberAccent, fontSize: 12, fontWeight: FontWeight.w800),
+                style: const TextStyle(
+                    color: Colors.amberAccent,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800),
               ),
             ],
           ),
@@ -387,7 +445,8 @@ class KpiScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+        border:
+            Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
@@ -414,21 +473,28 @@ class KpiScreen extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                    Text(title,
+                        style: const TextStyle(
+                            fontWeight: FontWeight.w800, fontSize: 15)),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54)),
+                    Text(subtitle,
+                        style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.white60 : Colors.black54)),
                   ],
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: color.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '${percent.toStringAsFixed(0)}%',
-                  style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 13),
+                  style: TextStyle(
+                      color: color, fontWeight: FontWeight.w900, fontSize: 13),
                 ),
               ),
             ],
@@ -440,17 +506,33 @@ class KpiScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ACHIEVED', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: isDark ? Colors.white54 : Colors.grey.shade600)),
+                  Text('ACHIEVED',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color:
+                              isDark ? Colors.white54 : Colors.grey.shade600)),
                   const SizedBox(height: 2),
-                  Text(currentValue, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+                  Text(currentValue,
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.w900)),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('GOAL TARGET', style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: isDark ? Colors.white54 : Colors.grey.shade600)),
+                  Text('GOAL TARGET',
+                      style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color:
+                              isDark ? Colors.white54 : Colors.grey.shade600)),
                   const SizedBox(height: 2),
-                  Text(targetValue, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: isDark ? Colors.white70 : Colors.black87)),
+                  Text(targetValue,
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? Colors.white70 : Colors.black87)),
                 ],
               ),
             ],
@@ -468,7 +550,10 @@ class KpiScreen extends ConsumerWidget {
           const SizedBox(height: 8),
           Text(
             bottomNote,
-            style: TextStyle(fontSize: 11, fontStyle: FontStyle.italic, color: isDark ? Colors.white54 : Colors.grey.shade600),
+            style: TextStyle(
+                fontSize: 11,
+                fontStyle: FontStyle.italic,
+                color: isDark ? Colors.white54 : Colors.grey.shade600),
           ),
         ],
       ),
@@ -488,7 +573,8 @@ class KpiScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+        border:
+            Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,15 +588,21 @@ class KpiScreen extends ConsumerWidget {
             child: Icon(icon, color: color, size: 20),
           ),
           const SizedBox(height: 12),
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
+          Text(value,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w900)),
           const SizedBox(height: 2),
-          Text(title, style: TextStyle(fontSize: 12, color: isDark ? Colors.white60 : Colors.black54)),
+          Text(title,
+              style: TextStyle(
+                  fontSize: 12,
+                  color: isDark ? Colors.white60 : Colors.black54)),
         ],
       ),
     );
   }
 
-  Widget _buildLeaderboardTile(BuildContext context, int rank, Map<String, dynamic> item, bool isDark) {
+  Widget _buildLeaderboardTile(
+      BuildContext context, int rank, Map<String, dynamic> item, bool isDark) {
     final userId = item['user_id'] ?? 'N/A';
     final totalVisits = item['total_visits'] ?? 0;
 
@@ -536,7 +628,8 @@ class KpiScreen extends ConsumerWidget {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF1E293B) : Colors.white,
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
+        border:
+            Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
       ),
       child: Row(
         children: [
@@ -558,9 +651,14 @@ class KpiScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Field Officer #$userId', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                Text('Field Officer #$userId',
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 14)),
                 const SizedBox(height: 2),
-                Text('Active Field Executive', style: TextStyle(fontSize: 11, color: isDark ? Colors.white54 : Colors.grey.shade600)),
+                Text('Active Field Executive',
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? Colors.white54 : Colors.grey.shade600)),
               ],
             ),
           ),
@@ -572,7 +670,10 @@ class KpiScreen extends ConsumerWidget {
             ),
             child: Text(
               '$totalVisits Visits',
-              style: TextStyle(fontWeight: FontWeight.w800, color: AppColors.primary, fontSize: 12),
+              style: TextStyle(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primary,
+                  fontSize: 12),
             ),
           ),
         ],
@@ -580,11 +681,15 @@ class KpiScreen extends ConsumerWidget {
     );
   }
 
-  void _openTargetConfigModal(BuildContext context, WidgetRef ref, KpiData? kpi) {
-    final titleCtrl = TextEditingController(text: kpi?.targetTitle ?? 'Field Performance Goal');
+  void _openTargetConfigModal(
+      BuildContext context, WidgetRef ref, KpiData? kpi) {
+    final titleCtrl = TextEditingController(
+        text: kpi?.targetTitle ?? 'Field Performance Goal');
     final visitCtrl = TextEditingController(text: '${kpi?.visitTarget ?? 15}');
-    final salesCtrl = TextEditingController(text: '${kpi?.salesTarget.toInt() ?? 50000}');
-    final coverageCtrl = TextEditingController(text: '${kpi?.coverageTarget.toInt() ?? 85}');
+    final salesCtrl =
+        TextEditingController(text: '${kpi?.salesTarget.toInt() ?? 50000}');
+    final coverageCtrl =
+        TextEditingController(text: '${kpi?.coverageTarget.toInt() ?? 85}');
     final currentPeriod = ref.read(kpiPeriodProvider);
 
     CellfinFormScreen.push(
@@ -595,28 +700,32 @@ class KpiScreen extends ConsumerWidget {
       cards: const [
         CellfinCardItem(title: 'Daily Goal', icon: Icons.today_rounded),
         CellfinCardItem(title: 'Weekly Beat', icon: Icons.view_week_rounded),
-        CellfinCardItem(title: 'Monthly Plan', icon: Icons.calendar_month_rounded),
+        CellfinCardItem(
+            title: 'Monthly Plan', icon: Icons.calendar_month_rounded),
         CellfinCardItem(title: 'High Growth', icon: Icons.trending_up_rounded),
       ],
       submitText: 'Save Target to Server',
       onSubmit: () async {
-        final title = titleCtrl.text.trim().isEmpty ? 'Performance Target' : titleCtrl.text.trim();
+        final title = titleCtrl.text.trim().isEmpty
+            ? 'Performance Target'
+            : titleCtrl.text.trim();
         final visitTarget = int.tryParse(visitCtrl.text.trim()) ?? 15;
         final salesTarget = double.tryParse(salesCtrl.text.trim()) ?? 50000.0;
-        final coverageTarget = double.tryParse(coverageCtrl.text.trim()) ?? 85.0;
+        final coverageTarget =
+            double.tryParse(coverageCtrl.text.trim()) ?? 85.0;
 
         final periodType = currentPeriod == KpiPeriod.today
             ? 'daily'
             : (currentPeriod == KpiPeriod.thisWeek ? 'weekly' : 'monthly');
 
         await ref.read(kpiTargetManagerProvider).saveTarget(
-          targetId: kpi?.targetId,
-          title: title,
-          periodType: periodType,
-          visitTarget: visitTarget,
-          salesTarget: salesTarget,
-          coverageTarget: coverageTarget,
-        );
+              targetId: kpi?.targetId,
+              title: title,
+              periodType: periodType,
+              visitTarget: visitTarget,
+              salesTarget: salesTarget,
+              coverageTarget: coverageTarget,
+            );
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -631,27 +740,31 @@ class KpiScreen extends ConsumerWidget {
         CellfinInputField(
           controller: titleCtrl,
           hint: 'Target Plan Name (e.g. Q4 Growth Target)',
-          prefixIcon: const Icon(Icons.badge_outlined, color: Color(0xFF6B7280)),
+          prefixIcon:
+              const Icon(Icons.badge_outlined, color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: visitCtrl,
           hint: 'Visit Target (Stores to visit)',
           keyboardType: TextInputType.number,
-          prefixIcon: const Icon(Icons.storefront_outlined, color: Color(0xFF6B7280)),
+          prefixIcon:
+              const Icon(Icons.storefront_outlined, color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: salesCtrl,
           hint: 'Sales Revenue Target',
           keyboardType: TextInputType.number,
           suffixText: '৳',
-          prefixIcon: const Icon(Icons.monetization_on_outlined, color: Color(0xFF6B7280)),
+          prefixIcon: const Icon(Icons.monetization_on_outlined,
+              color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: coverageCtrl,
           hint: 'Store Coverage Target (%)',
           keyboardType: TextInputType.number,
           suffixText: '%',
-          prefixIcon: const Icon(Icons.pin_drop_outlined, color: Color(0xFF6B7280)),
+          prefixIcon:
+              const Icon(Icons.pin_drop_outlined, color: Color(0xFF6B7280)),
         ),
       ],
     );

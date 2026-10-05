@@ -38,12 +38,15 @@ class DashboardScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
+              const Icon(Icons.error_outline_rounded,
+                  size: 48, color: Colors.red),
               const SizedBox(height: 12),
               Text('Connection Error: $error', textAlign: TextAlign.center),
               const SizedBox(height: 12),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: AppColors.cellfinGreen, foregroundColor: Colors.white),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.cellfinGreen,
+                    foregroundColor: Colors.white),
                 onPressed: () => ref.invalidate(dashboardProvider),
                 child: const Text('Retry Connection'),
               ),
@@ -62,7 +65,8 @@ class DashboardScreen extends ConsumerWidget {
 
                 // Main Service Cards Area
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   child: Column(
                     children: [
                       // First White Card: 8 Core Field Operations
@@ -91,7 +95,8 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Top Green area with Field Officer name and Golden Target Pill
-  Widget _buildFieldVisitHeader(BuildContext context, dynamic user, Map<String, dynamic> data) {
+  Widget _buildFieldVisitHeader(
+      BuildContext context, dynamic user, Map<String, dynamic> data) {
     final officerName = user != null && user.fullName.isNotEmpty
         ? user.fullName.toUpperCase()
         : 'FIELD OFFICER';
@@ -99,7 +104,8 @@ class DashboardScreen extends ConsumerWidget {
 
     return Container(
       width: double.infinity,
-      padding: EdgeInsets.fromLTRB(16, MediaQuery.of(context).padding.top + 8, 16, 20),
+      padding: EdgeInsets.fromLTRB(
+          16, MediaQuery.of(context).padding.top + 8, 16, 20),
       decoration: const BoxDecoration(
         color: AppColors.cellfinGreen,
         borderRadius: BorderRadius.only(
@@ -164,7 +170,8 @@ class DashboardScreen extends ConsumerWidget {
                 onTap: () => _open(context, const KpiScreen()),
                 borderRadius: BorderRadius.circular(24),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                   decoration: BoxDecoration(
                     color: const Color(0xFFFFB300), // Golden Yellow
                     borderRadius: BorderRadius.circular(24),
@@ -187,7 +194,8 @@ class DashboardScreen extends ConsumerWidget {
                           shape: BoxShape.circle,
                         ),
                         child: const Center(
-                          child: Icon(Icons.check_rounded, color: Color(0xFF136B3E), size: 15),
+                          child: Icon(Icons.check_rounded,
+                              color: Color(0xFF136B3E), size: 15),
                         ),
                       ),
                       const SizedBox(width: 6),
@@ -289,7 +297,8 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Second Card: 8 Management & Analytics Modules (Circular Mint Badges)
-  Widget _buildSecondManagementCard(BuildContext context, Map<String, dynamic> data) {
+  Widget _buildSecondManagementCard(
+      BuildContext context, Map<String, dynamic> data) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
@@ -365,7 +374,8 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Today's Field Performance Summary
-  Widget _buildFieldPerformanceSummary(BuildContext context, Map<String, dynamic> data) {
+  Widget _buildFieldPerformanceSummary(
+      BuildContext context, Map<String, dynamic> data) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final visited = data['visited_today'] ?? 0;
     final pending = data['pending_today'] ?? 0;
@@ -394,7 +404,8 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               Row(
                 children: [
-                  Icon(Icons.insights_rounded, color: AppColors.cellfinGreen, size: 20),
+                  Icon(Icons.insights_rounded,
+                      color: AppColors.cellfinGreen, size: 20),
                   const SizedBox(width: 8),
                   Text(
                     'Today\'s Field Summary',
@@ -410,7 +421,10 @@ class DashboardScreen extends ConsumerWidget {
                 onTap: () => _open(context, const VisitsScreen()),
                 child: const Text(
                   'View All Visits',
-                  style: TextStyle(color: AppColors.cellfinGreen, fontWeight: FontWeight.w700, fontSize: 13),
+                  style: TextStyle(
+                      color: AppColors.cellfinGreen,
+                      fontWeight: FontWeight.w700,
+                      fontSize: 13),
                 ),
               ),
             ],
@@ -418,13 +432,21 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              _buildMetricPill('Visited', '$visited', const Color(0xFF136B3E), const Color(0xFFE8F5E9), isDark: isDark),
+              _buildMetricPill('Visited', '$visited', const Color(0xFF136B3E),
+                  const Color(0xFFE8F5E9),
+                  isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Pending', '$pending', const Color(0xFFF59E0B), const Color(0xFFFEF3C7), isDark: isDark),
+              _buildMetricPill('Pending', '$pending', const Color(0xFFF59E0B),
+                  const Color(0xFFFEF3C7),
+                  isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Total Outlets', '$total', const Color(0xFF1E88E5), const Color(0xFFE3F2FD), isDark: isDark),
+              _buildMetricPill('Total Outlets', '$total',
+                  const Color(0xFF1E88E5), const Color(0xFFE3F2FD),
+                  isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Orders', '$orders', const Color(0xFF7E57C2), const Color(0xFFEDE7F6), isDark: isDark),
+              _buildMetricPill('Orders', '$orders', const Color(0xFF7E57C2),
+                  const Color(0xFFEDE7F6),
+                  isDark: isDark),
             ],
           ),
         ],
@@ -432,7 +454,9 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildMetricPill(String label, String value, Color textColor, Color bgColor, {bool isDark = false}) {
+  Widget _buildMetricPill(
+      String label, String value, Color textColor, Color bgColor,
+      {bool isDark = false}) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
@@ -445,7 +469,9 @@ class DashboardScreen extends ConsumerWidget {
             Text(
               value,
               style: TextStyle(
-                color: isDark ? Color.lerp(textColor, Colors.white, 0.35) : textColor,
+                color: isDark
+                    ? Color.lerp(textColor, Colors.white, 0.35)
+                    : textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w900,
               ),
@@ -454,7 +480,10 @@ class DashboardScreen extends ConsumerWidget {
             Text(
               label,
               style: TextStyle(
-                color: (isDark ? Color.lerp(textColor, Colors.white, 0.35) : textColor)?.withOpacity(0.85),
+                color: (isDark
+                        ? Color.lerp(textColor, Colors.white, 0.35)
+                        : textColor)
+                    ?.withOpacity(0.85),
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
               ),
@@ -493,7 +522,11 @@ class DashboardScreen extends ConsumerWidget {
                     child: Stack(
                       alignment: Alignment.center,
                       children: [
-                        Icon(icon, size: 36, color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF136B3E)),
+                        Icon(icon,
+                            size: 36,
+                            color: isDark
+                                ? const Color(0xFF4ADE80)
+                                : const Color(0xFF136B3E)),
                         if (hasBadge)
                           Positioned(
                             right: 4,
@@ -504,7 +537,8 @@ class DashboardScreen extends ConsumerWidget {
                                 color: Color(0xFFFFB300),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check, size: 10, color: Colors.white),
+                              child: const Icon(Icons.check,
+                                  size: 10, color: Colors.white),
                             ),
                           ),
                       ],
@@ -553,12 +587,16 @@ class DashboardScreen extends ConsumerWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: isDark ? const Color(0xFF14532D) : const Color(0xFFD7EEDD), // Soft mint circle
+                      color: isDark
+                          ? const Color(0xFF14532D)
+                          : const Color(0xFFD7EEDD), // Soft mint circle
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
                       icon,
-                      color: isDark ? const Color(0xFF6EE7A0) : const Color(0xFF136B3E),
+                      color: isDark
+                          ? const Color(0xFF6EE7A0)
+                          : const Color(0xFF136B3E),
                       size: 24,
                     ),
                   ),

@@ -25,123 +25,137 @@ class MoreScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Modules & Services', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('All Modules & Services',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
             tooltip: dark ? 'Light mode' : 'Dark mode',
             onPressed: () => ref.read(themeProvider.notifier).toggle(),
-            icon: Icon(dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+            icon:
+                Icon(dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
           ),
         ],
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         children: [
-          _buildCategoryHeader('Field Operations', 'Core day-to-day visiting and sales tools'),
+          _buildCategoryHeader(
+              'Field Operations', 'Core day-to-day visiting and sales tools'),
           const SizedBox(height: 10),
-          _buildGrid(context, [
-            _ModuleItem(
-              title: 'Beats & Routes',
-              subtitle: 'Assigned paths',
-              icon: Icons.alt_route_rounded,
-              gradient: [const Color(0xFF0D9488), const Color(0xFF14B8A6)],
-              screen: const BeatsScreen(),
-            ),
-            _ModuleItem(
-              title: 'Orders',
-              subtitle: 'Catalog sales',
-              icon: Icons.shopping_bag_rounded,
-              gradient: [const Color(0xFF3B82F6), const Color(0xFF60A5FA)],
-              screen: const OrdersScreen(),
-            ),
-            _ModuleItem(
-              title: 'Products',
-              subtitle: 'Price & inventory',
-              icon: Icons.inventory_2_rounded,
-              gradient: [const Color(0xFF8B5CF6), const Color(0xFFA78BFA)],
-              screen: const ProductsScreen(),
-            ),
-            _ModuleItem(
-              title: 'Scan QR Code',
-              subtitle: 'Instant check-in',
-              icon: Icons.qr_code_scanner_rounded,
-              gradient: [const Color(0xFFF59E0B), const Color(0xFFFBBF24)],
-              screen: const QrScannerScreen(),
-            ),
-          ], isDark),
+          _buildGrid(
+              context,
+              [
+                _ModuleItem(
+                  title: 'Beats & Routes',
+                  subtitle: 'Assigned paths',
+                  icon: Icons.alt_route_rounded,
+                  gradient: [const Color(0xFF0D9488), const Color(0xFF14B8A6)],
+                  screen: const BeatsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Orders',
+                  subtitle: 'Catalog sales',
+                  icon: Icons.shopping_bag_rounded,
+                  gradient: [const Color(0xFF3B82F6), const Color(0xFF60A5FA)],
+                  screen: const OrdersScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Products',
+                  subtitle: 'Price & inventory',
+                  icon: Icons.inventory_2_rounded,
+                  gradient: [const Color(0xFF8B5CF6), const Color(0xFFA78BFA)],
+                  screen: const ProductsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Scan QR Code',
+                  subtitle: 'Instant check-in',
+                  icon: Icons.qr_code_scanner_rounded,
+                  gradient: [const Color(0xFFF59E0B), const Color(0xFFFBBF24)],
+                  screen: const QrScannerScreen(),
+                ),
+              ],
+              isDark),
           const SizedBox(height: 24),
-          _buildCategoryHeader('Intelligence & Reports', 'Field metrics, targets, and references'),
+          _buildCategoryHeader('Intelligence & Reports',
+              'Field metrics, targets, and references'),
           const SizedBox(height: 10),
-          _buildGrid(context, [
-            _ModuleItem(
-              title: 'Target & KPIs',
-              subtitle: 'Goals & rankings',
-              icon: Icons.fact_check_rounded,
-              gradient: [const Color(0xFF0F766E), const Color(0xFF14B8A6)],
-              screen: const KpiScreen(),
-            ),
-            _ModuleItem(
-              title: 'Analytics Reports',
-              subtitle: 'Performance charts',
-              icon: Icons.analytics_rounded,
-              gradient: [const Color(0xFF10B981), const Color(0xFF34D399)],
-              screen: const ReportsScreen(),
-            ),
-            _ModuleItem(
-              title: 'System Alerts',
-              subtitle: 'Notifications feed',
-              icon: Icons.notifications_active_rounded,
-              gradient: [const Color(0xFFEF4444), const Color(0xFFF87171)],
-              screen: const NotificationsScreen(),
-            ),
-            _ModuleItem(
-              title: 'Reference Data',
-              subtitle: 'Metadata configs',
-              icon: Icons.tune_rounded,
-              gradient: [const Color(0xFF06B6D4), const Color(0xFF22D3EE)],
-              screen: const ReferenceDataScreen(),
-            ),
-            _ModuleItem(
-              title: 'Assignments',
-              subtitle: 'Officer allocations',
-              icon: Icons.person_pin_circle_rounded,
-              gradient: [const Color(0xFFEC4899), const Color(0xFFF472B6)],
-              screen: const AssignmentsScreen(),
-            ),
-          ], isDark),
+          _buildGrid(
+              context,
+              [
+                _ModuleItem(
+                  title: 'Target & KPIs',
+                  subtitle: 'Goals & rankings',
+                  icon: Icons.fact_check_rounded,
+                  gradient: [const Color(0xFF0F766E), const Color(0xFF14B8A6)],
+                  screen: const KpiScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Analytics Reports',
+                  subtitle: 'Performance charts',
+                  icon: Icons.analytics_rounded,
+                  gradient: [const Color(0xFF10B981), const Color(0xFF34D399)],
+                  screen: const ReportsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'System Alerts',
+                  subtitle: 'Notifications feed',
+                  icon: Icons.notifications_active_rounded,
+                  gradient: [const Color(0xFFEF4444), const Color(0xFFF87171)],
+                  screen: const NotificationsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Reference Data',
+                  subtitle: 'Metadata configs',
+                  icon: Icons.tune_rounded,
+                  gradient: [const Color(0xFF06B6D4), const Color(0xFF22D3EE)],
+                  screen: const ReferenceDataScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Assignments',
+                  subtitle: 'Officer allocations',
+                  icon: Icons.person_pin_circle_rounded,
+                  gradient: [const Color(0xFFEC4899), const Color(0xFFF472B6)],
+                  screen: const AssignmentsScreen(),
+                ),
+              ],
+              isDark),
           const SizedBox(height: 24),
-          _buildCategoryHeader('Administration & Security', 'User access, security policies, and personal profile'),
+          _buildCategoryHeader('Administration & Security',
+              'User access, security policies, and personal profile'),
           const SizedBox(height: 10),
-          _buildGrid(context, [
-            _ModuleItem(
-              title: 'Company Directory',
-              subtitle: 'Users & teams',
-              icon: Icons.corporate_fare_rounded,
-              gradient: [const Color(0xFF6366F1), const Color(0xFF818CF8)],
-              screen: const DirectoryScreen(),
-            ),
-            _ModuleItem(
-              title: 'Role Permissions',
-              subtitle: 'Access controls',
-              icon: Icons.security_rounded,
-              gradient: [const Color(0xFF64748B), const Color(0xFF94A3B8)],
-              screen: const RolePermissionsScreen(),
-            ),
-            _ModuleItem(
-              title: 'Auth Settings',
-              subtitle: 'Security parameters',
-              icon: Icons.lock_person_rounded,
-              gradient: [const Color(0xFF059669), const Color(0xFF10B981)],
-              screen: const AuthSettingsScreen(),
-            ),
-            _ModuleItem(
-              title: 'My Profile',
-              subtitle: 'Account & password',
-              icon: Icons.account_circle_rounded,
-              gradient: [const Color(0xFF0D9488), const Color(0xFF0891B2)],
-              screen: const AccountScreen(),
-            ),
-          ], isDark),
+          _buildGrid(
+              context,
+              [
+                _ModuleItem(
+                  title: 'Company Directory',
+                  subtitle: 'Users & teams',
+                  icon: Icons.corporate_fare_rounded,
+                  gradient: [const Color(0xFF6366F1), const Color(0xFF818CF8)],
+                  screen: const DirectoryScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Role Permissions',
+                  subtitle: 'Access controls',
+                  icon: Icons.security_rounded,
+                  gradient: [const Color(0xFF64748B), const Color(0xFF94A3B8)],
+                  screen: const RolePermissionsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'Auth Settings',
+                  subtitle: 'Security parameters',
+                  icon: Icons.lock_person_rounded,
+                  gradient: [const Color(0xFF059669), const Color(0xFF10B981)],
+                  screen: const AuthSettingsScreen(),
+                ),
+                _ModuleItem(
+                  title: 'My Profile',
+                  subtitle: 'Account & password',
+                  icon: Icons.account_circle_rounded,
+                  gradient: [const Color(0xFF0D9488), const Color(0xFF0891B2)],
+                  screen: const AccountScreen(),
+                ),
+              ],
+              isDark),
           const SizedBox(height: 30),
         ],
       ),
@@ -154,7 +168,8 @@ class MoreScreen extends ConsumerWidget {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: -0.2),
+          style: const TextStyle(
+              fontSize: 16, fontWeight: FontWeight.w800, letterSpacing: -0.2),
         ),
         const SizedBox(height: 2),
         Text(
@@ -165,7 +180,8 @@ class MoreScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildGrid(BuildContext context, List<_ModuleItem> items, bool isDark) {
+  Widget _buildGrid(
+      BuildContext context, List<_ModuleItem> items, bool isDark) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -181,7 +197,8 @@ class MoreScreen extends ConsumerWidget {
         return Material(
           color: Colors.transparent,
           child: InkWell(
-            onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => item.screen)),
+            onTap: () => Navigator.push(
+                context, MaterialPageRoute(builder: (_) => item.screen)),
             borderRadius: BorderRadius.circular(18),
             child: Container(
               padding: const EdgeInsets.all(14),
@@ -189,7 +206,9 @@ class MoreScreen extends ConsumerWidget {
                 color: isDark ? const Color(0xFF1E293B) : Colors.white,
                 borderRadius: BorderRadius.circular(18),
                 border: Border.all(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFE2E8F0),
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFE2E8F0),
                   width: 1,
                 ),
                 boxShadow: [
@@ -224,7 +243,8 @@ class MoreScreen extends ConsumerWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? Colors.white : const Color(0xFF0F172A),
+                          color:
+                              isDark ? Colors.white : const Color(0xFF0F172A),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -234,7 +254,9 @@ class MoreScreen extends ConsumerWidget {
                         item.subtitle,
                         style: TextStyle(
                           fontSize: 11,
-                          color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                          color: isDark
+                              ? const Color(0xFF94A3B8)
+                              : const Color(0xFF64748B),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,

@@ -45,10 +45,15 @@ class _DirectoryState extends ConsumerState<DirectoryScreen>
               indicatorWeight: 3.5,
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white70,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              labelStyle:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               tabs: const [
-                Tab(icon: Icon(Icons.person_outline_rounded, size: 18), text: 'Users'),
-                Tab(icon: Icon(Icons.business_outlined, size: 18), text: 'Companies'),
+                Tab(
+                    icon: Icon(Icons.person_outline_rounded, size: 18),
+                    text: 'Users'),
+                Tab(
+                    icon: Icon(Icons.business_outlined, size: 18),
+                    text: 'Companies'),
               ],
             ),
           ),
@@ -81,7 +86,8 @@ class _DirectoryList extends ConsumerWidget {
         color: _green,
         onRefresh: notifier.fetch,
         child: state.when(
-          loading: () => const Center(child: CircularProgressIndicator(color: _green)),
+          loading: () =>
+              const Center(child: CircularProgressIndicator(color: _green)),
           error: (e, _) => Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -94,7 +100,8 @@ class _DirectoryList extends ConsumerWidget {
                       color: Colors.red.withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.error_outline_rounded, color: Colors.red, size: 40),
+                    child: const Icon(Icons.error_outline_rounded,
+                        color: Colors.red, size: 40),
                   ),
                   const SizedBox(height: 14),
                   Text(_message(e),
@@ -105,7 +112,8 @@ class _DirectoryList extends ConsumerWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: _green,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: notifier.fetch,
                     child: const Text('Retry'),
@@ -129,7 +137,9 @@ class _DirectoryList extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                             child: Icon(
-                              users ? Icons.people_outline_rounded : Icons.business_outlined,
+                              users
+                                  ? Icons.people_outline_rounded
+                                  : Icons.business_outlined,
                               color: _green,
                               size: 36,
                             ),
@@ -146,7 +156,8 @@ class _DirectoryList extends ConsumerWidget {
                           const SizedBox(height: 6),
                           const Text(
                             'Tap + below to add a new record',
-                            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                            style: TextStyle(
+                                fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                         ],
                       ),
@@ -180,20 +191,24 @@ class _DirectoryList extends ConsumerWidget {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            title: const Text('Confirm Delete', style: TextStyle(fontWeight: FontWeight.w700)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14)),
+                            title: const Text('Confirm Delete',
+                                style: TextStyle(fontWeight: FontWeight.w700)),
                             content: Text(
                                 'Remove "${users ? (item['full_name'] ?? item['first_name'] ?? '') : item['name'] ?? ''}" from directory?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+                                child: const Text('Cancel',
+                                    style: TextStyle(color: Color(0xFF6B7280))),
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFDC2626),
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
                                   elevation: 0,
                                 ),
                                 onPressed: () => Navigator.pop(ctx, true),
@@ -251,7 +266,10 @@ class _DirectoryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = isUser
-        ? (item['full_name'] ?? '${item['first_name'] ?? ''} ${item['last_name'] ?? ''}').toString().trim()
+        ? (item['full_name'] ??
+                '${item['first_name'] ?? ''} ${item['last_name'] ?? ''}')
+            .toString()
+            .trim()
         : (item['name'] ?? '').toString();
     final subtitle = isUser
         ? (item['email'] ?? '').toString()
@@ -286,10 +304,14 @@ class _DirectoryCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isUser ? const Color(0xFFE8F5E9) : const Color(0xFFE0F2FE),
+                    color: isUser
+                        ? const Color(0xFFE8F5E9)
+                        : const Color(0xFFE0F2FE),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isUser ? const Color(0xFFC8E6C9) : const Color(0xFFBAE6FD),
+                      color: isUser
+                          ? const Color(0xFFC8E6C9)
+                          : const Color(0xFFBAE6FD),
                     ),
                   ),
                   child: Center(
@@ -321,14 +343,16 @@ class _DirectoryCard extends StatelessWidget {
                         const SizedBox(height: 4),
                         Text(
                           subtitle,
-                          style: const TextStyle(fontSize: 12.5, color: Color(0xFF6B7280)),
+                          style: const TextStyle(
+                              fontSize: 12.5, color: Color(0xFF6B7280)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                       ],
                       const SizedBox(height: 6),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: isActive
                               ? const Color(0xFFE8F5E9)
@@ -336,7 +360,9 @@ class _DirectoryCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
-                          isActive ? 'Active' : (status.isEmpty ? 'N/A' : status),
+                          isActive
+                              ? 'Active'
+                              : (status.isEmpty ? 'N/A' : status),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -355,7 +381,9 @@ class _DirectoryCard extends StatelessWidget {
                     if (onToggle != null)
                       IconButton(
                         icon: Icon(
-                          isActive ? Icons.toggle_on_rounded : Icons.toggle_off_rounded,
+                          isActive
+                              ? Icons.toggle_on_rounded
+                              : Icons.toggle_off_rounded,
                           size: 22,
                           color: isActive ? _green : const Color(0xFF9CA3AF),
                         ),
@@ -363,12 +391,14 @@ class _DirectoryCard extends StatelessWidget {
                         onPressed: onToggle,
                       ),
                     IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 20, color: _green),
+                      icon: const Icon(Icons.edit_outlined,
+                          size: 20, color: _green),
                       tooltip: 'Edit',
                       onPressed: onEdit,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Color(0xFFEF4444)),
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          size: 20, color: Color(0xFFEF4444)),
                       tooltip: 'Delete',
                       onPressed: onDelete,
                     ),
@@ -406,17 +436,23 @@ Future<void> _form(
     cards: users
         ? const [
             CellfinCardItem(title: 'Sales Rep', icon: Icons.badge_outlined),
-            CellfinCardItem(title: 'Manager', icon: Icons.manage_accounts_outlined),
-            CellfinCardItem(title: 'Supervisor', icon: Icons.supervisor_account_outlined),
-            CellfinCardItem(title: 'Admin', icon: Icons.admin_panel_settings_outlined),
+            CellfinCardItem(
+                title: 'Manager', icon: Icons.manage_accounts_outlined),
+            CellfinCardItem(
+                title: 'Supervisor', icon: Icons.supervisor_account_outlined),
+            CellfinCardItem(
+                title: 'Admin', icon: Icons.admin_panel_settings_outlined),
           ]
         : const [
-            CellfinCardItem(title: 'Distributor', icon: Icons.local_shipping_outlined),
+            CellfinCardItem(
+                title: 'Distributor', icon: Icons.local_shipping_outlined),
             CellfinCardItem(title: 'Retailer', icon: Icons.store_outlined),
-            CellfinCardItem(title: 'Wholesaler', icon: Icons.warehouse_outlined),
+            CellfinCardItem(
+                title: 'Wholesaler', icon: Icons.warehouse_outlined),
             CellfinCardItem(title: 'Partner', icon: Icons.handshake_outlined),
           ],
-    submitText: item == null ? (users ? 'Create User' : 'Add Company') : 'Save Changes',
+    submitText:
+        item == null ? (users ? 'Create User' : 'Add Company') : 'Save Changes',
     fields: [
       CellfinInputField(
         controller: first,
@@ -425,28 +461,34 @@ Future<void> _form(
           users ? Icons.person_outline_rounded : Icons.business_outlined,
           color: const Color(0xFF6B7280),
         ),
-        validator: (v) => v == null || v.trim().isEmpty ? 'This field is required' : null,
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'This field is required' : null,
       ),
       if (users) ...[
         CellfinInputField(
           controller: last,
           hint: 'Last Name',
-          prefixIcon: const Icon(Icons.person_outline_rounded, color: Color(0xFF6B7280)),
+          prefixIcon: const Icon(Icons.person_outline_rounded,
+              color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: email,
           hint: 'Email Address *',
           keyboardType: TextInputType.emailAddress,
-          prefixIcon: const Icon(Icons.email_outlined, color: Color(0xFF6B7280)),
-          validator: (v) => v == null || v.trim().isEmpty ? 'Email is required' : null,
+          prefixIcon:
+              const Icon(Icons.email_outlined, color: Color(0xFF6B7280)),
+          validator: (v) =>
+              v == null || v.trim().isEmpty ? 'Email is required' : null,
         ),
         if (item == null)
           CellfinInputField(
             controller: password,
             hint: 'Password *',
             obscureText: true,
-            prefixIcon: const Icon(Icons.lock_outline_rounded, color: Color(0xFF6B7280)),
-            validator: (v) => v == null || v.trim().isEmpty ? 'Password is required' : null,
+            prefixIcon: const Icon(Icons.lock_outline_rounded,
+                color: Color(0xFF6B7280)),
+            validator: (v) =>
+                v == null || v.trim().isEmpty ? 'Password is required' : null,
           ),
       ] else
         CellfinInputField(
@@ -476,14 +518,16 @@ Future<void> _form(
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(item == null ? 'Record created!' : 'Record updated!'),
+              content:
+                  Text(item == null ? 'Record created!' : 'Record updated!'),
               backgroundColor: _green,
             ),
           );
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_message(e))));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(_message(e))));
         }
       }
     },

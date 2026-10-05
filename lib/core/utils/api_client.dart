@@ -25,32 +25,34 @@ class ApiClient {
 
     if (dio == null) {
       this.dio.interceptors.add(InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          final token = await secureStorage.read(key: AppConstants.accessTokenKey);
-          if (token != null) {
-            options.headers['Authorization'] = 'Bearer $token';
-          }
-          return handler.next(options);
-        },
-        onError: (error, handler) async {
-          if (error.response?.statusCode == 401) {
-            await secureStorage.delete(key: AppConstants.accessTokenKey);
-            await secureStorage.delete(key: AppConstants.userKey);
-          }
-          return handler.next(error);
-        },
-      ));
+            onRequest: (options, handler) async {
+              final token =
+                  await secureStorage.read(key: AppConstants.accessTokenKey);
+              if (token != null) {
+                options.headers['Authorization'] = 'Bearer $token';
+              }
+              return handler.next(options);
+            },
+            onError: (error, handler) async {
+              if (error.response?.statusCode == 401) {
+                await secureStorage.delete(key: AppConstants.accessTokenKey);
+                await secureStorage.delete(key: AppConstants.userKey);
+              }
+              return handler.next(error);
+            },
+          ));
 
       this.dio.interceptors.add(PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        error: true,
-      ));
+            requestHeader: true,
+            requestBody: true,
+            responseBody: true,
+            error: true,
+          ));
     }
   }
 
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<Response> get(String path,
+      {Map<String, dynamic>? queryParameters}) async {
     return await dio.get(path, queryParameters: queryParameters);
   }
 

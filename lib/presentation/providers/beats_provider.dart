@@ -3,7 +3,8 @@ import 'package:field_visit_app/data/business_api.dart';
 import 'package:field_visit_app/data/models/beat.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
 
-final beatsProvider = StateNotifierProvider<BeatsNotifier, AsyncValue<List<Beat>>>((ref) {
+final beatsProvider =
+    StateNotifierProvider<BeatsNotifier, AsyncValue<List<Beat>>>((ref) {
   return BeatsNotifier(ref.watch(businessApiProvider));
 });
 
@@ -30,17 +31,39 @@ class BeatsNotifier extends StateNotifier<AsyncValue<List<Beat>>> {
     }
   }
 
-  Future<void> create(Map<String, dynamic> data) async { await api.createBeat(data); await fetchBeats(); }
-  Future<void> update(int id, Map<String, dynamic> data) async { await api.updateBeat(id, data); await fetchBeats(); }
-  Future<void> remove(int id) async { await api.deleteBeat(id); await fetchBeats(); }
+  Future<void> create(Map<String, dynamic> data) async {
+    await api.createBeat(data);
+    await fetchBeats();
+  }
+
+  Future<void> update(int id, Map<String, dynamic> data) async {
+    await api.updateBeat(id, data);
+    await fetchBeats();
+  }
+
+  Future<void> remove(int id) async {
+    await api.deleteBeat(id);
+    await fetchBeats();
+  }
+
   Future<List<Map<String, dynamic>>> outlets(int beatId) async {
     final response = await api.beatOutlets(beatId);
     final payload = Map<String, dynamic>.from(response.data as Map);
     final raw = payload['data'];
     final list = raw is Map ? raw['data'] : raw;
-    return (list as List<dynamic>? ?? const []).map((e) => Map<String, dynamic>.from(e as Map)).toList();
+    return (list as List<dynamic>? ?? const [])
+        .map((e) => Map<String, dynamic>.from(e as Map))
+        .toList();
   }
-  Future<void> addOutlet(int beatId, int outletId, int sequence) async { await api.addBeatOutlet(beatId, {'outlet_id': outletId, 'sequence': sequence}); }
-  Future<void> removeOutlet(int beatId, int beatOutletId) async { await api.removeBeatOutlet(beatId, beatOutletId); }
+
+  Future<void> addOutlet(int beatId, int outletId, int sequence) async {
+    await api
+        .addBeatOutlet(beatId, {'outlet_id': outletId, 'sequence': sequence});
+  }
+
+  Future<void> removeOutlet(int beatId, int beatOutletId) async {
+    await api.removeBeatOutlet(beatId, beatOutletId);
+  }
+
   Future<void> refresh() => fetchBeats();
 }

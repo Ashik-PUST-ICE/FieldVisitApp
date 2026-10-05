@@ -44,12 +44,15 @@ class CellfinTopCardsRow extends StatelessWidget {
               borderRadius: BorderRadius.circular(12),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 180),
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
                 decoration: BoxDecoration(
                   color: isSelected ? const Color(0xFF136B3E) : Colors.white,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? const Color(0xFF136B3E) : const Color(0xFFE2E8F0),
+                    color: isSelected
+                        ? const Color(0xFF136B3E)
+                        : const Color(0xFFE2E8F0),
                     width: isSelected ? 1.5 : 1.0,
                   ),
                   boxShadow: [
@@ -76,7 +79,8 @@ class CellfinTopCardsRow extends StatelessWidget {
                       ),
                       child: Icon(
                         card.icon,
-                        color: isSelected ? Colors.white : const Color(0xFF136B3E),
+                        color:
+                            isSelected ? Colors.white : const Color(0xFF136B3E),
                         size: 21,
                       ),
                     ),
@@ -85,8 +89,10 @@ class CellfinTopCardsRow extends StatelessWidget {
                       card.title,
                       style: TextStyle(
                         fontSize: 11.5,
-                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                        color: isSelected ? Colors.white : const Color(0xFF374151),
+                        fontWeight:
+                            isSelected ? FontWeight.w800 : FontWeight.w600,
+                        color:
+                            isSelected ? Colors.white : const Color(0xFF374151),
                         letterSpacing: -0.2,
                       ),
                       maxLines: 1,
@@ -161,7 +167,8 @@ class CellfinInputField extends StatelessWidget {
         filled: true,
         fillColor: Colors.white,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         hintText: hint,
         hintStyle: const TextStyle(
           fontSize: 14.5,
@@ -249,7 +256,9 @@ class CellfinDropdownField<T> extends StatelessWidget {
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: hasError ? const Color(0xFFD32F2F) : const Color(0xFFC4C4C4),
+                  color: hasError
+                      ? const Color(0xFFD32F2F)
+                      : const Color(0xFFC4C4C4),
                   width: 1.0,
                 ),
               ),
@@ -271,7 +280,8 @@ class CellfinDropdownField<T> extends StatelessWidget {
                     height: 22,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(0xFF6B7280), // Matches dark circular dropdown icon in photo
+                      color: Color(
+                          0xFF6B7280), // Matches dark circular dropdown icon in photo
                     ),
                     child: const Icon(
                       Icons.keyboard_arrow_down_rounded,
@@ -292,7 +302,8 @@ class CellfinDropdownField<T> extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 12, top: 4),
                 child: Text(
                   state.errorText ?? '',
-                  style: const TextStyle(color: Color(0xFFD32F2F), fontSize: 12),
+                  style:
+                      const TextStyle(color: Color(0xFFD32F2F), fontSize: 12),
                 ),
               ),
           ],
@@ -326,7 +337,8 @@ class CellfinOfficerCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.account_circle, color: Color(0xFF6B7280), size: 22),
+              const Icon(Icons.account_circle,
+                  color: Color(0xFF6B7280), size: 22),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -344,7 +356,8 @@ class CellfinOfficerCard extends StatelessWidget {
           const Divider(height: 14, color: Color(0xFFF1F5F9)),
           Row(
             children: [
-              const Icon(Icons.credit_card_outlined, color: Color(0xFF6B7280), size: 20),
+              const Icon(Icons.credit_card_outlined,
+                  color: Color(0xFF6B7280), size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -427,13 +440,16 @@ class _CellfinFormScreenState extends State<CellfinFormScreen> {
     final displayCards = widget.cards ??
         const [
           CellfinCardItem(title: 'CellFin', icon: Icons.phone_android_rounded),
-          CellfinCardItem(title: 'Account', icon: Icons.account_balance_outlined),
+          CellfinCardItem(
+              title: 'Account', icon: Icons.account_balance_outlined),
           CellfinCardItem(title: 'Card', icon: Icons.credit_card_outlined),
-          CellfinCardItem(title: 'mCash', icon: Icons.account_balance_wallet_outlined),
+          CellfinCardItem(
+              title: 'mCash', icon: Icons.account_balance_wallet_outlined),
         ];
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F4F7), // Soft grey background matching photo
+      backgroundColor:
+          const Color(0xFFF2F4F7), // Soft grey background matching photo
       appBar: AppBar(
         backgroundColor: const Color(0xFF136B3E), // Signature Forest Green
         foregroundColor: Colors.white,
@@ -463,7 +479,8 @@ class _CellfinFormScreenState extends State<CellfinFormScreen> {
                 CellfinTopCardsRow(
                   cards: displayCards,
                   selectedIndex: _selectedCardIndex,
-                  onSelect: (index) => setState(() => _selectedCardIndex = index),
+                  onSelect: (index) =>
+                      setState(() => _selectedCardIndex = index),
                 ),
 
                 const SizedBox(height: 14),
@@ -496,7 +513,8 @@ class _CellfinFormScreenState extends State<CellfinFormScreen> {
                             try {
                               await widget.onSubmit();
                             } finally {
-                              if (mounted) setState(() => _isSubmitting = false);
+                              if (mounted)
+                                setState(() => _isSubmitting = false);
                             }
                           }
                         },
@@ -513,7 +531,8 @@ class _CellfinFormScreenState extends State<CellfinFormScreen> {
                       ? const SizedBox(
                           width: 22,
                           height: 22,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.2),
+                          child: CircularProgressIndicator(
+                              color: Colors.white, strokeWidth: 2.2),
                         )
                       : Text(
                           widget.submitText,

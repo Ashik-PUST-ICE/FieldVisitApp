@@ -10,7 +10,8 @@ class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+  ConsumerState<NotificationsScreen> createState() =>
+      _NotificationsScreenState();
 }
 
 class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
@@ -32,7 +33,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           children: [
             const Text(
               'System Alerts',
-              style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18, color: Colors.white),
+              style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  fontSize: 18,
+                  color: Colors.white),
             ),
             if (unreadCount > 0)
               Text(
@@ -49,17 +53,22 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                 await ref.read(notificationsProvider.notifier).markAllRead();
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('All notifications marked as read'), backgroundColor: _green),
+                    const SnackBar(
+                        content: Text('All notifications marked as read'),
+                        backgroundColor: _green),
                   );
                 }
               },
               icon: const Icon(Icons.done_all_rounded, size: 18),
-              label: const Text('Mark All Read', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+              label: const Text('Mark All Read',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
             ),
           IconButton(
             tooltip: 'Refresh',
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
-            onPressed: () => ref.read(notificationsProvider.notifier).fetch(unreadOnly: _unreadOnly),
+            onPressed: () => ref
+                .read(notificationsProvider.notifier)
+                .fetch(unreadOnly: _unreadOnly),
           ),
         ],
       ),
@@ -83,22 +92,30 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           Expanded(
             child: RefreshIndicator(
               color: _green,
-              onRefresh: () => ref.read(notificationsProvider.notifier).fetch(unreadOnly: _unreadOnly),
+              onRefresh: () => ref
+                  .read(notificationsProvider.notifier)
+                  .fetch(unreadOnly: _unreadOnly),
               child: state.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: _green)),
+                loading: () => const Center(
+                    child: CircularProgressIndicator(color: _green)),
                 error: (e, _) => Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.error_outline_rounded, color: Colors.red, size: 48),
+                        const Icon(Icons.error_outline_rounded,
+                            color: Colors.red, size: 48),
                         const SizedBox(height: 12),
                         Text(_error(e), textAlign: TextAlign.center),
                         const SizedBox(height: 12),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: _green, foregroundColor: Colors.white),
-                          onPressed: () => ref.read(notificationsProvider.notifier).fetch(unreadOnly: _unreadOnly),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: _green,
+                              foregroundColor: Colors.white),
+                          onPressed: () => ref
+                              .read(notificationsProvider.notifier)
+                              .fetch(unreadOnly: _unreadOnly),
                           child: const Text('Retry'),
                         ),
                       ],
@@ -124,17 +141,24 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                   color: _green.withOpacity(0.08),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.notifications_off_outlined, size: 54, color: _green),
+                                child: const Icon(
+                                    Icons.notifications_off_outlined,
+                                    size: 54,
+                                    color: _green),
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                _unreadOnly ? 'No Unread Notifications' : 'No Notifications Found',
-                                style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16),
+                                _unreadOnly
+                                    ? 'No Unread Notifications'
+                                    : 'No Notifications Found',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700, fontSize: 16),
                               ),
                               const SizedBox(height: 6),
                               const Text(
                                 'You are all caught up with your visits, beats, and system alerts.',
-                                style: TextStyle(color: Color(0xFF6B7280), fontSize: 13),
+                                style: TextStyle(
+                                    color: Color(0xFF6B7280), fontSize: 13),
                               ),
                             ],
                           ),
@@ -150,17 +174,21 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     itemBuilder: (context, i) {
                       final n = filtered[i];
                       final isRead = n['read_at'] != null;
-                      final title = n['title'] ?? n['type'] ?? 'System Notification';
+                      final title =
+                          n['title'] ?? n['type'] ?? 'System Notification';
                       final message = n['message'] ?? '';
                       final createdAt = n['created_at']?.toString() ?? '';
                       final id = (n['id'] as num?)?.toInt() ?? 0;
 
                       return Container(
                         decoration: BoxDecoration(
-                          color: isRead ? Colors.white : const Color(0xFFF0FDF4),
+                          color:
+                              isRead ? Colors.white : const Color(0xFFF0FDF4),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isRead ? const Color(0xFFE2E8F0) : const Color(0xFF86EFAC),
+                            color: isRead
+                                ? const Color(0xFFE2E8F0)
+                                : const Color(0xFF86EFAC),
                             width: isRead ? 1 : 1.2,
                           ),
                           boxShadow: [
@@ -179,7 +207,9 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                 ? null
                                 : () async {
                                     if (id > 0) {
-                                      await ref.read(notificationsProvider.notifier).markRead(id);
+                                      await ref
+                                          .read(notificationsProvider.notifier)
+                                          .markRead(id);
                                     }
                                   },
                             child: Padding(
@@ -197,15 +227,20 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                       borderRadius: BorderRadius.circular(10),
                                     ),
                                     child: Icon(
-                                      isRead ? Icons.notifications_none_rounded : Icons.notifications_active_rounded,
-                                      color: isRead ? const Color(0xFF64748B) : _green,
+                                      isRead
+                                          ? Icons.notifications_none_rounded
+                                          : Icons.notifications_active_rounded,
+                                      color: isRead
+                                          ? const Color(0xFF64748B)
+                                          : _green,
                                       size: 22,
                                     ),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
@@ -213,9 +248,12 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                               child: Text(
                                                 title.toString(),
                                                 style: TextStyle(
-                                                  fontWeight: isRead ? FontWeight.w600 : FontWeight.w800,
+                                                  fontWeight: isRead
+                                                      ? FontWeight.w600
+                                                      : FontWeight.w800,
                                                   fontSize: 14,
-                                                  color: const Color(0xFF1E293B),
+                                                  color:
+                                                      const Color(0xFF1E293B),
                                                 ),
                                               ),
                                             ),
@@ -234,14 +272,18 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                                           const SizedBox(height: 4),
                                           Text(
                                             message.toString(),
-                                            style: const TextStyle(fontSize: 13, color: Color(0xFF475569)),
+                                            style: const TextStyle(
+                                                fontSize: 13,
+                                                color: Color(0xFF475569)),
                                           ),
                                         ],
                                         if (createdAt.isNotEmpty) ...[
                                           const SizedBox(height: 6),
                                           Text(
                                             createdAt,
-                                            style: const TextStyle(fontSize: 11, color: Color(0xFF94A3B8)),
+                                            style: const TextStyle(
+                                                fontSize: 11,
+                                                color: Color(0xFF94A3B8)),
                                           ),
                                         ],
                                       ],

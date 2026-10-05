@@ -24,9 +24,8 @@ class StatCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = color ?? AppColors.primary;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark
-        ? c.withOpacity(0.15)
-        : AppColors.tintedBackground(c);
+    final bgColor =
+        isDark ? c.withOpacity(0.15) : AppColors.tintedBackground(c);
 
     return GestureDetector(
       onTap: onTap,
@@ -36,9 +35,8 @@ class StatCard extends StatelessWidget {
           gradient: gradient,
           color: gradient == null ? bgColor : null,
           borderRadius: BorderRadius.circular(16),
-          border: gradient == null
-              ? Border.all(color: c.withOpacity(0.15))
-              : null,
+          border:
+              gradient == null ? Border.all(color: c.withOpacity(0.15)) : null,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

@@ -15,11 +15,13 @@ class ReportsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
-        title: const Text('Reports', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('Reports',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           if (filter.from != null || filter.to != null)
             TextButton.icon(
-              onPressed: () => ref.read(reportsFilterProvider.notifier).state = const ReportsFilter(),
+              onPressed: () => ref.read(reportsFilterProvider.notifier).state =
+                  const ReportsFilter(),
               icon: const Icon(Icons.clear, size: 16),
               label: const Text('Clear', style: TextStyle(fontSize: 12)),
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
@@ -39,7 +41,8 @@ class ReportsScreen extends ConsumerWidget {
               color: AppColors.primary,
               onRefresh: () async => ref.invalidate(reportsProvider),
               child: state.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary)),
                 error: (e, _) => Center(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
@@ -50,12 +53,18 @@ class ReportsScreen extends ConsumerWidget {
                           color: AppColors.errorLight,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.bar_chart_rounded, size: 48, color: AppColors.error),
+                        child: const Icon(Icons.bar_chart_rounded,
+                            size: 48, color: AppColors.error),
                       ),
                       const SizedBox(height: 16),
-                      const Text('Unable to load reports', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      const Text('Unable to load reports',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 8),
-                      Text(e.toString(), textAlign: TextAlign.center, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                      Text(e.toString(),
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                              color: Colors.grey, fontSize: 12)),
                     ]),
                   ),
                 ),
@@ -104,11 +113,14 @@ class _DateRangeBar extends ConsumerWidget {
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 12),
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkSurface : Colors.white,
-        border: Border(bottom: BorderSide(color: isDark ? AppColors.darkBorder : AppColors.border)),
+        border: Border(
+            bottom: BorderSide(
+                color: isDark ? AppColors.darkBorder : AppColors.border)),
       ),
       child: Row(
         children: [
-          const Icon(Icons.date_range_rounded, size: 18, color: AppColors.primary),
+          const Icon(Icons.date_range_rounded,
+              size: 18, color: AppColors.primary),
           const SizedBox(width: 8),
           Expanded(
             child: Row(
@@ -118,19 +130,22 @@ class _DateRangeBar extends ConsumerWidget {
                   onTap: () async {
                     final picked = await showDatePicker(
                       context: context,
-                      initialDate: filter.from ?? DateTime.now().subtract(const Duration(days: 30)),
+                      initialDate: filter.from ??
+                          DateTime.now().subtract(const Duration(days: 30)),
                       firstDate: DateTime(2020),
                       lastDate: DateTime.now(),
                       builder: (ctx, child) => Theme(
                         data: Theme.of(ctx).copyWith(
-                          colorScheme: const ColorScheme.light(primary: AppColors.primary),
+                          colorScheme: const ColorScheme.light(
+                              primary: AppColors.primary),
                         ),
                         child: child!,
                       ),
                     );
                     if (picked != null) {
-                      ref.read(reportsFilterProvider.notifier).state =
-                          ref.read(reportsFilterProvider).copyWith(from: picked);
+                      ref.read(reportsFilterProvider.notifier).state = ref
+                          .read(reportsFilterProvider)
+                          .copyWith(from: picked);
                     }
                   },
                   isDark: isDark,
@@ -138,7 +153,9 @@ class _DateRangeBar extends ConsumerWidget {
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: Text('→', style: TextStyle(color: isDark ? Colors.white60 : Colors.grey)),
+                  child: Text('→',
+                      style: TextStyle(
+                          color: isDark ? Colors.white60 : Colors.grey)),
                 ),
                 _DatePickerButton(
                   label: filter.to != null ? _fmt(filter.to!) : 'To date',
@@ -150,7 +167,8 @@ class _DateRangeBar extends ConsumerWidget {
                       lastDate: DateTime.now(),
                       builder: (ctx, child) => Theme(
                         data: Theme.of(ctx).copyWith(
-                          colorScheme: const ColorScheme.light(primary: AppColors.primary),
+                          colorScheme: const ColorScheme.light(
+                              primary: AppColors.primary),
                         ),
                         child: child!,
                       ),
@@ -176,8 +194,20 @@ class _DateRangeBar extends ConsumerWidget {
   static String _fmt(DateTime dt) =>
       '${dt.day.toString().padLeft(2, '0')} ${_month(dt.month)} ${dt.year}';
 
-  static String _month(int m) =>
-      ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][m - 1];
+  static String _month(int m) => [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec'
+      ][m - 1];
 }
 
 class _DatePickerButton extends StatelessWidget {
@@ -185,7 +215,11 @@ class _DatePickerButton extends StatelessWidget {
   final VoidCallback onTap;
   final bool isDark;
   final bool hasValue;
-  const _DatePickerButton({required this.label, required this.onTap, required this.isDark, required this.hasValue});
+  const _DatePickerButton(
+      {required this.label,
+      required this.onTap,
+      required this.isDark,
+      required this.hasValue});
 
   @override
   Widget build(BuildContext context) {
@@ -200,7 +234,9 @@ class _DatePickerButton extends StatelessWidget {
               : (isDark ? AppColors.darkCard : AppColors.background),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: hasValue ? AppColors.primary.withOpacity(0.4) : (isDark ? AppColors.darkBorder : AppColors.border),
+            color: hasValue
+                ? AppColors.primary.withOpacity(0.4)
+                : (isDark ? AppColors.darkBorder : AppColors.border),
           ),
         ),
         child: Text(
@@ -208,7 +244,9 @@ class _DatePickerButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 12,
             fontWeight: hasValue ? FontWeight.w600 : FontWeight.w400,
-            color: hasValue ? AppColors.primary : (isDark ? Colors.white60 : Colors.grey),
+            color: hasValue
+                ? AppColors.primary
+                : (isDark ? Colors.white60 : Colors.grey),
           ),
         ),
       ),
@@ -235,13 +273,14 @@ class _QuickRangeMenu extends ConsumerWidget {
       onSelected: (days) {
         final to = DateTime.now();
         final from = to.subtract(Duration(days: days));
-        ref.read(reportsFilterProvider.notifier).state = ReportsFilter(from: from, to: to);
+        ref.read(reportsFilterProvider.notifier).state =
+            ReportsFilter(from: from, to: to);
       },
     );
   }
 
-  PopupMenuItem<int> _item(int days, String label) =>
-      PopupMenuItem(value: days, child: Text(label, style: const TextStyle(fontSize: 13)));
+  PopupMenuItem<int> _item(int days, String label) => PopupMenuItem(
+      value: days, child: Text(label, style: const TextStyle(fontSize: 13)));
 }
 
 // ─── Report Section Card ─────────────────────────────────────────────────────
@@ -269,7 +308,8 @@ class _ReportSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+        border:
+            Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
         boxShadow: AppColors.cardShadow,
       ),
       child: Column(
@@ -284,7 +324,8 @@ class _ReportSection extends StatelessWidget {
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(18)),
             ),
             child: Row(children: [
               Container(
@@ -296,23 +337,31 @@ class _ReportSection extends StatelessWidget {
                 child: Icon(icon, color: color, size: 20),
               ),
               const SizedBox(width: 12),
-              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w800)),
             ]),
           ),
           // Stat grid
           Padding(
             padding: const EdgeInsets.all(16),
             child: entries.isEmpty
-                ? const Center(child: Padding(padding: EdgeInsets.all(8), child: Text('No data', style: TextStyle(color: Colors.grey))))
+                ? const Center(
+                    child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Text('No data',
+                            style: TextStyle(color: Colors.grey))))
                 : Wrap(
                     spacing: 12,
                     runSpacing: 12,
-                    children: entries.map((e) => _StatChip(
-                          label: e.key.replaceAll('_', ' '),
-                          value: '${e.value}',
-                          color: color,
-                          isDark: isDark,
-                        )).toList(),
+                    children: entries
+                        .map((e) => _StatChip(
+                              label: e.key.replaceAll('_', ' '),
+                              value: '${e.value}',
+                              color: color,
+                              isDark: isDark,
+                            ))
+                        .toList(),
                   ),
           ),
         ],
@@ -326,7 +375,11 @@ class _StatChip extends StatelessWidget {
   final String value;
   final Color color;
   final bool isDark;
-  const _StatChip({required this.label, required this.value, required this.color, required this.isDark});
+  const _StatChip(
+      {required this.label,
+      required this.value,
+      required this.color,
+      required this.isDark});
 
   @override
   Widget build(BuildContext context) {
@@ -337,22 +390,26 @@ class _StatChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: color.withOpacity(0.2)),
       ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
-        Text(
-          value,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w800, color: color),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label.toUpperCase(),
-          style: TextStyle(
-            fontSize: 10,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
-            color: isDark ? Colors.white60 : Colors.grey[600],
-          ),
-        ),
-      ]),
+      child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              value,
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w800, color: color),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label.toUpperCase(),
+              style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5,
+                color: isDark ? Colors.white60 : Colors.grey[600],
+              ),
+            ),
+          ]),
     );
   }
 }
@@ -373,7 +430,8 @@ class _OfficersSection extends StatelessWidget {
       decoration: BoxDecoration(
         color: isDark ? AppColors.darkCard : Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+        border:
+            Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
         boxShadow: AppColors.cardShadow,
       ),
       child: Column(
@@ -383,11 +441,15 @@ class _OfficersSection extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [AppColors.purple.withOpacity(0.12), AppColors.purple.withOpacity(0.04)],
+                colors: [
+                  AppColors.purple.withOpacity(0.12),
+                  AppColors.purple.withOpacity(0.04)
+                ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,
               ),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(18)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(18)),
             ),
             child: Row(children: [
               Container(
@@ -396,16 +458,20 @@ class _OfficersSection extends StatelessWidget {
                   color: AppColors.purple.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.people_alt_rounded, color: AppColors.purple, size: 20),
+                child: const Icon(Icons.people_alt_rounded,
+                    color: AppColors.purple, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text('Officer Performance', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              const Text('Officer Performance',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
             ]),
           ),
           if (rows is! List || (rows as List).isEmpty)
             const Padding(
               padding: EdgeInsets.all(20),
-              child: Center(child: Text('No officer data available', style: TextStyle(color: Colors.grey))),
+              child: Center(
+                  child: Text('No officer data available',
+                      style: TextStyle(color: Colors.grey))),
             )
           else
             ...(rows as List).asMap().entries.map((entry) {
@@ -419,7 +485,8 @@ class _OfficersSection extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isDark ? AppColors.darkSurface : AppColors.background,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: isDark ? AppColors.darkBorder : AppColors.border),
+                  border: Border.all(
+                      color: isDark ? AppColors.darkBorder : AppColors.border),
                 ),
                 child: Row(children: [
                   CircleAvatar(
@@ -427,24 +494,37 @@ class _OfficersSection extends StatelessWidget {
                     backgroundColor: AppColors.purple.withOpacity(0.15),
                     child: Text(
                       '${i + 1}',
-                      style: const TextStyle(color: AppColors.purple, fontWeight: FontWeight.w800),
+                      style: const TextStyle(
+                          color: AppColors.purple, fontWeight: FontWeight.w800),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(
-                        row['user_name']?.toString() ?? 'Officer #${row['user_id']}',
-                        style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                      ),
-                      if (row['user_id'] != null)
-                        Text('ID: ${row['user_id']}', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                    ]),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            row['user_name']?.toString() ??
+                                'Officer #${row['user_id']}',
+                            style: const TextStyle(
+                                fontWeight: FontWeight.w700, fontSize: 14),
+                          ),
+                          if (row['user_id'] != null)
+                            Text('ID: ${row['user_id']}',
+                                style: const TextStyle(
+                                    fontSize: 11, color: Colors.grey)),
+                        ]),
                   ),
                   Row(children: [
-                    _MiniStat(label: 'Visits', value: '$visits', color: AppColors.primary),
+                    _MiniStat(
+                        label: 'Visits',
+                        value: '$visits',
+                        color: AppColors.primary),
                     const SizedBox(width: 8),
-                    _MiniStat(label: 'Orders', value: '$orders', color: AppColors.blue),
+                    _MiniStat(
+                        label: 'Orders',
+                        value: '$orders',
+                        color: AppColors.blue),
                   ]),
                 ]),
               );
@@ -460,7 +540,8 @@ class _MiniStat extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _MiniStat({required this.label, required this.value, required this.color});
+  const _MiniStat(
+      {required this.label, required this.value, required this.color});
 
   @override
   Widget build(BuildContext context) {
@@ -471,8 +552,11 @@ class _MiniStat extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(children: [
-        Text(value, style: TextStyle(fontWeight: FontWeight.w800, color: color, fontSize: 15)),
-        Text(label, style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
+        Text(value,
+            style: TextStyle(
+                fontWeight: FontWeight.w800, color: color, fontSize: 15)),
+        Text(label,
+            style: TextStyle(fontSize: 10, color: color.withOpacity(0.8))),
       ]),
     );
   }

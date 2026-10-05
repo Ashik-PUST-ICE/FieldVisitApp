@@ -23,6 +23,10 @@ class _AccountState extends ConsumerState<AccountScreen> {
   bool _isUpdatingProfile = false;
   bool _isUploadingImage = false;
 
+  /// URL whose `NetworkImage` failed to load, so the avatar falls back to the
+  /// initials. Tracked by value so a fresh URL is retried automatically.
+  String? _avatarFailedUrl;
+
   @override
   void initState() {
     super.initState();
@@ -42,30 +46,46 @@ class _AccountState extends ConsumerState<AccountScreen> {
     super.dispose();
   }
 
+  /// Pulls the saved avatar URL straight out of the PUT response.
+  ///
+  /// Reading it from the provider after `getProfile()` was unreliable: that
+  /// notifier swallows failures and leaves the state as `AsyncValue.error`, so
+  /// `valueOrNull` became null and the UI wrongly reported
+  /// "Image uploaded but not returned by server".
+  String? _imageFrom(Response<dynamic> response) {
+    final data = response.data;
+    if (data is! Map) return null;
+    final body = data['data'];
+    if (body is! Map) return null;
+    final user = body['user'];
+    if (user is! Map) return null;
+    final url = user['image'];
+    return url is String && url.isNotEmpty ? url : null;
+  }
+
   Future<void> _pickAndUploadImage() async {
+    // Resolve the messenger BEFORE the first await. After an async gap this
+    // element can be deactivated (the screen is popped / reparented while the
+    // gallery picker is open), and `ScaffoldMessenger.of(context)` then throws
+    // "Looking up a deactivated widget's ancestor is unsafe".
+    final messenger = ScaffoldMessenger.of(context);
     final picked = await ImagePicker().pickImage(
       source: ImageSource.gallery,
       imageQuality: 82,
       maxWidth: 1200,
     );
-    if (picked == null) return;
+    if (picked == null || !mounted) return;
     setState(() => _isUploadingImage = true);
     try {
-      final user = ref.read(authProvider).valueOrNull;
-      // `name` + `email` are REQUIRED by the backend's ProfileUpdateRequest,
-      // so an image-only request would 422 and silently never persist.
-      await ref.read(authApiProvider).updateProfileWithImage(
-        {},
-        bytes: await picked.readAsBytes(),
-        filename: picked.name,
-        name: user?.fullName,
-        email: user?.email,
-      );
+      final response = await ref.read(authApiProvider).updateProfileWithImage(
+            bytes: await picked.readAsBytes(),
+            filename: picked.name,
+          );
+      final savedUrl = _imageFrom(response);
+      if (savedUrl != null) _avatarFailedUrl = null;
       await ref.read(authProvider.notifier).getProfile();
-      if (!mounted) return;
-      final updated = ref.read(authProvider).valueOrNull;
-      final hasImage = (updated?.image ?? '').isNotEmpty;
-      ScaffoldMessenger.of(context).showSnackBar(
+      final hasImage = savedUrl != null;
+      messenger.showSnackBar(
         SnackBar(
           content: Text(hasImage
               ? 'Profile image updated successfully'
@@ -74,13 +94,14 @@ class _AccountState extends ConsumerState<AccountScreen> {
         ),
       );
     } catch (e) {
-      _show(e);
+      _show(messenger, e);
     } finally {
       if (mounted) setState(() => _isUploadingImage = false);
     }
   }
 
   Future<void> profile() async {
+    final messenger = ScaffoldMessenger.of(context);
     setState(() => _isUpdatingProfile = true);
     try {
       await ref.read(authApiProvider).updateProfile({
@@ -89,32 +110,28 @@ class _AccountState extends ConsumerState<AccountScreen> {
         'mobile': mobile.text.trim(),
       });
       await ref.read(authProvider.notifier).getProfile();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Profile updated successfully!')),
-        );
-      }
+      messenger.showSnackBar(
+        const SnackBar(content: Text('Profile updated successfully!')),
+      );
     } catch (e) {
-      _show(e);
+      _show(messenger, e);
     } finally {
       if (mounted) setState(() => _isUpdatingProfile = false);
     }
   }
 
-  void _show(Object e) {
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            e is DioException && e.response?.data is Map
-                ? ((e.response!.data as Map)['message'] ??
-                        (e.response!.data as Map)['errors'])
-                    .toString()
-                : e.toString(),
-          ),
+  void _show(ScaffoldMessengerState messenger, Object e) {
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          e is DioException && e.response?.data is Map
+              ? ((e.response!.data as Map)['message'] ??
+                      (e.response!.data as Map)['errors'])
+                  .toString()
+              : e.toString(),
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -127,7 +144,10 @@ class _AccountState extends ConsumerState<AccountScreen> {
     // The API returns a laptop-only absolute URL; rewrite it onto the local
     // tunnel so the device can actually fetch the bytes.
     final imageUrl = AppConstants.resolveMediaUrl(user?.image);
-    final hasImage = imageUrl.isNotEmpty;
+    // `hasImage` alone is not enough: once a `backgroundImage` is set the
+    // `child` is not rendered, so a failed load would leave a blank circle.
+    // Drop the image when THIS url already failed so the initials come back.
+    final showImage = imageUrl.isNotEmpty && _avatarFailedUrl != imageUrl;
 
     return Scaffold(
       appBar: AppBar(
@@ -169,13 +189,17 @@ class _AccountState extends ConsumerState<AccountScreen> {
                       CircleAvatar(
                         radius: 32,
                         backgroundColor: Colors.white,
-                        // `errorBuilder` keeps the initials visible if the
-                        // image is missing/unreachable instead of showing a
-                        // blank grey circle.
                         backgroundImage:
-                            hasImage ? NetworkImage(imageUrl) : null,
-                        onBackgroundImageError: hasImage ? (_, __) {} : null,
-                        child: hasImage
+                            showImage ? NetworkImage(imageUrl) : null,
+                        onBackgroundImageError: showImage
+                            ? (_, __) {
+                                // Swap back to the initials instead of leaving
+                                // an empty circle behind.
+                                if (!mounted) return;
+                                setState(() => _avatarFailedUrl = imageUrl);
+                              }
+                            : null,
+                        child: showImage
                             ? null
                             : Text(
                                 initials,

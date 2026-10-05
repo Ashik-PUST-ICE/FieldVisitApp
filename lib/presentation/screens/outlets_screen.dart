@@ -31,7 +31,8 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Outlets Directory', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: const Text('Outlets Directory',
+            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
             tooltip: 'Verify QR Code',
@@ -52,10 +53,12 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
             color: isDark ? const Color(0xFF0F172A) : Colors.white,
             child: TextField(
               controller: _searchController,
-              onChanged: (val) => setState(() => _searchQuery = val.trim().toLowerCase()),
+              onChanged: (val) =>
+                  setState(() => _searchQuery = val.trim().toLowerCase()),
               decoration: InputDecoration(
                 hintText: 'Search by store name, code, or address...',
-                prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary, size: 20),
+                prefixIcon: const Icon(Icons.search_rounded,
+                    color: AppColors.primary, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear_rounded, size: 18),
@@ -65,9 +68,11 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
                         },
                       )
                     : null,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 filled: true,
-                fillColor: isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
+                fillColor:
+                    isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
                   borderSide: BorderSide.none,
@@ -80,7 +85,8 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
               color: AppColors.primary,
               onRefresh: () => ref.read(outletsProvider.notifier).refresh(),
               child: outletsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+                loading: () => const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary)),
                 error: (error, _) => _ErrorView(
                   error: error,
                   onRetry: () => ref.read(outletsProvider.notifier).refresh(),
@@ -91,7 +97,9 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
                     final name = o.name.toLowerCase();
                     final code = (o.code ?? '').toLowerCase();
                     final address = (o.address ?? '').toLowerCase();
-                    return name.contains(_searchQuery) || code.contains(_searchQuery) || address.contains(_searchQuery);
+                    return name.contains(_searchQuery) ||
+                        code.contains(_searchQuery) ||
+                        address.contains(_searchQuery);
                   }).toList();
 
                   if (filtered.isEmpty) {
@@ -107,12 +115,19 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
                                   color: AppColors.primary.withOpacity(0.08),
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.storefront_outlined, size: 48, color: AppColors.primary),
+                                child: const Icon(Icons.storefront_outlined,
+                                    size: 48, color: AppColors.primary),
                               ),
                               const SizedBox(height: 16),
-                              const Text('No outlets found', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              const Text('No outlets found',
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text('Tap "+" below to add a new retail outlet', style: TextStyle(color: Colors.grey, fontSize: 13)),
+                              const Text(
+                                  'Tap "+" below to add a new retail outlet',
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 13)),
                             ],
                           ),
                         ),
@@ -123,7 +138,8 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
                   return ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 12, 16, 80),
                     itemCount: filtered.length,
-                    itemBuilder: (_, index) => _OutletCard(outlet: filtered[index]),
+                    itemBuilder: (_, index) =>
+                        _OutletCard(outlet: filtered[index]),
                   );
                 },
               ),
@@ -138,7 +154,8 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
         elevation: 6,
         onPressed: () => _showOutletForm(context, ref),
         icon: const Icon(Icons.add_business_rounded, size: 22),
-        label: const Text('Add Outlet', style: TextStyle(fontWeight: FontWeight.w700)),
+        label: const Text('Add Outlet',
+            style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -193,7 +210,8 @@ class _OutletCard extends ConsumerWidget {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 24),
+                  child: const Icon(Icons.storefront_rounded,
+                      color: Colors.white, size: 24),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -206,16 +224,20 @@ class _OutletCard extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               outlet.name,
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                              style: const TextStyle(
+                                  fontWeight: FontWeight.w800, fontSize: 16),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (outlet.code != null && outlet.code!.isNotEmpty)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 2),
                               decoration: BoxDecoration(
-                                color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                                color: isDark
+                                    ? const Color(0xFF334155)
+                                    : const Color(0xFFF1F5F9),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: Text(
@@ -223,7 +245,9 @@ class _OutletCard extends ConsumerWidget {
                                 style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w700,
-                                  color: isDark ? Colors.white70 : const Color(0xFF475569),
+                                  color: isDark
+                                      ? Colors.white70
+                                      : const Color(0xFF475569),
                                 ),
                               ),
                             ),
@@ -232,14 +256,21 @@ class _OutletCard extends ConsumerWidget {
                       const SizedBox(height: 6),
                       Row(
                         children: [
-                          Icon(Icons.location_on_outlined, size: 14, color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B)),
+                          Icon(Icons.location_on_outlined,
+                              size: 14,
+                              color: isDark
+                                  ? const Color(0xFF94A3B8)
+                                  : const Color(0xFF64748B)),
                           const SizedBox(width: 4),
                           Expanded(
                             child: Text(
-                              outlet.address ?? 'No physical address configured',
+                              outlet.address ??
+                                  'No physical address configured',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+                                color: isDark
+                                    ? const Color(0xFF94A3B8)
+                                    : const Color(0xFF64748B),
                               ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
@@ -251,11 +282,15 @@ class _OutletCard extends ConsumerWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(Icons.phone_outlined, size: 14, color: Color(0xFF10B981)),
+                            const Icon(Icons.phone_outlined,
+                                size: 14, color: Color(0xFF10B981)),
                             const SizedBox(width: 4),
                             Text(
                               outlet.phone!,
-                              style: const TextStyle(fontSize: 12, color: Color(0xFF10B981), fontWeight: FontWeight.w600),
+                              style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF10B981),
+                                  fontWeight: FontWeight.w600),
                             ),
                           ],
                         ),
@@ -276,7 +311,9 @@ class _OutletCard extends ConsumerWidget {
               ),
               border: Border(
                 top: BorderSide(
-                  color: isDark ? const Color(0xFF334155) : const Color(0xFFF1F5F9),
+                  color: isDark
+                      ? const Color(0xFF334155)
+                      : const Color(0xFFF1F5F9),
                 ),
               ),
             ),
@@ -287,16 +324,23 @@ class _OutletCard extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     InkWell(
-                      onTap: () => _showOutletForm(context, ref, outlet: outlet),
+                      onTap: () =>
+                          _showOutletForm(context, ref, outlet: outlet),
                       borderRadius: BorderRadius.circular(8),
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.edit_outlined, size: 16, color: Color(0xFF136B3E)),
+                            Icon(Icons.edit_outlined,
+                                size: 16, color: Color(0xFF136B3E)),
                             SizedBox(width: 4),
-                            Text('Edit', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFF136B3E))),
+                            Text('Edit',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF136B3E))),
                           ],
                         ),
                       ),
@@ -306,13 +350,19 @@ class _OutletCard extends ConsumerWidget {
                       onTap: () => _showOutletQrDialog(context, ref, outlet),
                       borderRadius: BorderRadius.circular(8),
                       child: const Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.qr_code_2_rounded, size: 16, color: Color(0xFFD97706)),
+                            Icon(Icons.qr_code_2_rounded,
+                                size: 16, color: Color(0xFFD97706)),
                             SizedBox(width: 4),
-                            Text('QR Code', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Color(0xFFD97706))),
+                            Text('QR Code',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFFD97706))),
                           ],
                         ),
                       ),
@@ -326,16 +376,21 @@ class _OutletCard extends ConsumerWidget {
                     if (action == 'qr_view') {
                       _showOutletQrDialog(context, ref, outlet);
                     } else if (action == 'edit') {
-                      if (context.mounted) _showOutletForm(context, ref, outlet: outlet);
+                      if (context.mounted)
+                        _showOutletForm(context, ref, outlet: outlet);
                     } else if (action == 'qr') {
                       await notifier.regenerateQr(outlet.id);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('QR code regenerated')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('QR code regenerated')));
                       }
                     } else if (action == 'deactivate') {
                       await notifier.deactivateQr(outlet.id);
                       if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('QR code deactivated')));
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('QR code deactivated')));
                       }
                     } else if (action == 'verify') {
                       await _verifyOutletQr(context, ref);
@@ -343,13 +398,18 @@ class _OutletCard extends ConsumerWidget {
                       final ok = await showDialog<bool>(
                         context: context,
                         builder: (_) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
                           title: const Text('Delete Outlet?'),
-                          content: Text('Are you sure you want to delete ${outlet.name}? This action cannot be undone.'),
+                          content: Text(
+                              'Are you sure you want to delete ${outlet.name}? This action cannot be undone.'),
                           actions: [
-                            TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                            TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancel')),
                             FilledButton(
-                              style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                              style: FilledButton.styleFrom(
+                                  backgroundColor: Colors.red),
                               onPressed: () => Navigator.pop(context, true),
                               child: const Text('Delete'),
                             ),
@@ -360,11 +420,17 @@ class _OutletCard extends ConsumerWidget {
                     }
                   },
                   itemBuilder: (_) => const [
-                    PopupMenuItem(value: 'qr_view', child: Text('View & Download QR')),
+                    PopupMenuItem(
+                        value: 'qr_view', child: Text('View & Download QR')),
                     PopupMenuItem(value: 'edit', child: Text('Edit Info')),
-                    PopupMenuItem(value: 'qr', child: Text('Regenerate QR Token')),
-                    PopupMenuItem(value: 'deactivate', child: Text('Deactivate QR')),
-                    PopupMenuItem(value: 'delete', child: Text('Delete Outlet', style: TextStyle(color: Colors.red))),
+                    PopupMenuItem(
+                        value: 'qr', child: Text('Regenerate QR Token')),
+                    PopupMenuItem(
+                        value: 'deactivate', child: Text('Deactivate QR')),
+                    PopupMenuItem(
+                        value: 'delete',
+                        child: Text('Delete Outlet',
+                            style: TextStyle(color: Colors.red))),
                   ],
                 ),
               ],
@@ -376,10 +442,13 @@ class _OutletCard extends ConsumerWidget {
   }
 }
 
-Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet outlet) async {
+Future<void> _showOutletQrDialog(
+    BuildContext context, WidgetRef ref, Outlet outlet) async {
   final qrToken = outlet.qrToken ?? 'OUTLET-${outlet.id}';
-  final qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${Uri.encodeComponent(qrToken)}';
-  final downloadUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&download=1&data=${Uri.encodeComponent(qrToken)}';
+  final qrUrl =
+      'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${Uri.encodeComponent(qrToken)}';
+  final downloadUrl =
+      'https://api.qrserver.com/v1/create-qr-code/?size=600x600&format=png&download=1&data=${Uri.encodeComponent(qrToken)}';
 
   await showDialog<void>(
     context: context,
@@ -393,7 +462,8 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
               color: const Color(0xFF136B3E).withOpacity(0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.qr_code_2_rounded, color: Color(0xFF136B3E), size: 24),
+            child: const Icon(Icons.qr_code_2_rounded,
+                color: Color(0xFF136B3E), size: 24),
           ),
           const SizedBox(width: 10),
           Expanded(
@@ -401,9 +471,12 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(outlet.name, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16)),
+                Text(outlet.name,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.w700, fontSize: 16)),
                 Text('Code: ${outlet.code ?? "#${outlet.id}"}',
-                    style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280))),
+                    style: const TextStyle(
+                        fontSize: 12, color: Color(0xFF6B7280))),
               ],
             ),
           ),
@@ -421,7 +494,10 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: const Color(0xFFE2E8F0)),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 6, offset: const Offset(0, 2)),
+                  BoxShadow(
+                      color: Colors.black.withOpacity(0.04),
+                      blurRadius: 6,
+                      offset: const Offset(0, 2)),
                 ],
               ),
               child: Image.network(
@@ -433,7 +509,9 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
                     : const SizedBox(
                         width: 200,
                         height: 200,
-                        child: Center(child: CircularProgressIndicator(color: Color(0xFF136B3E))),
+                        child: Center(
+                            child: CircularProgressIndicator(
+                                color: Color(0xFF136B3E))),
                       ),
                 errorBuilder: (_, __, ___) => const SizedBox(
                   width: 200,
@@ -442,9 +520,11 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.broken_image_rounded, size: 40, color: Colors.grey),
+                        Icon(Icons.broken_image_rounded,
+                            size: 40, color: Colors.grey),
                         SizedBox(height: 8),
-                        Text('Unable to load QR image', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                        Text('Unable to load QR image',
+                            style: TextStyle(fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -460,7 +540,10 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
               ),
               child: Text(
                 'Token: $qrToken',
-                style: const TextStyle(fontSize: 11, fontFamily: 'monospace', color: Color(0xFF334155)),
+                style: const TextStyle(
+                    fontSize: 11,
+                    fontFamily: 'monospace',
+                    color: Color(0xFF334155)),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -477,7 +560,8 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primary,
             side: const BorderSide(color: AppColors.primary),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           onPressed: () async {
             final uri = Uri.parse(downloadUrl);
@@ -498,14 +582,17 @@ Future<void> _showOutletQrDialog(BuildContext context, WidgetRef ref, Outlet out
         FilledButton.icon(
           style: FilledButton.styleFrom(
             backgroundColor: const Color(0xFF136B3E),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           ),
           onPressed: () async {
             await ref.read(outletsProvider.notifier).regenerateQr(outlet.id);
             if (ctx.mounted) Navigator.pop(ctx);
             if (context.mounted) {
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('QR token regenerated!'), backgroundColor: Color(0xFF136B3E)),
+                const SnackBar(
+                    content: Text('QR token regenerated!'),
+                    backgroundColor: Color(0xFF136B3E)),
               );
             }
           },
@@ -532,26 +619,34 @@ Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Cancel')),
+        TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel')),
         FilledButton(
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           onPressed: () async {
             if (token.text.trim().isEmpty) return;
             try {
-              final response = await ref.read(businessApiProvider).verifyQr(token.text.trim());
+              final response = await ref
+                  .read(businessApiProvider)
+                  .verifyQr(token.text.trim());
               final payload = Map<String, dynamic>.from(response.data as Map);
               if (dialogContext.mounted) {
                 Navigator.pop(dialogContext);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(payload['message']?.toString() ?? 'QR verified successfully')),
+                  SnackBar(
+                      content: Text(payload['message']?.toString() ??
+                          'QR verified successfully')),
                 );
               }
             } catch (e) {
               if (dialogContext.mounted) {
-                ScaffoldMessenger.of(dialogContext).showSnackBar(SnackBar(content: Text(e.toString())));
+                ScaffoldMessenger.of(dialogContext)
+                    .showSnackBar(SnackBar(content: Text(e.toString())));
               }
             }
           },
@@ -563,14 +658,16 @@ Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
   token.dispose();
 }
 
-Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outlet}) async {
+Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
+    {Outlet? outlet}) async {
   final name = TextEditingController(text: outlet?.name);
   final address = TextEditingController(text: outlet?.address);
   final code = TextEditingController(text: outlet?.code);
   final phone = TextEditingController(text: outlet?.phone);
   final latitude = TextEditingController(text: outlet?.latitude?.toString());
   final longitude = TextEditingController(text: outlet?.longitude?.toString());
-  final radius = TextEditingController(text: outlet?.geofenceRadius?.toString());
+  final radius =
+      TextEditingController(text: outlet?.geofenceRadius?.toString());
 
   await CellfinFormScreen.push(
     context: context,
@@ -588,8 +685,10 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
       CellfinInputField(
         controller: name,
         hint: 'Receiver / Outlet Store Name *',
-        prefixIcon: const Icon(Icons.storefront_rounded, color: Color(0xFF6B7280)),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Outlet name is required' : null,
+        prefixIcon:
+            const Icon(Icons.storefront_rounded, color: Color(0xFF6B7280)),
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Outlet name is required' : null,
       ),
       CellfinInputField(
         controller: code,
@@ -599,8 +698,10 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
       CellfinInputField(
         controller: address,
         hint: 'Full Store / Market Address *',
-        prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Address is required' : null,
+        prefixIcon:
+            const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Address is required' : null,
       ),
       CellfinInputField(
         controller: phone,
@@ -614,8 +715,10 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
             child: CellfinInputField(
               controller: latitude,
               hint: 'GPS Latitude',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              prefixIcon: const Icon(Icons.my_location_rounded, color: Color(0xFF6B7280)),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              prefixIcon: const Icon(Icons.my_location_rounded,
+                  color: Color(0xFF6B7280)),
             ),
           ),
           const SizedBox(width: 10),
@@ -623,8 +726,10 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
             child: CellfinInputField(
               controller: longitude,
               hint: 'GPS Longitude',
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              prefixIcon: const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              prefixIcon: const Icon(Icons.location_on_outlined,
+                  color: Color(0xFF6B7280)),
             ),
           ),
         ],
@@ -643,8 +748,10 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
         if (address.text.trim().isNotEmpty) 'address': address.text.trim(),
         if (phone.text.trim().isNotEmpty) 'phone': phone.text.trim(),
         if (latitude.text.trim().isNotEmpty) 'latitude': latitude.text.trim(),
-        if (longitude.text.trim().isNotEmpty) 'longitude': longitude.text.trim(),
-        if (radius.text.trim().isNotEmpty) 'geofence_radius': int.tryParse(radius.text.trim()),
+        if (longitude.text.trim().isNotEmpty)
+          'longitude': longitude.text.trim(),
+        if (radius.text.trim().isNotEmpty)
+          'geofence_radius': int.tryParse(radius.text.trim()),
       };
       try {
         if (outlet == null) {
@@ -655,11 +762,15 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref, {Outlet? outle
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Outlet saved successfully!'), backgroundColor: AppColors.cellfinGreen),
+            const SnackBar(
+                content: Text('Outlet saved successfully!'),
+                backgroundColor: AppColors.cellfinGreen),
           );
         }
       } catch (e) {
-        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+        if (context.mounted)
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(e.toString())));
       }
     },
   );
@@ -688,7 +799,8 @@ class _ErrorView extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: onRetry,
             child: const Text('Retry'),

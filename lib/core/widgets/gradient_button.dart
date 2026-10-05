@@ -31,7 +31,9 @@ class GradientButton extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: onPressed != null ? effectiveGradient : null,
-          color: onPressed == null ? AppColors.textTertiary.withOpacity(0.3) : null,
+          color: onPressed == null
+              ? AppColors.textTertiary.withOpacity(0.3)
+              : null,
           borderRadius: BorderRadius.circular(14),
           boxShadow: onPressed != null
               ? [

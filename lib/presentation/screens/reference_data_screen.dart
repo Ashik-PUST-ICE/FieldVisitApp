@@ -45,10 +45,15 @@ class _ReferenceDataState extends ConsumerState<ReferenceDataScreen>
               indicatorWeight: 3.5,
               labelColor: Colors.white,
               unselectedLabelColor: Colors.white70,
-              labelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+              labelStyle:
+                  const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
               tabs: const [
-                Tab(icon: Icon(Icons.straighten_outlined, size: 18), text: 'Units'),
-                Tab(icon: Icon(Icons.warning_amber_outlined, size: 18), text: 'Competitors'),
+                Tab(
+                    icon: Icon(Icons.straighten_outlined, size: 18),
+                    text: 'Units'),
+                Tab(
+                    icon: Icon(Icons.warning_amber_outlined, size: 18),
+                    text: 'Competitors'),
               ],
             ),
           ),
@@ -81,7 +86,8 @@ class _ReferenceList extends ConsumerWidget {
         color: _green,
         onRefresh: notifier.fetch,
         child: state.when(
-          loading: () => const Center(child: CircularProgressIndicator(color: _green)),
+          loading: () =>
+              const Center(child: CircularProgressIndicator(color: _green)),
           error: (e, _) => Center(
             child: Padding(
               padding: const EdgeInsets.all(24),
@@ -90,16 +96,21 @@ class _ReferenceList extends ConsumerWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(color: Colors.red.withOpacity(0.1), shape: BoxShape.circle),
-                    child: const Icon(Icons.error_outline_rounded, color: Colors.red, size: 40),
+                    decoration: BoxDecoration(
+                        color: Colors.red.withOpacity(0.1),
+                        shape: BoxShape.circle),
+                    child: const Icon(Icons.error_outline_rounded,
+                        color: Colors.red, size: 40),
                   ),
                   const SizedBox(height: 14),
                   Text(_message(e), textAlign: TextAlign.center),
                   const SizedBox(height: 16),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _green, foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      backgroundColor: _green,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: notifier.fetch,
                     child: const Text('Retry'),
@@ -123,7 +134,9 @@ class _ReferenceList extends ConsumerWidget {
                               borderRadius: BorderRadius.circular(18),
                             ),
                             child: Icon(
-                              units ? Icons.straighten_outlined : Icons.warning_amber_outlined,
+                              units
+                                  ? Icons.straighten_outlined
+                                  : Icons.warning_amber_outlined,
                               color: _green,
                               size: 36,
                             ),
@@ -140,7 +153,8 @@ class _ReferenceList extends ConsumerWidget {
                           const SizedBox(height: 6),
                           const Text(
                             'Tap + below to add a record',
-                            style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
+                            style: TextStyle(
+                                fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                         ],
                       ),
@@ -162,20 +176,25 @@ class _ReferenceList extends ConsumerWidget {
                         final confirmed = await showDialog<bool>(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                            title: Text(units ? 'Delete Unit?' : 'Delete Competitor?',
-                                style: const TextStyle(fontWeight: FontWeight.w700)),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(14)),
+                            title: Text(
+                                units ? 'Delete Unit?' : 'Delete Competitor?',
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
                             content: Text('Remove "${item['name'] ?? ''}"?'),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+                                child: const Text('Cancel',
+                                    style: TextStyle(color: Color(0xFF6B7280))),
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: const Color(0xFFDC2626),
                                   foregroundColor: Colors.white,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8)),
                                   elevation: 0,
                                 ),
                                 onPressed: () => Navigator.pop(ctx, true),
@@ -189,7 +208,8 @@ class _ReferenceList extends ConsumerWidget {
                             await notifier.remove(id);
                           } catch (e) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_message(e))));
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(_message(e))));
                             }
                           }
                         }
@@ -219,7 +239,11 @@ class _RefCard extends StatelessWidget {
   final bool isUnit;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
-  const _RefCard({required this.item, required this.isUnit, required this.onEdit, required this.onDelete});
+  const _RefCard(
+      {required this.item,
+      required this.isUnit,
+      required this.onEdit,
+      required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +257,10 @@ class _RefCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 6, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 6,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Material(
@@ -250,15 +277,21 @@ class _RefCard extends StatelessWidget {
                   width: 48,
                   height: 48,
                   decoration: BoxDecoration(
-                    color: isUnit ? const Color(0xFFE8F5E9) : const Color(0xFFFEF3C7),
+                    color: isUnit
+                        ? const Color(0xFFE8F5E9)
+                        : const Color(0xFFFEF3C7),
                     borderRadius: BorderRadius.circular(10),
                     border: Border.all(
-                      color: isUnit ? const Color(0xFFC8E6C9) : const Color(0xFFFDE68A),
+                      color: isUnit
+                          ? const Color(0xFFC8E6C9)
+                          : const Color(0xFFFDE68A),
                     ),
                   ),
                   child: Center(
                     child: Icon(
-                      isUnit ? Icons.straighten_rounded : Icons.warning_amber_rounded,
+                      isUnit
+                          ? Icons.straighten_rounded
+                          : Icons.warning_amber_rounded,
                       color: isUnit ? _green : const Color(0xFFD97706),
                       size: 24,
                     ),
@@ -273,7 +306,9 @@ class _RefCard extends StatelessWidget {
                     children: [
                       Text(name,
                           style: const TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w700, color: Color(0xFF1F2937)),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF1F2937)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 6),
@@ -282,26 +317,34 @@ class _RefCard extends StatelessWidget {
                         children: [
                           if (code.isNotEmpty)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
                               decoration: BoxDecoration(
                                 color: const Color(0xFFF3F4F6),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(code,
                                   style: const TextStyle(
-                                      fontSize: 11.5, fontWeight: FontWeight.w600, color: Color(0xFF4B5563))),
+                                      fontSize: 11.5,
+                                      fontWeight: FontWeight.w600,
+                                      color: Color(0xFF4B5563))),
                             ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 3),
                             decoration: BoxDecoration(
-                              color: isUnit ? const Color(0xFFE8F5E9) : const Color(0xFFFEF3C7),
+                              color: isUnit
+                                  ? const Color(0xFFE8F5E9)
+                                  : const Color(0xFFFEF3C7),
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
                               isUnit ? 'Measurement Unit' : 'Competitor',
                               style: TextStyle(
-                                fontSize: 11, fontWeight: FontWeight.w600,
-                                color: isUnit ? _green : const Color(0xFFD97706),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color:
+                                    isUnit ? _green : const Color(0xFFD97706),
                               ),
                             ),
                           ),
@@ -310,7 +353,8 @@ class _RefCard extends StatelessWidget {
                       if (desc.isNotEmpty) ...[
                         const SizedBox(height: 5),
                         Text(desc,
-                            style: const TextStyle(fontSize: 12, color: Color(0xFF6B7280)),
+                            style: const TextStyle(
+                                fontSize: 12, color: Color(0xFF6B7280)),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis),
                       ],
@@ -323,12 +367,14 @@ class _RefCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.edit_outlined, size: 20, color: _green),
+                      icon: const Icon(Icons.edit_outlined,
+                          size: 20, color: _green),
                       tooltip: 'Edit',
                       onPressed: onEdit,
                     ),
                     IconButton(
-                      icon: const Icon(Icons.delete_outline_rounded, size: 20, color: Color(0xFFEF4444)),
+                      icon: const Icon(Icons.delete_outline_rounded,
+                          size: 20, color: Color(0xFFEF4444)),
                       tooltip: 'Delete',
                       onPressed: onDelete,
                     ),
@@ -343,10 +389,12 @@ class _RefCard extends StatelessWidget {
   }
 }
 
-Future<void> _edit(BuildContext context, WidgetRef ref, bool units, Map<String, dynamic>? item) async {
+Future<void> _edit(BuildContext context, WidgetRef ref, bool units,
+    Map<String, dynamic>? item) async {
   final name = TextEditingController(text: item?['name']?.toString());
   final code = TextEditingController(text: item?['code']?.toString());
-  final description = TextEditingController(text: item?['description']?.toString());
+  final description =
+      TextEditingController(text: item?['description']?.toString());
 
   await CellfinFormScreen.push(
     context: context,
@@ -354,12 +402,15 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units, Map<String, 
         ? (units ? 'Add Measurement Unit' : 'Add Competitor')
         : (units ? 'Edit Unit' : 'Edit Competitor'),
     officerName: 'REFERENCE DATA MANAGER',
-    officerInfo: units ? 'Measurement Unit Configuration' : 'Market Competitor Profile',
+    officerInfo:
+        units ? 'Measurement Unit Configuration' : 'Market Competitor Profile',
     cards: units
         ? const [
-            CellfinCardItem(title: 'Weight', icon: Icons.monitor_weight_outlined),
+            CellfinCardItem(
+                title: 'Weight', icon: Icons.monitor_weight_outlined),
             CellfinCardItem(title: 'Volume', icon: Icons.water_drop_outlined),
-            CellfinCardItem(title: 'Count', icon: Icons.format_list_numbered_rounded),
+            CellfinCardItem(
+                title: 'Count', icon: Icons.format_list_numbered_rounded),
             CellfinCardItem(title: 'Length', icon: Icons.straighten_rounded),
           ]
         : const [
@@ -377,7 +428,8 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units, Map<String, 
           units ? Icons.straighten_rounded : Icons.warning_amber_outlined,
           color: const Color(0xFF6B7280),
         ),
-        validator: (v) => v == null || v.trim().isEmpty ? 'Name is required' : null,
+        validator: (v) =>
+            v == null || v.trim().isEmpty ? 'Name is required' : null,
       ),
       CellfinInputField(
         controller: code,
@@ -389,7 +441,8 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units, Map<String, 
           controller: description,
           hint: 'Description & Notes',
           maxLines: 3,
-          prefixIcon: const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
+          prefixIcon:
+              const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
         ),
     ],
     onSubmit: () async {
@@ -399,7 +452,8 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units, Map<String, 
           {
             'name': name.text.trim(),
             if (code.text.trim().isNotEmpty) 'code': code.text.trim(),
-            if (!units && description.text.trim().isNotEmpty) 'description': description.text.trim(),
+            if (!units && description.text.trim().isNotEmpty)
+              'description': description.text.trim(),
           },
           (item?['id'] as num?)?.toInt(),
         );
@@ -414,7 +468,8 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units, Map<String, 
         }
       } catch (e) {
         if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_message(e))));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(_message(e))));
         }
       }
     },

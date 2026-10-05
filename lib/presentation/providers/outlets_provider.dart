@@ -3,7 +3,8 @@ import 'package:field_visit_app/data/business_api.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
 
-final outletsProvider = StateNotifierProvider<OutletsNotifier, AsyncValue<List<Outlet>>>((ref) {
+final outletsProvider =
+    StateNotifierProvider<OutletsNotifier, AsyncValue<List<Outlet>>>((ref) {
   return OutletsNotifier(ref.watch(businessApiProvider));
 });
 
@@ -22,7 +23,8 @@ class OutletsNotifier extends StateNotifier<AsyncValue<List<Outlet>>> {
       final raw = payload['data'];
       final list = raw is Map ? raw['data'] : raw;
       final outlets = (list as List<dynamic>? ?? const [])
-          .map((item) => Outlet.fromJson(Map<String, dynamic>.from(item as Map)))
+          .map(
+              (item) => Outlet.fromJson(Map<String, dynamic>.from(item as Map)))
           .toList();
       state = AsyncValue.data(outlets);
     } catch (e, st) {

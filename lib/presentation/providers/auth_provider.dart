@@ -83,7 +83,8 @@ final authUserApiClientProvider = Provider<ApiClient>((ref) {
   return ApiClient(dio: dio, secureStorage: storage);
 });
 
-final authProvider = StateNotifierProvider<AuthNotifier, AsyncValue<User?>>((ref) {
+final authProvider =
+    StateNotifierProvider<AuthNotifier, AsyncValue<User?>>((ref) {
   return AuthNotifier(
     ref.watch(authApiClientProvider),
     ref.watch(authUserApiClientProvider),
@@ -98,7 +99,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   final ApiClient businessApiClient;
   final FlutterSecureStorage secureStorage;
 
-  AuthNotifier(this.authApiClient, this.authUserApiClient, this.businessApiClient, this.secureStorage)
+  AuthNotifier(this.authApiClient, this.authUserApiClient,
+      this.businessApiClient, this.secureStorage)
       : super(const AsyncValue.data(null)) {
     _checkAuthStatus();
   }
@@ -114,7 +116,9 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   }
 
   Future<bool> isBiometricLoginEnabled() async {
-    return (await secureStorage.read(key: AppConstants.biometricLoginEnabledKey)) == 'true';
+    return (await secureStorage.read(
+            key: AppConstants.biometricLoginEnabledKey)) ==
+        'true';
   }
 
   Future<bool> canUseBiometrics() async {
@@ -129,7 +133,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   Future<bool> enableBiometricLogin() async {
     final auth = LocalAuthentication();
     try {
-      if (!await auth.canCheckBiometrics || !await auth.isDeviceSupported()) return false;
+      if (!await auth.canCheckBiometrics || !await auth.isDeviceSupported())
+        return false;
       final verified = await auth.authenticate(
         localizedReason: 'Verify your identity to enable biometric login',
         options: const AuthenticationOptions(
@@ -141,9 +146,11 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
       );
       if (!verified) return false;
 
-      await secureStorage.write(key: AppConstants.biometricLoginEnabledKey, value: 'true');
+      await secureStorage.write(
+          key: AppConstants.biometricLoginEnabledKey, value: 'true');
       try {
-        await authUserApiClient.put('/security-settings/biometric', data: {'enabled': true});
+        await authUserApiClient
+            .put('/security-settings/biometric', data: {'enabled': true});
       } catch (_) {
         // Device unlock remains local-first; the preference syncs next time.
       }
@@ -156,7 +163,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
   Future<void> disableBiometricLogin() async {
     await secureStorage.delete(key: AppConstants.biometricLoginEnabledKey);
     try {
-      await authUserApiClient.put('/security-settings/biometric', data: {'enabled': false});
+      await authUserApiClient
+          .put('/security-settings/biometric', data: {'enabled': false});
     } catch (_) {}
   }
 
@@ -200,7 +208,8 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
       final response = await authUserApiClient.get('/me');
       if (response.statusCode == 200 && response.data['success'] == true) {
         final user = User.fromJson(response.data['data']['user']);
-        await secureStorage.write(key: AppConstants.userKey, value: user.toJson().toString());
+        await secureStorage.write(
+            key: AppConstants.userKey, value: user.toJson().toString());
         state = AsyncValue.data(user);
         return state;
       }
@@ -223,12 +232,15 @@ class AuthNotifier extends StateNotifier<AsyncValue<User?>> {
         final token = data['token']['access_token'];
         final user = User.fromJson(data['user']);
 
-        await secureStorage.write(key: AppConstants.accessTokenKey, value: token);
+        await secureStorage.write(
+            key: AppConstants.accessTokenKey, value: token);
         final refreshToken = data['token']['refresh_token'];
         if (refreshToken is String && refreshToken.isNotEmpty) {
-          await secureStorage.write(key: AppConstants.refreshTokenKey, value: refreshToken);
+          await secureStorage.write(
+              key: AppConstants.refreshTokenKey, value: refreshToken);
         }
-        await secureStorage.write(key: AppConstants.userKey, value: user.toJson().toString());
+        await secureStorage.write(
+            key: AppConstants.userKey, value: user.toJson().toString());
 
         state = AsyncValue.data(user);
         return state;

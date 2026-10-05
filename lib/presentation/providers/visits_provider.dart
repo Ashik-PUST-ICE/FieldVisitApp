@@ -4,7 +4,8 @@ import 'package:field_visit_app/data/business_api.dart';
 import 'package:field_visit_app/data/models/visit.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
 
-final visitsProvider = StateNotifierProvider<VisitsNotifier, AsyncValue<List<Visit>>>((ref) {
+final visitsProvider =
+    StateNotifierProvider<VisitsNotifier, AsyncValue<List<Visit>>>((ref) {
   return VisitsNotifier(ref.watch(businessApiProvider));
 });
 
@@ -31,18 +32,27 @@ class VisitsNotifier extends StateNotifier<AsyncValue<List<Visit>>> {
     }
   }
 
-  Future<void> start({required int outletId, required String latitude, required String longitude}) async {
-    await api.startVisit({'outlet_id': outletId, 'latitude': latitude, 'longitude': longitude});
+  Future<void> start(
+      {required int outletId,
+      required String latitude,
+      required String longitude}) async {
+    await api.startVisit(
+        {'outlet_id': outletId, 'latitude': latitude, 'longitude': longitude});
     await fetchVisits();
   }
 
-  Future<void> verifyLocation(int id, {required String latitude, required String longitude}) async {
-    await api.verifyVisitLocation(id, {'latitude': latitude, 'longitude': longitude});
+  Future<void> verifyLocation(int id,
+      {required String latitude, required String longitude}) async {
+    await api.verifyVisitLocation(
+        id, {'latitude': latitude, 'longitude': longitude});
     await fetchVisits();
   }
 
   Future<void> complete(int id, {String? remarks}) async {
-    await api.completeVisit(id, {if (remarks != null && remarks.trim().isNotEmpty) 'remarks': remarks.trim()});
+    await api.completeVisit(id, {
+      if (remarks != null && remarks.trim().isNotEmpty)
+        'remarks': remarks.trim()
+    });
     await fetchVisits();
   }
 
@@ -61,7 +71,8 @@ class VisitsNotifier extends StateNotifier<AsyncValue<List<Visit>>> {
         .toList();
   }
 
-  Future<void> uploadPhoto(int visitId, Uint8List bytes, String filename, {String? caption}) async {
+  Future<void> uploadPhoto(int visitId, Uint8List bytes, String filename,
+      {String? caption}) async {
     await api.uploadVisitPhotoBytes(visitId, bytes, filename, caption: caption);
   }
 
@@ -75,7 +86,8 @@ class VisitsNotifier extends StateNotifier<AsyncValue<List<Visit>>> {
         .toList();
   }
 
-  Future<void> addCompetitor(int visitId, {required int competitorId, String? notes}) async {
+  Future<void> addCompetitor(int visitId,
+      {required int competitorId, String? notes}) async {
     await api.addVisitCompetitor(visitId, {
       'competitor_id': competitorId,
       if (notes != null && notes.trim().isNotEmpty) 'notes': notes.trim(),
@@ -119,7 +131,8 @@ class VisitsNotifier extends StateNotifier<AsyncValue<List<Visit>>> {
 }
 
 /// Fetches the completed visit history from /visits/history.
-final visitHistoryProvider = FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
+final visitHistoryProvider =
+    FutureProvider.autoDispose<List<Map<String, dynamic>>>((ref) async {
   final api = ref.watch(businessApiProvider);
   final response = await api.visitHistory();
   final payload = Map<String, dynamic>.from(response.data as Map);

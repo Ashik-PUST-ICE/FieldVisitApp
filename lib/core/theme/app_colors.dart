@@ -5,7 +5,8 @@ class AppColors {
   AppColors._();
 
   // ─── CELLFIN PRIMARY PALETTE ─────────────────────────────────────
-  static const Color primary = Color(0xFF136B3E); // Cellfin signature Forest Green
+  static const Color primary =
+      Color(0xFF136B3E); // Cellfin signature Forest Green
   static const Color primaryLight = Color(0xFF2E7D32);
   static const Color primaryDark = Color(0xFF0A4425);
   static const Color primarySurface = Color(0xFFE8F5E9);
@@ -32,7 +33,8 @@ class AppColors {
   static const Color border = Color(0xFFE5E7EB);
   static const Color divider = Color(0xFFF3F4F6);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color background = Color(0xFFF0F4F2); // Soft mint/grayish backdrop
+  static const Color background =
+      Color(0xFFF0F4F2); // Soft mint/grayish backdrop
   static const Color scaffold = Color(0xFFF0F4F2);
 
   // ─── CELLFIN SPECIFIC COLORS ─────────────────────────────────────

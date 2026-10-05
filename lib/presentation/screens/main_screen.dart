@@ -28,11 +28,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = const [
-    DashboardScreen(),   // 0: Dashboard
-    OutletsScreen(),     // 1: Outlets
-    VisitsScreen(),      // 2: Visits
-    MapScreen(),         // 3: Route Map
-    MoreScreen(),        // 4: All Modules
+    DashboardScreen(), // 0: Dashboard
+    OutletsScreen(), // 1: Outlets
+    VisitsScreen(), // 2: Visits
+    MapScreen(), // 3: Route Map
+    MoreScreen(), // 4: All Modules
   ];
 
   void _selectTab(int index) {
@@ -54,7 +54,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: isDark ? const Color(0xFF0B1220) : const Color(0xFFF1F5F2),
+      backgroundColor:
+          isDark ? const Color(0xFF0B1220) : const Color(0xFFF1F5F2),
 
       // Top Green Header (Cellfin Layout with FieldVisit Branding)
       appBar: PreferredSize(
@@ -69,7 +70,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 children: [
                   // Hamburger Menu Button
                   IconButton(
-                    icon: const Icon(Icons.menu_rounded, color: Colors.white, size: 28),
+                    icon: const Icon(Icons.menu_rounded,
+                        color: Colors.white, size: 28),
                     onPressed: () => _scaffoldKey.currentState?.openDrawer(),
                   ),
 
@@ -78,7 +80,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   // White Logo Pill/Card for FieldVisit
                   Container(
                     height: 38,
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(10),
@@ -101,7 +104,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                             borderRadius: BorderRadius.circular(5),
                           ),
                           child: const Center(
-                            child: Icon(Icons.location_city_rounded, color: Colors.white, size: 14),
+                            child: Icon(Icons.location_city_rounded,
+                                color: Colors.white, size: 14),
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -138,21 +142,25 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   // Profile Icon
                   IconButton(
                     tooltip: 'My Profile',
-                    icon: const Icon(Icons.person_outline_rounded, color: Colors.white, size: 24),
+                    icon: const Icon(Icons.person_outline_rounded,
+                        color: Colors.white, size: 24),
                     onPressed: () => _openScreen(const AccountScreen()),
                   ),
 
                   // Notifications Bell with Unread Badge
                   Consumer(
                     builder: (context, ref, _) {
-                      final unread = ref.watch(unreadNotificationsCountProvider);
+                      final unread =
+                          ref.watch(unreadNotificationsCountProvider);
                       return Stack(
                         clipBehavior: Clip.none,
                         children: [
                           IconButton(
                             tooltip: 'Alerts',
-                            icon: const Icon(Icons.notifications_none_rounded, color: Colors.white, size: 24),
-                            onPressed: () => _openScreen(const NotificationsScreen()),
+                            icon: const Icon(Icons.notifications_none_rounded,
+                                color: Colors.white, size: 24),
+                            onPressed: () =>
+                                _openScreen(const NotificationsScreen()),
                           ),
                           if (unread > 0)
                             Positioned(
@@ -164,7 +172,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                                   color: Color(0xFFEF4444),
                                   shape: BoxShape.circle,
                                 ),
-                                constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+                                constraints: const BoxConstraints(
+                                    minWidth: 18, minHeight: 18),
                                 child: Text(
                                   unread > 99 ? '99+' : '$unread',
                                   style: const TextStyle(
@@ -185,7 +194,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   // Logout Icon
                   IconButton(
                     tooltip: 'Logout',
-                    icon: const Icon(Icons.logout_rounded, color: Colors.white, size: 24),
+                    icon: const Icon(Icons.logout_rounded,
+                        color: Colors.white, size: 24),
                     onPressed: () => ref.read(authProvider.notifier).logout(),
                   ),
                 ],
@@ -263,7 +273,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
           Positioned(
             top: -24,
             child: InkWell(
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const QrScannerScreen())),
+              onTap: () => Navigator.push(context,
+                  MaterialPageRoute(builder: (_) => const QrScannerScreen())),
               borderRadius: BorderRadius.circular(35),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -274,7 +285,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     decoration: BoxDecoration(
                       color: Colors.white,
                       shape: BoxShape.circle,
-                      border: Border.all(color: const Color(0xFFE0E0E0), width: 1.5),
+                      border: Border.all(
+                          color: const Color(0xFFE0E0E0), width: 1.5),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.18),
@@ -395,7 +407,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Center(
-                          child: Icon(Icons.location_city_rounded, color: Colors.white, size: 24),
+                          child: Icon(Icons.location_city_rounded,
+                              color: Colors.white, size: 24),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -448,17 +461,30 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 children: [
-                  _buildDrawerTile(Icons.home_rounded, 'Home Dashboard', () => _selectTab(0)),
-                  _buildDrawerTile(Icons.storefront_rounded, 'Outlets & Stores', () => _selectTab(1)),
-                  _buildDrawerTile(Icons.assignment_rounded, 'My Field Visits', () => _selectTab(2)),
-                  _buildDrawerTile(Icons.fact_check_rounded, 'Target & KPIs', () => _openScreen(const KpiScreen())),
-                  _buildDrawerTile(Icons.map_rounded, 'Field Route & Map', () => _openScreen(const MapScreen())),
-                  _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports', () => _openScreen(const ReportsScreen())),
-                  _buildDrawerTile(Icons.settings_rounded, 'Settings', () => _openScreen(const SecuritySettingsScreen())),
-                  if ((ref.watch(authProvider).valueOrNull?.roles ?? []).any((role) => role == 'super-admin' || role == 'special-super-admin'))
-                    _buildDrawerTile(Icons.cloud_outlined, 'Storage Settings', () => _openScreen(const StorageSettingsScreen())),
-                  _buildDrawerTile(Icons.person_outline_rounded, 'My Profile', () => _openScreen(const AccountScreen())),
-                  _buildDrawerTile(Icons.logout_rounded, 'Logout', () => ref.read(authProvider.notifier).logout()),
+                  _buildDrawerTile(Icons.home_rounded, 'Home Dashboard',
+                      () => _selectTab(0)),
+                  _buildDrawerTile(Icons.storefront_rounded, 'Outlets & Stores',
+                      () => _selectTab(1)),
+                  _buildDrawerTile(Icons.assignment_rounded, 'My Field Visits',
+                      () => _selectTab(2)),
+                  _buildDrawerTile(Icons.fact_check_rounded, 'Target & KPIs',
+                      () => _openScreen(const KpiScreen())),
+                  _buildDrawerTile(Icons.map_rounded, 'Field Route & Map',
+                      () => _openScreen(const MapScreen())),
+                  _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports',
+                      () => _openScreen(const ReportsScreen())),
+                  _buildDrawerTile(Icons.settings_rounded, 'Settings',
+                      () => _openScreen(const SecuritySettingsScreen())),
+                  if ((ref.watch(authProvider).valueOrNull?.roles ?? []).any(
+                      (role) =>
+                          role == 'super-admin' ||
+                          role == 'special-super-admin'))
+                    _buildDrawerTile(Icons.cloud_outlined, 'Storage Settings',
+                        () => _openScreen(const StorageSettingsScreen())),
+                  _buildDrawerTile(Icons.person_outline_rounded, 'My Profile',
+                      () => _openScreen(const AccountScreen())),
+                  _buildDrawerTile(Icons.logout_rounded, 'Logout',
+                      () => ref.read(authProvider.notifier).logout()),
                 ],
               ),
             ),
@@ -473,7 +499,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                   Text(
                     'Version 2.4.0 (Build 395)',
                     style: TextStyle(
-                      color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF6B7280),
+                      color: isDark
+                          ? const Color(0xFF9CA3AF)
+                          : const Color(0xFF6B7280),
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -487,9 +515,11 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                         height: 32,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFF136B3E), width: 1.5),
+                          border: Border.all(
+                              color: const Color(0xFF136B3E), width: 1.5),
                         ),
-                        child: const Icon(Icons.verified_user_rounded, color: Color(0xFF136B3E), size: 18),
+                        child: const Icon(Icons.verified_user_rounded,
+                            color: Color(0xFF136B3E), size: 18),
                       ),
                       const SizedBox(width: 8),
                       Column(
@@ -498,7 +528,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           Text(
                             'ফিল্ড ভিজিট এন্টারপ্রাইজ',
                             style: TextStyle(
-                              color: isDark ? const Color(0xFF4ADE80) : const Color(0xFF136B3E),
+                              color: isDark
+                                  ? const Color(0xFF4ADE80)
+                                  : const Color(0xFF136B3E),
                               fontSize: 15,
                               fontWeight: FontWeight.w900,
                             ),
@@ -506,7 +538,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                           Text(
                             'ফিল্ড ফোর্স ও সেলস অটোমেশন সিস্টেম',
                             style: TextStyle(
-                              color: isDark ? const Color(0xFF9CA3AF) : const Color(0xFF4B5563),
+                              color: isDark
+                                  ? const Color(0xFF9CA3AF)
+                                  : const Color(0xFF4B5563),
                               fontSize: 9.5,
                               fontWeight: FontWeight.w500,
                             ),
@@ -530,7 +564,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
       builder: (context) {
         final isDark = Theme.of(context).brightness == Brightness.dark;
         return ListTile(
-          leading: Icon(icon, color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151), size: 24),
+          leading: Icon(icon,
+              color: isDark ? const Color(0xFFD1D5DB) : const Color(0xFF374151),
+              size: 24),
           title: Text(
             title,
             style: TextStyle(
@@ -539,7 +575,8 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               fontWeight: FontWeight.w600,
             ),
           ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 24, vertical: 2),
           onTap: onTap,
         );
       },

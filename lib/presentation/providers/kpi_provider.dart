@@ -98,7 +98,8 @@ class KpiData {
   factory KpiData.fromJson(Map<String, dynamic> json) {
     final target = Map<String, dynamic>.from(json['target'] as Map? ?? {});
     final actual = Map<String, dynamic>.from(json['actual'] as Map? ?? {});
-    final achievement = Map<String, dynamic>.from(json['achievement'] as Map? ?? {});
+    final achievement =
+        Map<String, dynamic>.from(json['achievement'] as Map? ?? {});
     final rawLeaders = json['leaderboard'] as List? ?? [];
 
     return KpiData(
@@ -111,23 +112,32 @@ class KpiData {
       visitTarget: (target['visit_target'] as num?)?.toInt() ?? 15,
       salesTarget: (target['sales_target'] as num?)?.toDouble() ?? 50000.0,
       coverageTarget: (target['coverage_target'] as num?)?.toDouble() ?? 85.0,
-      strikeRateTarget: (target['strike_rate_target'] as num?)?.toDouble() ?? 65.0,
+      strikeRateTarget:
+          (target['strike_rate_target'] as num?)?.toDouble() ?? 65.0,
       totalVisits: (actual['total_visits'] as num?)?.toInt() ?? 0,
       completedVisits: (actual['completed_visits'] as num?)?.toInt() ?? 0,
       verifiedVisits: (actual['verified_visits'] as num?)?.toInt() ?? 0,
       ordersCount: (actual['orders_count'] as num?)?.toInt() ?? 0,
       ordersAmount: (actual['orders_amount'] as num?)?.toDouble() ?? 0.0,
-      totalAssignedOutlets: (actual['total_assigned_outlets'] as num?)?.toInt() ?? 0,
-      uniqueOutletsVisited: (actual['unique_outlets_visited'] as num?)?.toInt() ?? 0,
-      coveragePercentage: (actual['coverage_percentage'] as num?)?.toDouble() ?? 0.0,
+      totalAssignedOutlets:
+          (actual['total_assigned_outlets'] as num?)?.toInt() ?? 0,
+      uniqueOutletsVisited:
+          (actual['unique_outlets_visited'] as num?)?.toInt() ?? 0,
+      coveragePercentage:
+          (actual['coverage_percentage'] as num?)?.toDouble() ?? 0.0,
       strikeRate: (actual['strike_rate'] as num?)?.toDouble() ?? 0.0,
       avgOrderValue: (actual['avg_order_value'] as num?)?.toDouble() ?? 0.0,
-      visitPercentage: (achievement['visit_percentage'] as num?)?.toDouble() ?? 0.0,
-      salesPercentage: (achievement['sales_percentage'] as num?)?.toDouble() ?? 0.0,
-      coverageAchievement: (achievement['coverage_percentage'] as num?)?.toDouble() ?? 0.0,
+      visitPercentage:
+          (achievement['visit_percentage'] as num?)?.toDouble() ?? 0.0,
+      salesPercentage:
+          (achievement['sales_percentage'] as num?)?.toDouble() ?? 0.0,
+      coverageAchievement:
+          (achievement['coverage_percentage'] as num?)?.toDouble() ?? 0.0,
       overallScore: (achievement['overall_score'] as num?)?.toDouble() ?? 0.0,
-      performanceGrade: achievement['performance_grade']?.toString() ?? 'Active',
-      leaderboard: rawLeaders.map((e) => Map<String, dynamic>.from(e as Map)).toList(),
+      performanceGrade:
+          achievement['performance_grade']?.toString() ?? 'Active',
+      leaderboard:
+          rawLeaders.map((e) => Map<String, dynamic>.from(e as Map)).toList(),
     );
   }
 }

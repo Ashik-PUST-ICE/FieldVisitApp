@@ -300,15 +300,13 @@ class AppTheme {
           fontSize: 14,
           height: 1.5,
         ),
-        insetPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       ),
 
       // ─── LIST TILE ────────────────────────────────────────────────
       listTileTheme: ListTileThemeData(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -393,8 +391,7 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
         elevation: 4,
-        insetPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       ),
 
       // ─── POPUP MENU ───────────────────────────────────────────────
@@ -503,7 +500,6 @@ class AppTheme {
       primaryColor: AppColors.darkPrimary,
       scaffoldBackgroundColor: AppColors.darkBackground,
       fontFamily: GoogleFonts.inter().fontFamily,
-
       colorScheme: const ColorScheme.dark(
         primary: AppColors.darkPrimary,
         onPrimary: AppColors.darkBackground,
@@ -522,7 +518,6 @@ class AppTheme {
         outlineVariant: Color(0xFF1E2D45),
         shadow: Color(0x40000000),
       ),
-
       textTheme: baseText.copyWith(
         displayLarge: baseText.displayLarge?.copyWith(
           color: AppColors.darkText,
@@ -573,7 +568,6 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
       ),
-
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkText,
@@ -593,7 +587,6 @@ class AppTheme {
         ),
         iconTheme: const IconThemeData(color: AppColors.darkText, size: 22),
       ),
-
       cardTheme: CardTheme(
         color: AppColors.darkCard,
         elevation: 0,
@@ -605,7 +598,6 @@ class AppTheme {
         surfaceTintColor: Colors.transparent,
         clipBehavior: Clip.antiAlias,
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.darkPrimary,
@@ -622,7 +614,6 @@ class AppTheme {
           ),
         ),
       ),
-
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.darkPrimary,
@@ -638,7 +629,6 @@ class AppTheme {
           ),
         ),
       ),
-
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.darkPrimary,
@@ -650,7 +640,6 @@ class AppTheme {
           ),
         ),
       ),
-
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.darkPrimary,
@@ -660,7 +649,6 @@ class AppTheme {
           ),
         ),
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         isDense: true,
         filled: true,
@@ -699,7 +687,6 @@ class AppTheme {
           fontWeight: FontWeight.w600,
         ),
       ),
-
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: AppColors.darkPrimary,
         foregroundColor: AppColors.darkBackground,
@@ -708,7 +695,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(radiusMd),
         ),
       ),
-
       dialogTheme: DialogTheme(
         backgroundColor: AppColors.darkCard,
         surfaceTintColor: Colors.transparent,
@@ -726,14 +712,11 @@ class AppTheme {
           fontSize: 14,
           height: 1.5,
         ),
-        insetPadding:
-            const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
         actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
       ),
-
       listTileTheme: ListTileThemeData(
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radiusSm),
         ),
@@ -749,7 +732,6 @@ class AppTheme {
           height: 1.4,
         ),
       ),
-
       bottomNavigationBarTheme: BottomNavigationBarThemeData(
         backgroundColor: AppColors.darkSurface,
         selectedItemColor: AppColors.darkPrimary,
@@ -765,7 +747,6 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
       ),
-
       tabBarTheme: TabBarTheme(
         labelColor: AppColors.darkPrimary,
         unselectedLabelColor: AppColors.darkTextSecondary,
@@ -781,7 +762,6 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
       ),
-
       chipTheme: ChipThemeData(
         backgroundColor: const Color(0xFF1A3A36),
         labelStyle: GoogleFonts.inter(
@@ -794,13 +774,11 @@ class AppTheme {
           borderRadius: BorderRadius.circular(radiusFull),
         ),
       ),
-
       dividerTheme: const DividerThemeData(
         color: AppColors.darkBorder,
         thickness: 0.5,
         space: 0.5,
       ),
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.darkCard,
         contentTextStyle: GoogleFonts.inter(
@@ -812,7 +790,6 @@ class AppTheme {
         ),
         behavior: SnackBarBehavior.floating,
       ),
-
       popupMenuTheme: PopupMenuThemeData(
         elevation: 8,
         color: AppColors.darkCard,
@@ -821,12 +798,10 @@ class AppTheme {
           borderRadius: BorderRadius.circular(radiusSm),
         ),
       ),
-
       drawerTheme: const DrawerThemeData(
         backgroundColor: AppColors.darkSurface,
         surfaceTintColor: Colors.transparent,
       ),
-
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -838,7 +813,6 @@ class AppTheme {
           borderRadius: BorderRadius.circular(4),
         ),
       ),
-
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return Colors.white;
@@ -851,12 +825,10 @@ class AppTheme {
           return AppColors.darkBorder;
         }),
       ),
-
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.darkPrimary,
         linearTrackColor: Color(0xFF1A3A36),
       ),
-
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.darkSurface,
         surfaceTintColor: Colors.transparent,

@@ -11,6 +11,7 @@ class ApiResponse<T> with _$ApiResponse<T> {
     required T? data,
   }) = _ApiResponse<T>;
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(Object? json) fromJsonT) =>
+  factory ApiResponse.fromJson(
+          Map<String, dynamic> json, T Function(Object? json) fromJsonT) =>
       _$ApiResponseFromJson(json, fromJsonT);
 }

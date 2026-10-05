@@ -21,7 +21,10 @@ class StatusBadge extends StatelessWidget {
     final s = (status ?? 'unknown').toLowerCase();
     Color c;
     IconData ic;
-    if (s == 'active' || s == 'completed' || s == 'delivered' || s == 'verified') {
+    if (s == 'active' ||
+        s == 'completed' ||
+        s == 'delivered' ||
+        s == 'verified') {
       c = AppColors.success;
       ic = Icons.check_circle_outline;
     } else if (s == 'pending' || s == 'in_progress' || s == 'started') {
@@ -109,13 +112,15 @@ class SectionHeader extends StatelessWidget {
             TextButton(
               onPressed: onAction,
               style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 minimumSize: Size.zero,
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               child: Text(
                 actionLabel!,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                style:
+                    const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
             ),
         ],

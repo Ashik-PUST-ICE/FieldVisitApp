@@ -963,6 +963,8 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
   final pourashavaCtrl = TextEditingController(text: outlet?.pourashava);
   final ward = TextEditingController(text: outlet?.ward);
   final village = TextEditingController(text: outlet?.village);
+  // Urban leaf under a pourashava ward (town chain vs rural chain).
+  final mohalla = TextEditingController(text: outlet?.mohalla);
 
   await CellfinFormScreen.push(
     context: context,
@@ -1025,6 +1027,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
         pourashava: pourashavaCtrl,
         ward: ward,
         village: village,
+        mohalla: mohalla,
       ),
       CellfinInputField(
         controller: phone,
@@ -1079,6 +1082,8 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
           'pourashava': pourashavaCtrl.text.trim(),
         if (ward.text.trim().isNotEmpty) 'ward': ward.text.trim(),
         if (village.text.trim().isNotEmpty) 'village': village.text.trim(),
+        // Only one leaf is ever filled (the cascade shows one per branch).
+        if (mohalla.text.trim().isNotEmpty) 'mohalla': mohalla.text.trim(),
         if (phone.text.trim().isNotEmpty) 'phone': phone.text.trim(),
         if (latitude.text.trim().isNotEmpty) 'latitude': latitude.text.trim(),
         if (longitude.text.trim().isNotEmpty)
@@ -1121,6 +1126,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
   pourashavaCtrl.dispose();
   ward.dispose();
   village.dispose();
+  mohalla.dispose();
 }
 
 class _ErrorView extends StatelessWidget {

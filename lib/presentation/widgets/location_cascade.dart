@@ -26,8 +26,11 @@ const _levels = <_Level>[
   _Level('pourashava', 'Pourashava', 'Choose pourashava',
       Icons.location_city_rounded),
   _Level('ward', 'Ward', 'Ward number', Icons.grid_view_rounded),
+  // Rural leaf under a union ward.
+  _Level('village', 'Village', 'Village or para', Icons.home_work_outlined),
+  // Urban leaf under a pourashava ward (shown instead of village).
   _Level(
-      'village', 'Village / Para', 'Village or para', Icons.home_work_outlined),
+      'mohalla', 'Mahalla', 'Mahalla or para', Icons.holiday_village_outlined),
 ];
 
 /// Cascading picker for division -> district -> upazila -> union -> ward ->
@@ -51,6 +54,9 @@ class LocationCascadeField extends ConsumerStatefulWidget {
   final TextEditingController pourashava;
   final TextEditingController ward;
   final TextEditingController village;
+  // Urban leaf under a pourashava ward: mahalla/para. Rural wards use
+  // `village` above; town wards use this instead (never both).
+  final TextEditingController mohalla;
 
   const LocationCascadeField({
     super.key,
@@ -61,6 +67,7 @@ class LocationCascadeField extends ConsumerStatefulWidget {
     required this.pourashava,
     required this.ward,
     required this.village,
+    required this.mohalla,
   });
 
   @override
@@ -82,6 +89,8 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
         'pourashava' => widget.pourashava,
         'ward' => widget.ward,
         'village' => widget.village,
+        'mohalla' => widget.mohalla,
+        'mohalla' => widget.mohalla,
         _ => widget.division,
       };
 
@@ -102,9 +111,13 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
 
   /// The mutually exclusive counterpart at the same depth, if any.
   /// Picking one branch clears and locks the other.
+  /// Ward's leaf also differs per branch: rural wards own villages,
+  /// pourashava wards own mahallas.
   static String? _siblingType(String type) => switch (type) {
         'union' => 'pourashava',
         'pourashava' => 'union',
+        'village' => 'mohalla',
+        'mohalla' => 'village',
         _ => null,
       };
 
@@ -181,20 +194,39 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
   }
 
   /// Levels that sit below [type] and must reset when it changes.
-  /// Ward follows whichever branch (union or pourashava) is active.
+  /// Ward follows whichever branch (union or pourashava) is active, and the
+  /// leaf follows the branch too (village vs mahalla).
   List<String> _descendantTypes(String type) {
     switch (type) {
       case 'division':
-        return const ['district', 'upazila', 'union', 'pourashava', 'ward', 'village'];
+        return const [
+          'district',
+          'upazila',
+          'union',
+          'pourashava',
+          'ward',
+          'village',
+          'mohalla'
+        ];
       case 'district':
-        return const ['upazila', 'union', 'pourashava', 'ward', 'village'];
+        return const [
+          'upazila',
+          'union',
+          'pourashava',
+          'ward',
+          'village',
+          'mohalla'
+        ];
       case 'upazila':
-        return const ['union', 'pourashava', 'ward', 'village'];
+        return const ['union', 'pourashava', 'ward', 'village', 'mohalla'];
       case 'union':
+        return const ['ward', 'village', 'mohalla'];
       case 'pourashava':
-        return const ['ward', 'village'];
+        return const ['ward', 'village', 'mohalla'];
       case 'ward':
-        return const ['village'];
+        // Only the active branch leaf resets; the sibling leaf stays cleared
+        // by the exclusion logic in _onPick.
+        return _isUrbanBranch ? const ['mohalla'] : const ['village'];
       default:
         return const [];
     }
@@ -208,18 +240,35 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
         // After either branch the next step is ward (under that branch).
         'union' => 'ward',
         'pourashava' => 'ward',
-        'ward' => 'village',
+        // Ward's leaf depends on the active branch.
+        'ward' => _isUrbanBranch ? 'mohalla' : 'village',
         _ => null,
       };
 
+  /// True when the urban branch (pourashava) is active, i.e. ward's leaf
+  /// must be mahalla instead of village.
+  bool get _isUrbanBranch =>
+      _selectedId['pourashava'] != null ||
+      (_selectedId['union'] == null &&
+          _selectedId['pourashava'] == null &&
+          _ctrlFor('pourashava').text.trim().isNotEmpty);
+
   @override
   Widget build(BuildContext context) {
+    // Ward's leaf depends on the branch: rural shows village, urban shows
+    // mahalla. The sibling leaf is skipped so the form never shows both.
+    final visible = <_Level>[];
+    for (final l in _levels) {
+      if (l.type == 'village' && _isUrbanBranch) continue;
+      if (l.type == 'mohalla' && !_isUrbanBranch) continue;
+      visible.add(l);
+    }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        for (var i = 0; i < _levels.length; i++) ...[
+        for (var i = 0; i < visible.length; i++) ...[
           if (i > 0) const SizedBox(height: 10),
-          _buildLevel(_levels[i], i),
+          _buildLevel(visible[i], _levels.indexOf(visible[i])),
         ],
       ],
     );
@@ -284,6 +333,7 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
         'union' => 'chooseUnion',
         'pourashava' => 'choosePourashava',
         'ward' => 'wardNumber',
+        'mohalla' => 'chooseMohalla',
         _ => 'villageOrPara',
       }),
       icon: level.icon,

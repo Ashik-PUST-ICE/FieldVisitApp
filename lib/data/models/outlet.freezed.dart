@@ -47,6 +47,10 @@ mixin _$Outlet {
   String? get ward => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _outletString)
   String? get village => throw _privateConstructorUsedError;
+  @JsonKey(fromJson: _outletString)
+  String? get mohalla =>
+      throw _privateConstructorUsedError; // Urban leaf under a pourashava ward (mahalla/para). Rural wards use
+// `village` above; town wards use this instead (never both).
   @JsonKey(fromJson: _outletDouble)
   double? get latitude => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _outletDouble)
@@ -92,6 +96,7 @@ abstract class $OutletCopyWith<$Res> {
       @JsonKey(fromJson: _outletString) String? pourashava,
       @JsonKey(fromJson: _outletString) String? ward,
       @JsonKey(fromJson: _outletString) String? village,
+      @JsonKey(fromJson: _outletString) String? mohalla,
       @JsonKey(fromJson: _outletDouble) double? latitude,
       @JsonKey(fromJson: _outletDouble) double? longitude,
       @JsonKey(fromJson: _outletString) String? phone,
@@ -131,6 +136,7 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
     Object? pourashava = freezed,
     Object? ward = freezed,
     Object? village = freezed,
+    Object? mohalla = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? phone = freezed,
@@ -189,6 +195,10 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
       village: freezed == village
           ? _value.village
           : village // ignore: cast_nullable_to_non_nullable
+              as String?,
+      mohalla: freezed == mohalla
+          ? _value.mohalla
+          : mohalla // ignore: cast_nullable_to_non_nullable
               as String?,
       latitude: freezed == latitude
           ? _value.latitude
@@ -250,6 +260,7 @@ abstract class _$$OutletImplCopyWith<$Res> implements $OutletCopyWith<$Res> {
       @JsonKey(fromJson: _outletString) String? pourashava,
       @JsonKey(fromJson: _outletString) String? ward,
       @JsonKey(fromJson: _outletString) String? village,
+      @JsonKey(fromJson: _outletString) String? mohalla,
       @JsonKey(fromJson: _outletDouble) double? latitude,
       @JsonKey(fromJson: _outletDouble) double? longitude,
       @JsonKey(fromJson: _outletString) String? phone,
@@ -287,6 +298,7 @@ class __$$OutletImplCopyWithImpl<$Res>
     Object? pourashava = freezed,
     Object? ward = freezed,
     Object? village = freezed,
+    Object? mohalla = freezed,
     Object? latitude = freezed,
     Object? longitude = freezed,
     Object? phone = freezed,
@@ -346,6 +358,10 @@ class __$$OutletImplCopyWithImpl<$Res>
           ? _value.village
           : village // ignore: cast_nullable_to_non_nullable
               as String?,
+      mohalla: freezed == mohalla
+          ? _value.mohalla
+          : mohalla // ignore: cast_nullable_to_non_nullable
+              as String?,
       latitude: freezed == latitude
           ? _value.latitude
           : latitude // ignore: cast_nullable_to_non_nullable
@@ -402,6 +418,7 @@ class _$OutletImpl implements _Outlet {
       @JsonKey(fromJson: _outletString) this.pourashava,
       @JsonKey(fromJson: _outletString) this.ward,
       @JsonKey(fromJson: _outletString) this.village,
+      @JsonKey(fromJson: _outletString) this.mohalla,
       @JsonKey(fromJson: _outletDouble) this.latitude,
       @JsonKey(fromJson: _outletDouble) this.longitude,
       @JsonKey(fromJson: _outletString) this.phone,
@@ -456,6 +473,11 @@ class _$OutletImpl implements _Outlet {
   @JsonKey(fromJson: _outletString)
   final String? village;
   @override
+  @JsonKey(fromJson: _outletString)
+  final String? mohalla;
+// Urban leaf under a pourashava ward (mahalla/para). Rural wards use
+// `village` above; town wards use this instead (never both).
+  @override
   @JsonKey(fromJson: _outletDouble)
   final double? latitude;
   @override
@@ -484,7 +506,7 @@ class _$OutletImpl implements _Outlet {
 
   @override
   String toString() {
-    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, division: $division, district: $district, upazila: $upazila, union: $union, pourashava: $pourashava, ward: $ward, village: $village, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, division: $division, district: $district, upazila: $upazila, union: $union, pourashava: $pourashava, ward: $ward, village: $village, mohalla: $mohalla, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -507,6 +529,7 @@ class _$OutletImpl implements _Outlet {
                 other.pourashava == pourashava) &&
             (identical(other.ward, ward) || other.ward == ward) &&
             (identical(other.village, village) || other.village == village) &&
+            (identical(other.mohalla, mohalla) || other.mohalla == mohalla) &&
             (identical(other.latitude, latitude) ||
                 other.latitude == latitude) &&
             (identical(other.longitude, longitude) ||
@@ -540,6 +563,7 @@ class _$OutletImpl implements _Outlet {
         pourashava,
         ward,
         village,
+        mohalla,
         latitude,
         longitude,
         phone,
@@ -581,6 +605,7 @@ abstract class _Outlet implements Outlet {
       @JsonKey(fromJson: _outletString) final String? pourashava,
       @JsonKey(fromJson: _outletString) final String? ward,
       @JsonKey(fromJson: _outletString) final String? village,
+      @JsonKey(fromJson: _outletString) final String? mohalla,
       @JsonKey(fromJson: _outletDouble) final double? latitude,
       @JsonKey(fromJson: _outletDouble) final double? longitude,
       @JsonKey(fromJson: _outletString) final String? phone,
@@ -635,6 +660,11 @@ abstract class _Outlet implements Outlet {
   @override
   @JsonKey(fromJson: _outletString)
   String? get village;
+  @override
+  @JsonKey(fromJson: _outletString)
+  String?
+      get mohalla; // Urban leaf under a pourashava ward (mahalla/para). Rural wards use
+// `village` above; town wards use this instead (never both).
   @override
   @JsonKey(fromJson: _outletDouble)
   double? get latitude;

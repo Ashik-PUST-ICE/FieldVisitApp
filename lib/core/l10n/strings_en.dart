@@ -448,6 +448,8 @@ const enStrings = <String, String>{
   'chooseUpazila': 'Choose upazila',
   'chooseUnion': 'Choose union',
   'choosePourashava': 'Choose pourashava',
+  'mohalla': 'Mahalla',
+  'chooseMohalla': 'Choose mahalla',
   'chooseWard': 'Choose ward',
   'chooseVillage': 'Choose village',
 

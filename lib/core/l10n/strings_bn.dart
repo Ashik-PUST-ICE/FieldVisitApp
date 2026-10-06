@@ -447,6 +447,8 @@ const bnStrings = <String, String>{
   'chooseUpazila': 'উপজেলা বেছে নিন',
   'chooseUnion': 'ইউনিয়ন বেছে নিন',
   'choosePourashava': 'পৌরসভা বেছে নিন',
+  'mohalla': 'মহল্লা',
+  'chooseMohalla': 'মহল্লা বেছে নিন',
   'chooseWard': 'ওয়ার্ড বেছে নিন',
   'chooseVillage': 'গ্রাম বেছে নিন',
 

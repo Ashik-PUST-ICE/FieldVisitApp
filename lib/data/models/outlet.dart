@@ -42,6 +42,9 @@ class Outlet with _$Outlet {
     @JsonKey(fromJson: _outletString) String? pourashava,
     @JsonKey(fromJson: _outletString) String? ward,
     @JsonKey(fromJson: _outletString) String? village,
+    @JsonKey(fromJson: _outletString) String? mohalla,
+    // Urban leaf under a pourashava ward (mahalla/para). Rural wards use
+    // `village` above; town wards use this instead (never both).
     @JsonKey(fromJson: _outletDouble) double? latitude,
     @JsonKey(fromJson: _outletDouble) double? longitude,
     @JsonKey(fromJson: _outletString) String? phone,

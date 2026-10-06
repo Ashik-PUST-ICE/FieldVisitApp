@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 import 'package:field_visit_app/presentation/providers/dashboard_provider.dart';
@@ -41,14 +42,15 @@ class DashboardScreen extends ConsumerWidget {
               const Icon(Icons.error_outline_rounded,
                   size: 48, color: Colors.red),
               const SizedBox(height: 12),
-              Text('Connection Error: $error', textAlign: TextAlign.center),
+              Text('${trOf(context, 'connectionError')}: $error',
+                  textAlign: TextAlign.center),
               const SizedBox(height: 12),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.cellfinGreen,
                     foregroundColor: Colors.white),
                 onPressed: () => ref.invalidate(dashboardProvider),
-                child: const Text('Retry Connection'),
+                child: Text(trOf(context, 'retryConnection')),
               ),
             ],
           ),
@@ -99,7 +101,7 @@ class DashboardScreen extends ConsumerWidget {
       BuildContext context, dynamic user, Map<String, dynamic> data) {
     final officerName = user != null && user.fullName.isNotEmpty
         ? user.fullName.toUpperCase()
-        : 'FIELD OFFICER';
+        : trOf(context, 'fieldOfficer');
     final coverage = data['coverage_percentage'] ?? 0;
 
     return Container(
@@ -149,7 +151,7 @@ class DashboardScreen extends ConsumerWidget {
                         ),
                         const SizedBox(width: 5),
                         Text(
-                          'ONLINE • ON DUTY',
+                          trOf(context, 'onlineOnDuty'),
                           style: TextStyle(
                             color: Colors.white.withOpacity(0.85),
                             fontSize: 11,
@@ -200,7 +202,7 @@ class DashboardScreen extends ConsumerWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        '$coverage% Target',
+                        '$coverage% ${trOf(context, 'targetPercent')}',
                         style: const TextStyle(
                           color: Color(0xFF1F2937),
                           fontSize: 13,
@@ -243,22 +245,22 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               _buildIconItem(
                 icon: Icons.play_circle_outline_rounded,
-                title: 'Start\nVisit',
+                title: trOf(context, 'dashStartVisit'),
                 onTap: () => _open(context, const VisitsScreen()),
               ),
               _buildIconItem(
                 icon: Icons.storefront_outlined,
-                title: 'Outlets\nDirectory',
+                title: trOf(context, 'dashOutletsDirectory'),
                 onTap: () => _open(context, const OutletsScreen()),
               ),
               _buildIconItem(
                 icon: Icons.shopping_bag_outlined,
-                title: 'Book\nOrder',
+                title: trOf(context, 'dashBookOrder'),
                 onTap: () => _open(context, const OrdersScreen()),
               ),
               _buildIconItem(
                 icon: Icons.map_outlined,
-                title: 'Live\nRoute',
+                title: trOf(context, 'dashLiveRoute'),
                 onTap: () => _open(context, const MapScreen()),
               ),
             ],
@@ -270,22 +272,22 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               _buildIconItem(
                 icon: Icons.camera_alt_outlined,
-                title: 'Shelf\nPhotos',
+                title: trOf(context, 'dashShelfPhotos'),
                 onTap: () => _open(context, const VisitsScreen()),
               ),
               _buildIconItem(
                 icon: Icons.inventory_2_outlined,
-                title: 'Product\nCatalog',
+                title: trOf(context, 'dashProductCatalog'),
                 onTap: () => _open(context, const ProductsScreen()),
               ),
               _buildIconItem(
                 icon: Icons.alt_route_rounded,
-                title: 'Beats &\nRoutes',
+                title: trOf(context, 'dashBeatsRoutes'),
                 onTap: () => _open(context, const BeatsScreen()),
               ),
               _buildIconItem(
                 icon: Icons.qr_code_scanner_rounded,
-                title: 'Scan QR\nCheck-in',
+                title: trOf(context, 'dashScanQrCheckIn'),
                 hasBadge: true,
                 onTap: () => _open(context, const QrScannerScreen()),
               ),
@@ -321,22 +323,22 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               _buildCircularMintItem(
                 icon: Icons.analytics_rounded,
-                title: 'Analytics\nReports',
+                title: trOf(context, 'dashAnalyticsReports'),
                 onTap: () => _open(context, const ReportsScreen()),
               ),
               _buildCircularMintItem(
                 icon: Icons.person_pin_circle_rounded,
-                title: 'Officer\nAssignments',
+                title: trOf(context, 'dashOfficerAssignments'),
                 onTap: () => _open(context, const AssignmentsScreen()),
               ),
               _buildCircularMintItem(
                 icon: Icons.corporate_fare_rounded,
-                title: 'Directory &\nUsers',
+                title: trOf(context, 'dashDirectoryUsers'),
                 onTap: () => _open(context, const DirectoryScreen()),
               ),
               _buildCircularMintItem(
                 icon: Icons.fact_check_rounded,
-                title: 'Target\nKPIs',
+                title: trOf(context, 'dashTargetKpis'),
                 onTap: () => _open(context, const KpiScreen()),
               ),
             ],
@@ -348,22 +350,22 @@ class DashboardScreen extends ConsumerWidget {
             children: [
               _buildCircularMintItem(
                 icon: Icons.travel_explore_rounded,
-                title: 'Competitor\nAudit',
+                title: trOf(context, 'dashCompetitorAudit'),
                 onTap: () => _open(context, const VisitsScreen()),
               ),
               _buildCircularMintItem(
                 icon: Icons.security_rounded,
-                title: 'Role\nPermissions',
+                title: trOf(context, 'dashRolePermissions'),
                 onTap: () => _open(context, const RolePermissionsScreen()),
               ),
               _buildCircularMintItem(
                 icon: Icons.person_outline_rounded,
-                title: 'My\nAccount',
+                title: trOf(context, 'dashMyAccount'),
                 onTap: () => _open(context, const AccountScreen()),
               ),
               _buildCircularMintItem(
                 icon: Icons.grid_view_rounded,
-                title: 'All\nModules',
+                title: trOf(context, 'dashAllModules'),
                 onTap: () => _open(context, const MoreScreen()),
               ),
             ],
@@ -408,7 +410,7 @@ class DashboardScreen extends ConsumerWidget {
                       color: AppColors.cellfinGreen, size: 20),
                   const SizedBox(width: 8),
                   Text(
-                    'Today\'s Field Summary',
+                    trOf(context, 'todayFieldSummary'),
                     style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.w800,
@@ -419,9 +421,9 @@ class DashboardScreen extends ConsumerWidget {
               ),
               InkWell(
                 onTap: () => _open(context, const VisitsScreen()),
-                child: const Text(
-                  'View All Visits',
-                  style: TextStyle(
+                child: Text(
+                  trOf(context, 'viewAllVisits'),
+                  style: const TextStyle(
                       color: AppColors.cellfinGreen,
                       fontWeight: FontWeight.w700,
                       fontSize: 13),
@@ -432,20 +434,20 @@ class DashboardScreen extends ConsumerWidget {
           const SizedBox(height: 14),
           Row(
             children: [
-              _buildMetricPill('Visited', '$visited', const Color(0xFF136B3E),
-                  const Color(0xFFE8F5E9),
+              _buildMetricPill(trOf(context, 'visited'), '$visited',
+                  const Color(0xFF136B3E), const Color(0xFFE8F5E9),
                   isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Pending', '$pending', const Color(0xFFF59E0B),
-                  const Color(0xFFFEF3C7),
+              _buildMetricPill(trOf(context, 'pending'), '$pending',
+                  const Color(0xFFF59E0B), const Color(0xFFFEF3C7),
                   isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Total Outlets', '$total',
+              _buildMetricPill(trOf(context, 'totalOutlets'), '$total',
                   const Color(0xFF1E88E5), const Color(0xFFE3F2FD),
                   isDark: isDark),
               const SizedBox(width: 8),
-              _buildMetricPill('Orders', '$orders', const Color(0xFF7E57C2),
-                  const Color(0xFFEDE7F6),
+              _buildMetricPill(trOf(context, 'orders'), '$orders',
+                  const Color(0xFF7E57C2), const Color(0xFFEDE7F6),
                   isDark: isDark),
             ],
           ),

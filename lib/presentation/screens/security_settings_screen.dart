@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class SecuritySettingsScreen extends ConsumerStatefulWidget {
   const SecuritySettingsScreen({super.key});
@@ -86,23 +87,21 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
         return;
       }
       if (!await ref.read(authProvider.notifier).canUseBiometrics()) {
-        _showError(
-            'No biometric (fingerprint/face) enrolled on this device. Add one in Android settings first.');
+        _showError(tr(ref, 'noBiometricEnrolled'));
         setState(() => settings['biometric_enabled'] = false);
         return;
       }
       final enabledNow =
           await ref.read(authProvider.notifier).enableBiometricLogin();
       if (!enabledNow) {
-        _showError(
-            'Biometric verification failed or was cancelled. Try again.');
+        _showError(tr(ref, 'biometricFailed'));
         setState(() => settings['biometric_enabled'] = false);
         return;
       }
       await _load();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Biometric login enabled')));
+            SnackBar(content: Text(tr(ref, 'biometricLoginEnabled'))));
       }
     } catch (e) {
       _showError(e);
@@ -139,8 +138,8 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF136B3E),
         foregroundColor: Colors.white,
-        title: const Text('Settings',
-            style: TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
+        title: Text(tr(ref, 'settings'),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
       ),
       body: loading
           ? const Center(
@@ -152,36 +151,37 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
                 children: [
                   _settingCard(context,
                       icon: Icons.password_rounded,
-                      title: 'Change PIN',
+                      title: tr(ref, 'changePin'),
                       subtitle: settings['has_pin'] == true
-                          ? 'PIN is already set'
-                          : 'Create your secure PIN',
+                          ? tr(ref, 'pinAlreadySet')
+                          : tr(ref, 'createSecurePin'),
                       onTap: _changePin),
                   _settingCard(context,
                       icon: Icons.dialpad_rounded,
-                      title: 'Update MNP',
-                      subtitle: settings['mnp']?.toString() ?? 'Not configured',
+                      title: tr(ref, 'updateMnp'),
+                      subtitle: settings['mnp']?.toString() ??
+                          tr(ref, 'notConfigured'),
                       onTap: _updateMnp),
                   _settingCard(context,
                       icon: Icons.sms_outlined,
-                      title: 'Change SMS/OTP channel',
+                      title: tr(ref, 'changeOtpChannel'),
                       subtitle:
                           _channelLabel(settings['otp_channel']?.toString()),
                       onTap: _updateOtpChannel),
                   _settingCard(context,
                       icon: Icons.fingerprint_rounded,
-                      title: 'Manage biometric verification',
+                      title: tr(ref, 'manageBiometric'),
                       subtitle: _settingBool('biometric_enabled')
-                          ? 'Enabled'
-                          : 'Disabled',
+                          ? tr(ref, 'enabled')
+                          : tr(ref, 'disabled'),
                       trailing: Switch(
                           value: _settingBool('biometric_enabled'),
                           activeColor: AppColors.cellfinGreen,
                           onChanged: biometricBusy ? null : _setBiometric)),
                   _settingCard(context,
                       icon: Icons.keyboard_alt_outlined,
-                      title: 'Randomize PIN keyboard',
-                      subtitle: 'Shuffle PIN keys for extra privacy',
+                      title: tr(ref, 'randomizePinKeyboard'),
+                      subtitle: tr(ref, 'shufflePinKeys'),
                       trailing: Switch(
                           value: _settingBool('randomize_pin_keyboard'),
                           activeColor: AppColors.cellfinGreen,
@@ -191,7 +191,7 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
                               () => ref
                                   .read(authApiProvider)
                                   .updateRandomPinKeyboard(value),
-                              'PIN keyboard preference updated'))),
+                              tr(ref, 'pinKeyboardUpdated')))),
                 ],
               ),
             ),
@@ -258,20 +258,20 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
     await showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-                title: const Text('Change PIN'),
+                title: Text(tr(ref, 'changePin')),
                 content: SingleChildScrollView(
                     child: Column(mainAxisSize: MainAxisSize.min, children: [
                   if (settings['has_pin'] == true)
-                    _pinField(current, 'Current PIN'),
+                    _pinField(current, tr(ref, 'currentPin')),
                   if (settings['has_pin'] == true) const SizedBox(height: 10),
-                  _pinField(next, 'New PIN (4–6 digits)'),
+                  _pinField(next, tr(ref, 'newPin')),
                   const SizedBox(height: 10),
-                  _pinField(confirm, 'Confirm new PIN')
+                  _pinField(confirm, tr(ref, 'confirmNewPin'))
                 ])),
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
-                      child: const Text('Cancel')),
+                      child: Text(tr(ref, 'cancel'))),
                   FilledButton(
                       onPressed: () async {
                         if (next.text.length < 4 || next.text != confirm.text)
@@ -289,7 +289,7 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
                           _showError(e);
                         }
                       },
-                      child: const Text('Save PIN'))
+                      child: Text(tr(ref, 'savePin')))
                 ]));
     current.dispose();
     next.dispose();
@@ -312,15 +312,15 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
     await showDialog<void>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-                title: const Text('Update MNP'),
+                title: Text(tr(ref, 'updateMnp')),
                 content: TextField(
                     controller: controller,
-                    decoration: const InputDecoration(
-                        labelText: 'MNP / mobile network provider')),
+                    decoration: InputDecoration(
+                        labelText: tr(ref, 'mnpProvider'))),
                 actions: [
                   TextButton(
                       onPressed: () => Navigator.pop(dialogContext),
-                      child: const Text('Cancel')),
+                      child: Text(tr(ref, 'cancel'))),
                   FilledButton(
                       onPressed: () async {
                         if (controller.text.trim().isEmpty) return;
@@ -335,7 +335,7 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
                           _showError(e);
                         }
                       },
-                      child: const Text('Update'))
+                      child: Text(tr(ref, 'update')))
                 ]));
     controller.dispose();
   }
@@ -345,7 +345,7 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
     final value = await showDialog<String>(
         context: context,
         builder: (dialogContext) => SimpleDialog(
-            title: const Text('Choose SMS/OTP channel'),
+            title: Text(tr(ref, 'chooseOtpChannel')),
             children: ['sms', 'email', 'whatsapp']
                 .map((channel) => RadioListTile<String>(
                     value: channel,
@@ -355,7 +355,7 @@ class _SecuritySettingsState extends ConsumerState<SecuritySettingsScreen> {
                 .toList()));
     if (value != null)
       await _run(() => ref.read(authApiProvider).updateOtpChannel(value),
-          'OTP channel updated');
+          tr(ref, 'otpChannelUpdated'));
   }
 
   String _channelLabel(String? value) => switch (value) {

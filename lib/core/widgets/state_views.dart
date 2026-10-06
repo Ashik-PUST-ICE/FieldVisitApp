@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 /// Empty state view with icon, title, subtitle, and optional action.
 class EmptyStateView extends StatelessWidget {
@@ -104,7 +105,7 @@ class ErrorRetryView extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             Text(
-              title ?? 'Something went wrong',
+              title ?? trOf(context, 'somethingWentWrong'),
               style: const TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w600,
@@ -128,7 +129,7 @@ class ErrorRetryView extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onRetry,
               icon: const Icon(Icons.refresh, size: 18),
-              label: const Text('Try again'),
+              label: Text(trOf(context, 'tryAgainButton')),
             ),
           ],
         ),

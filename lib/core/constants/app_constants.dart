@@ -80,6 +80,7 @@ class AppConstants {
   static const String userKey = 'user';
   static const String isLoggedInKey = 'is_logged_in';
   static const String biometricLoginEnabledKey = 'biometric_login_enabled';
+  static const String localeKey = 'locale';
 
   // App Info
   static const String appName = 'Field Visit';

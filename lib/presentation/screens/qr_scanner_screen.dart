@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
 
 class QrScannerScreen extends ConsumerStatefulWidget {
@@ -35,8 +36,8 @@ class _QrScannerState extends ConsumerState<QrScannerScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(
-              payload['message']?.toString() ?? 'QR verified successfully'),
+          content: Text(payload['message']?.toString() ??
+              tr(ref, 'qrVerified')),
           backgroundColor: _green,
         ),
       );
@@ -58,24 +59,24 @@ class _QrScannerState extends ConsumerState<QrScannerScreen> {
     final entered = await showDialog<String>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Enter QR code'),
+        title: Text(trOf(dialogContext, 'enterQrCode')),
         content: TextField(
           controller: _manualCtrl,
           autofocus: true,
-          decoration: const InputDecoration(
-            labelText: 'QR code / token',
-            hintText: 'Paste or type the code',
+          decoration: InputDecoration(
+            labelText: trOf(dialogContext, 'qrCodeToken'),
+            hintText: trOf(dialogContext, 'pasteOrTypeCode'),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(trOf(dialogContext, 'cancel')),
           ),
           FilledButton(
             onPressed: () =>
                 Navigator.pop(dialogContext, _manualCtrl.text.trim()),
-            child: const Text('Verify'),
+            child: Text(trOf(dialogContext, 'verify')),
           ),
         ],
       ),
@@ -91,8 +92,9 @@ class _QrScannerState extends ConsumerState<QrScannerScreen> {
       appBar: AppBar(
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
-        title: const Text('Scan outlet QR',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+        title: Text(tr(ref, 'scanOutletQr'),
+            style: const TextStyle(
+                fontWeight: FontWeight.w800, fontSize: 17)),
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -117,14 +119,14 @@ class _QrScannerState extends ConsumerState<QrScannerScreen> {
               ),
             ),
           ),
-          const Positioned(
+          Positioned(
             left: 0,
             right: 0,
             bottom: 150,
             child: Text(
-              'Align the outlet QR inside the frame',
+              tr(ref, 'alignQrFrame'),
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white, fontSize: 13.5),
+              style: const TextStyle(color: Colors.white, fontSize: 13.5),
             ),
           ),
 
@@ -146,14 +148,14 @@ class _QrScannerState extends ConsumerState<QrScannerScreen> {
                     icon: torchOn
                         ? Icons.flashlight_on_rounded
                         : Icons.flashlight_off_rounded,
-                    label: torchOn ? 'Torch off' : 'Torch',
+                    label: torchOn ? tr(ref, 'torchOff') : tr(ref, 'torch'),
                     active: torchOn,
                     onTap: _toggleTorch,
                   ),
                   const SizedBox(width: 10),
                   _ActionButton(
                     icon: Icons.keyboard_rounded,
-                    label: 'Type code',
+                    label: tr(ref, 'typeCode'),
                     onTap: _openManualEntry,
                   ),
                   const SizedBox(width: 10),
@@ -161,7 +163,7 @@ class _QrScannerState extends ConsumerState<QrScannerScreen> {
                     icon: processing
                         ? Icons.hourglass_top_rounded
                         : Icons.refresh_rounded,
-                    label: 'Rescan',
+                    label: tr(ref, 'rescan'),
                     onTap: processing
                         ? null
                         : () {

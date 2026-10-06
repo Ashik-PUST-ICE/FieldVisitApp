@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/widgets/app_dropdown.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/visit.dart';
@@ -42,25 +43,25 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Field Visits',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'fieldVisits'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
-            tooltip: 'Sync Cloud Visits',
+            tooltip: tr(ref, 'syncCloudVisits'),
             icon: const Icon(Icons.cloud_sync_rounded),
             onPressed: () {
               ref.read(visitsProvider.notifier).refresh();
               ref.invalidate(visitHistoryProvider);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Visits synced with cloud server!'),
-                  backgroundColor: Color(0xFF136B3E),
+                SnackBar(
+                  content: Text(tr(ref, 'visitsSynced')),
+                  backgroundColor: const Color(0xFF136B3E),
                 ),
               );
             },
           ),
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () {
               ref.read(visitsProvider.notifier).refresh();
@@ -76,11 +77,13 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen>
           unselectedLabelColor: isDark ? Colors.white60 : Colors.grey,
           labelStyle:
               const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-          tabs: const [
+          tabs: [
             Tab(
-                text: 'Active Visits',
-                icon: Icon(Icons.assignment_rounded, size: 18)),
-            Tab(text: 'History', icon: Icon(Icons.history_rounded, size: 18)),
+                text: tr(ref, 'activeVisits'),
+                icon: const Icon(Icons.assignment_rounded, size: 18)),
+            Tab(
+                text: tr(ref, 'history'),
+                icon: const Icon(Icons.history_rounded, size: 18)),
           ],
         ),
       ),
@@ -98,11 +101,13 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen>
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildFilterChip('All', 'all', isDark),
+                      _buildFilterChip(tr(ref, 'filterAll'), 'all', isDark),
                       const SizedBox(width: 8),
-                      _buildFilterChip('In Progress', 'in_progress', isDark),
+                      _buildFilterChip(
+                          tr(ref, 'filterInProgress'), 'in_progress', isDark),
                       const SizedBox(width: 8),
-                      _buildFilterChip('Completed', 'completed', isDark),
+                      _buildFilterChip(
+                          tr(ref, 'completed'), 'completed', isDark),
                     ],
                   ),
                 ),
@@ -147,13 +152,13 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen>
                                     size: 48, color: AppColors.primary),
                               ),
                               const SizedBox(height: 16),
-                              const Text('No visits found',
-                                  style: TextStyle(
+                              Text(tr(ref, 'noVisits'),
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text('Tap "Start Visit" below to begin',
-                                  style: TextStyle(
+                              Text(tr(ref, 'tapStartVisit'),
+                                  style: const TextStyle(
                                       color: Colors.grey, fontSize: 13)),
                             ]),
                           ),
@@ -181,8 +186,9 @@ class _VisitsScreenState extends ConsumerState<VisitsScreen>
         elevation: 6,
         onPressed: () => _showStartVisit(context, ref),
         icon: const Icon(Icons.play_arrow_rounded, size: 24),
-        label: const Text('Start Visit',
-            style: TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.3)),
+        label: Text(tr(ref, 'startVisit'),
+            style:
+                const TextStyle(fontWeight: FontWeight.w700, letterSpacing: 0.3)),
       ),
     );
   }
@@ -241,8 +247,8 @@ class _VisitHistoryTab extends ConsumerWidget {
                   size: 48, color: AppColors.error),
             ),
             const SizedBox(height: 16),
-            const Text('Could not load history',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            Text(tr(ref, 'couldNotLoadHistory'),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
             const SizedBox(height: 8),
             Text(e.toString(),
                 textAlign: TextAlign.center,
@@ -253,7 +259,7 @@ class _VisitHistoryTab extends ConsumerWidget {
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white),
               onPressed: () => ref.invalidate(visitHistoryProvider),
-              child: const Text('Retry'),
+              child: Text(tr(ref, 'retry')),
             ),
           ]),
         ),
@@ -272,12 +278,12 @@ class _VisitHistoryTab extends ConsumerWidget {
                       size: 48, color: AppColors.primary),
                 ),
                 const SizedBox(height: 16),
-                const Text('No visit history yet',
-                    style:
-                        TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(tr(ref, 'noVisitHistory'),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
-                const Text('Completed visits will appear here',
-                    style: TextStyle(color: Colors.grey, fontSize: 13)),
+                Text(tr(ref, 'completedAppearHere'),
+                    style: const TextStyle(color: Colors.grey, fontSize: 13)),
               ])),
             ]);
           }
@@ -354,7 +360,7 @@ class _HistoryCard extends StatelessWidget {
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                 Text(
-                  'Visit #${record['id'] ?? index + 1}',
+                  '${trOf(context, 'visitNo')}${record['id'] ?? index + 1}',
                   style: const TextStyle(
                       fontWeight: FontWeight.w800, fontSize: 14),
                 ),
@@ -367,7 +373,7 @@ class _HistoryCard extends StatelessWidget {
                   ),
                   child: Text(
                     isComplete
-                        ? 'Completed'
+                        ? trOf(context, 'completed')
                         : (record['status']?.toString() ?? 'Unknown'),
                     style: TextStyle(
                         color: color,
@@ -380,7 +386,8 @@ class _HistoryCard extends StatelessWidget {
               if (record['outlet_id'] != null)
                 _InfoRow(
                     icon: Icons.store_rounded,
-                    text: 'Outlet #${record['outlet_id']}',
+                    text:
+                        '${trOf(context, 'outletNo')}${record['outlet_id']}',
                     isDark: isDark),
               if (formattedDate.isNotEmpty)
                 _InfoRow(
@@ -449,15 +456,15 @@ class _VisitTile extends ConsumerWidget {
     if (status.contains('complete') || status.contains('verified')) {
       statusColor = const Color(0xFF10B981);
       statusBg = const Color(0xFFD1FAE5);
-      statusLabel = 'Completed';
+      statusLabel = tr(ref, 'completed');
     } else if (status.contains('progress') || status.contains('started')) {
       statusColor = const Color(0xFFF59E0B);
       statusBg = const Color(0xFFFEF3C7);
-      statusLabel = 'In Progress';
+      statusLabel = tr(ref, 'filterInProgress');
     } else {
       statusColor = const Color(0xFF0D9488);
       statusBg = const Color(0xFFCCFBF1);
-      statusLabel = 'Scheduled';
+      statusLabel = tr(ref, 'scheduled');
     }
 
     return Container(
@@ -502,7 +509,7 @@ class _VisitTile extends ConsumerWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Visit #${visit.id}',
+                            '${tr(ref, 'visitNo')}${visit.id}',
                             style: const TextStyle(
                                 fontWeight: FontWeight.w800, fontSize: 16),
                           ),
@@ -536,7 +543,7 @@ class _VisitTile extends ConsumerWidget {
                                   : const Color(0xFF64748B)),
                           const SizedBox(width: 4),
                           Text(
-                            'Outlet ID: ${visit.outletId}',
+                            '${tr(ref, 'outletIdLabel')}: ${visit.outletId}',
                             style: TextStyle(
                               fontSize: 13,
                               color: isDark
@@ -593,19 +600,19 @@ class _VisitTile extends ConsumerWidget {
                         _buildQuickActionBtn(
                           context,
                           icon: Icons.my_location_rounded,
-                          label: 'Verify GPS',
+                          label: tr(ref, 'verifyGpsBtn'),
                           onTap: () => _showVerifyLocation(context, ref, visit),
                         ),
                         _buildQuickActionBtn(
                           context,
                           icon: Icons.camera_alt_rounded,
-                          label: 'Photos',
+                          label: tr(ref, 'photos'),
                           onTap: () => _showVisitPhotos(context, ref, visit),
                         ),
                         _buildQuickActionBtn(
                           context,
                           icon: Icons.check_circle_outline_rounded,
-                          label: 'Complete',
+                          label: tr(ref, 'completeAction'),
                           onTap: () => _showCompleteVisit(context, ref, visit),
                         ),
                       ],
@@ -643,7 +650,7 @@ class _VisitTile extends ConsumerWidget {
                       padding: EdgeInsets.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    tooltip: 'More actions',
+                    tooltip: tr(ref, 'moreActions'),
                     icon: Icon(
                       Icons.more_vert_rounded,
                       size: 20,
@@ -680,48 +687,49 @@ class _VisitTile extends ConsumerWidget {
                       }
                     },
                     itemBuilder: (_) => [
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'take_order',
                         child: Row(
                           children: [
-                            Icon(Icons.add_shopping_cart_rounded,
+                            const Icon(Icons.add_shopping_cart_rounded,
                                 size: 18, color: Color(0xFF10B981)),
-                            SizedBox(width: 8),
-                            Text('Book / Take Order'),
+                            const SizedBox(width: 8),
+                            Text(tr(ref, 'bookTakeOrder')),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'products',
                         child: Row(
                           children: [
-                            Icon(Icons.inventory_2_outlined,
+                            const Icon(Icons.inventory_2_outlined,
                                 size: 18, color: Color(0xFF64748B)),
-                            SizedBox(width: 8),
-                            Text('Visit Products'),
+                            const SizedBox(width: 8),
+                            Text(tr(ref, 'visitProducts')),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'competitors',
                         child: Row(
                           children: [
-                            Icon(Icons.travel_explore_rounded,
+                            const Icon(Icons.travel_explore_rounded,
                                 size: 18, color: Color(0xFF64748B)),
-                            SizedBox(width: 8),
-                            Text('Competitor Analysis'),
+                            const SizedBox(width: 8),
+                            Text(tr(ref, 'competitorAnalysis')),
                           ],
                         ),
                       ),
-                      const PopupMenuItem(
+                      PopupMenuItem(
                         value: 'delete',
                         child: Row(
                           children: [
-                            Icon(Icons.delete_outline_rounded,
+                            const Icon(Icons.delete_outline_rounded,
                                 size: 18, color: Colors.red),
-                            SizedBox(width: 8),
-                            Text('Delete Visit',
-                                style: TextStyle(color: Colors.red)),
+                            const SizedBox(width: 8),
+                            Text(tr(ref, 'deleteVisit'),
+                                style:
+                                    const TextStyle(color: Colors.red)),
                           ],
                         ),
                       ),
@@ -792,9 +800,7 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
   final outlets = ref.read(outletsProvider).valueOrNull ?? const [];
   if (outlets.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-          content:
-              Text('No valid outlet is available. Create an outlet first.')),
+      SnackBar(content: Text(tr(ref, 'noValidOutlet'))),
     );
     return;
   }
@@ -804,28 +810,33 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
 
   await CellfinFormScreen.push(
     context: context,
-    title: 'Start Field Visit',
-    officerName: 'FIELD OFFICER INITIATION',
-    officerInfo: 'Real-time GPS Check-in',
-    cards: const [
-      CellfinCardItem(title: 'Routine', icon: Icons.storefront_rounded),
-      CellfinCardItem(title: 'Sales Call', icon: Icons.trending_up_rounded),
-      CellfinCardItem(title: 'Audit', icon: Icons.fact_check_outlined),
-      CellfinCardItem(title: 'Collection', icon: Icons.receipt_long_rounded),
+    title: tr(ref, 'startFieldVisit'),
+    officerName: tr(ref, 'fieldOfficerInitiation'),
+    officerInfo: tr(ref, 'gpsCheckinInfo'),
+    cards: [
+      CellfinCardItem(
+          title: tr(ref, 'visitRoutine'), icon: Icons.storefront_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'visitSalesCall'), icon: Icons.trending_up_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'visitAudit'), icon: Icons.fact_check_outlined),
+      CellfinCardItem(
+          title: tr(ref, 'visitCollection'),
+          icon: Icons.receipt_long_rounded),
     ],
-    submitText: 'Start Visit',
+    submitText: tr(ref, 'startVisit'),
     fields: [
       StatefulBuilder(
         builder: (context, setDropState) => AppDropdownField<int>(
-          label: 'Outlet',
-          hint: 'Select Outlet *',
+          label: tr(ref, 'outlet'),
+          hint: '${tr(ref, 'selectOutlet')} *',
           icon: Icons.storefront_rounded,
           value: selectedOutletId,
           options: outlets
               .map((outlet) => AppDropdownOption<int>(
                     value: outlet.id,
                     title: outlet.name,
-                    subtitle: 'Outlet #${outlet.id}',
+                    subtitle: '${tr(ref, 'outletNo')}${outlet.id}',
                     leadingIcon: Icons.storefront_rounded,
                   ))
               .toList(),
@@ -834,14 +845,14 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
       ),
       CellfinInputField(
         controller: latitude,
-        hint: 'GPS Latitude (Optional)',
+        hint: tr(ref, 'gpsLatitudeOptional'),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon:
             const Icon(Icons.my_location_rounded, color: Color(0xFF6B7280)),
       ),
       CellfinInputField(
         controller: longitude,
-        hint: 'GPS Longitude (Optional)',
+        hint: tr(ref, 'gpsLongitudeOptional'),
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon:
             const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
@@ -850,7 +861,7 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
     onSubmit: () async {
       if (selectedOutletId == null) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an outlet')),
+          SnackBar(content: Text(tr(ref, 'pleaseSelectOutlet'))),
         );
         return;
       }
@@ -863,8 +874,8 @@ Future<void> _showStartVisit(BuildContext context, WidgetRef ref) async {
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Field visit started successfully!'),
+            SnackBar(
+                content: Text(tr(ref, 'visitStarted')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -886,35 +897,40 @@ Future<void> _showVerifyLocation(
 
   await CellfinFormScreen.push(
     context: context,
-    title: 'Verify GPS Coordinates',
-    officerName: 'LOCATION VERIFICATION',
-    officerInfo: 'Visit #${visit.id} Geofence Check',
-    cards: const [
-      CellfinCardItem(title: 'GPS Auto', icon: Icons.my_location_rounded),
+    title: tr(ref, 'verifyGps'),
+    officerName: tr(ref, 'locationVerification'),
+    officerInfo: '${tr(ref, 'visitNo')}${visit.id} ${tr(ref, 'geofenceCheck')}',
+    cards: [
       CellfinCardItem(
-          title: 'Manual Pin', icon: Icons.edit_location_alt_rounded),
-      CellfinCardItem(title: 'Geofence', icon: Icons.fmd_good_outlined),
-      CellfinCardItem(title: 'QR Match', icon: Icons.qr_code_2_rounded),
+          title: tr(ref, 'gpsAuto'), icon: Icons.my_location_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'manualPin'),
+          icon: Icons.edit_location_alt_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'geofence'), icon: Icons.fmd_good_outlined),
+      CellfinCardItem(
+          title: tr(ref, 'qrMatch'), icon: Icons.qr_code_2_rounded),
     ],
-    submitText: 'Confirm Location',
+    submitText: tr(ref, 'confirmLocation'),
     fields: [
       CellfinInputField(
         controller: latitude,
-        hint: 'GPS Latitude *',
+        hint: '${tr(ref, 'gpsLatitude')} *',
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon:
             const Icon(Icons.my_location_rounded, color: Color(0xFF6B7280)),
         validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Latitude is required' : null,
+            v == null || v.trim().isEmpty ? tr(ref, 'latitudeRequired') : null,
       ),
       CellfinInputField(
         controller: longitude,
-        hint: 'GPS Longitude *',
+        hint: '${tr(ref, 'gpsLongitude')} *',
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
         prefixIcon:
             const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Longitude is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'longitudeRequired')
+            : null,
       ),
     ],
     onSubmit: () async {
@@ -927,8 +943,8 @@ Future<void> _showVerifyLocation(
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Location verified successfully!'),
+            SnackBar(
+                content: Text(tr(ref, 'locationVerified')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -949,22 +965,28 @@ Future<void> _showCompleteVisit(
 
   await CellfinFormScreen.push(
     context: context,
-    title: 'Complete Field Visit',
-    officerName: 'VISIT SIGN-OFF',
-    officerInfo: 'Visit #${visit.id} Finalization',
-    cards: const [
+    title: tr(ref, 'completeFieldVisit'),
+    officerName: tr(ref, 'visitSignOff'),
+    officerInfo:
+        '${tr(ref, 'visitNo')}${visit.id} ${tr(ref, 'finalization')}',
+    cards: [
       CellfinCardItem(
-          title: 'Completed', icon: Icons.check_circle_outline_rounded),
+          title: tr(ref, 'completed'),
+          icon: Icons.check_circle_outline_rounded),
       CellfinCardItem(
-          title: 'Partial', icon: Icons.published_with_changes_rounded),
-      CellfinCardItem(title: 'Follow-up', icon: Icons.event_repeat_rounded),
-      CellfinCardItem(title: 'Reschedule', icon: Icons.calendar_month_outlined),
+          title: tr(ref, 'visitPartial'),
+          icon: Icons.published_with_changes_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'visitFollowUp'), icon: Icons.event_repeat_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'visitReschedule'),
+          icon: Icons.calendar_month_outlined),
     ],
-    submitText: 'Complete Visit',
+    submitText: tr(ref, 'completeVisit'),
     fields: [
       CellfinInputField(
         controller: remarks,
-        hint: 'Note / Visit Observation & Feedback',
+        hint: tr(ref, 'visitObservationHint'),
         maxLines: 4,
         prefixIcon: const Icon(Icons.notes_rounded, color: Color(0xFF6B7280)),
       ),
@@ -977,8 +999,8 @@ Future<void> _showCompleteVisit(
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Visit marked as complete!'),
+            SnackBar(
+                content: Text(tr(ref, 'visitComplete')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -1019,7 +1041,8 @@ class _ErrorView extends StatelessWidget {
                   size: 48, color: Colors.red),
             ),
             const SizedBox(height: 16),
-            Text('Error: $error', textAlign: TextAlign.center),
+            Text('${trOf(context, 'errorPrefix')}: $error',
+                textAlign: TextAlign.center),
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -1029,7 +1052,7 @@ class _ErrorView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: onRetry,
-              child: const Text('Retry'),
+              child: Text(trOf(context, 'retry')),
             ),
           ],
         ),

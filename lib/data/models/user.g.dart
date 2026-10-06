@@ -14,6 +14,7 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       uniqueId: json['unique_id'] as String,
       status: (json['status'] as num).toInt(),
       lastLoginAt: json['last_login_at'] as String?,
+      locale: json['locale'] as String? ?? 'en',
       roles:
           (json['roles'] as List<dynamic>?)?.map((e) => e as String).toList(),
       permissions: (json['permissions'] as List<dynamic>?)
@@ -30,6 +31,7 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'unique_id': instance.uniqueId,
       'status': instance.status,
       'last_login_at': instance.lastLoginAt,
+      'locale': instance.locale,
       'roles': instance.roles,
       'permissions': instance.permissions,
     };

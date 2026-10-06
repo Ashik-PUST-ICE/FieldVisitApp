@@ -6,6 +6,7 @@ import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/orders_provider.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/core/widgets/app_dropdown.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
@@ -16,11 +17,11 @@ class OrdersScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Field Orders',
+        title: Text(tr(ref, 'fieldOrders'),
             style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => ref.read(ordersProvider.notifier).refresh(),
           ),
@@ -54,8 +55,8 @@ class OrdersScreen extends ConsumerWidget {
                               size: 48, color: AppColors.primary),
                         ),
                         const SizedBox(height: 16),
-                        const Text('No orders found',
-                            style: TextStyle(
+                        Text(tr(ref, 'noOrdersFound'),
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 6),
                         const Text(
@@ -82,7 +83,7 @@ class OrdersScreen extends ConsumerWidget {
         elevation: 6,
         onPressed: () => _showOrderForm(context, ref),
         icon: const Icon(Icons.add_shopping_cart_rounded, size: 22),
-        label: const Text('Book Order',
+        label: Text(tr(ref, 'bookOrder'),
             style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
@@ -159,7 +160,7 @@ class _OrderCard extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Order #$id',
+                          Text('${tr(ref, 'orderHash')}$id',
                               style: const TextStyle(
                                   fontWeight: FontWeight.w800, fontSize: 16)),
                           Container(
@@ -230,15 +231,16 @@ class _OrderCard extends ConsumerWidget {
                 InkWell(
                   onTap: () => _showItems(context, ref, id),
                   borderRadius: BorderRadius.circular(8),
-                  child: const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.inventory_2_outlined,
                             size: 16, color: Color(0xFF0D9488)),
                         SizedBox(width: 4),
-                        Text('Order Line Items',
+                        Text(tr(ref, 'orderLineItems'),
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
@@ -262,12 +264,12 @@ class _OrderCard extends ConsumerWidget {
                       }
                     }
                   },
-                  itemBuilder: (_) => const [
+                  itemBuilder: (_) => [
                     PopupMenuItem(
-                        value: 'status', child: Text('Update Status')),
+                        value: 'status', child: Text(tr(ref, 'updateStatus'))),
                     PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete Order',
+                        child: Text(tr(ref, 'deleteOrder'),
                             style: TextStyle(color: Colors.red))),
                   ],
                 ),
@@ -284,7 +286,7 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
   final outlets = ref.read(outletsProvider).valueOrNull ?? const [];
   if (outlets.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please create an outlet first')));
+        SnackBar(content: Text(tr(ref, 'createOutletFirst'))));
     return;
   }
   int selectedOutlet = outlets.first.id;
@@ -292,19 +294,21 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
 
   await CellfinFormModal.show(
     context: context,
-    title: 'Book Retail Order',
-    cards: const [
-      CellfinCardItem(title: 'Standard', icon: Icons.shopping_bag_outlined),
-      CellfinCardItem(title: 'Priority', icon: Icons.bolt_rounded),
-      CellfinCardItem(title: 'Cash COD', icon: Icons.payments_outlined),
-      CellfinCardItem(title: 'Bulk Order', icon: Icons.inventory_2_outlined),
+    title: tr(ref, 'bookRetailOrder'),
+    cards: [
+      CellfinCardItem(
+          title: tr(ref, 'standard'), icon: Icons.shopping_bag_outlined),
+      CellfinCardItem(title: tr(ref, 'priority'), icon: Icons.bolt_rounded),
+      CellfinCardItem(title: tr(ref, 'cashCod'), icon: Icons.payments_outlined),
+      CellfinCardItem(
+          title: tr(ref, 'bulkOrder'), icon: Icons.inventory_2_outlined),
     ],
-    submitText: 'Submit',
+    submitText: tr(ref, 'submit'),
     fields: [
       StatefulBuilder(
         builder: (context, setDropState) => AppDropdownField<int>(
-          label: 'Receiver Outlet Account',
-          hint: 'Select outlet',
+          label: tr(ref, 'receiverOutletAccount'),
+          hint: tr(ref, 'selectOutletLower'),
           value: selectedOutlet,
           options: outlets
               .map((outlet) => AppDropdownOption<int>(
@@ -320,7 +324,7 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
       CellfinInputField(
         controller: notes,
         maxLines: 2,
-        hint: 'Note / Order Delivery Specifics',
+        hint: tr(ref, 'orderNote'),
         prefixIcon:
             const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
       ),
@@ -334,8 +338,8 @@ Future<void> _showOrderForm(BuildContext context, WidgetRef ref) async {
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Order booked successfully!'),
+            SnackBar(
+                content: Text(tr(ref, 'orderBooked')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -357,10 +361,10 @@ Future<void> _updateStatus(BuildContext context, WidgetRef ref, int id) async {
     builder: (dialogContext) => StatefulBuilder(
       builder: (context, setState) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Update Order Status',
+        title: Text(tr(ref, 'updateOrderStatus'),
             style: TextStyle(fontWeight: FontWeight.bold)),
         content: AppDropdownField<String>(
-          label: 'Status',
+          label: tr(ref, 'status'),
           icon: Icons.local_shipping_rounded,
           value: status,
           options: const ['pending', 'confirmed', 'delivered', 'cancelled']
@@ -374,7 +378,7 @@ Future<void> _updateStatus(BuildContext context, WidgetRef ref, int id) async {
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
-              child: const Text('Cancel')),
+              child: Text(tr(ref, 'cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(
               backgroundColor: AppColors.primary,
@@ -382,7 +386,7 @@ Future<void> _updateStatus(BuildContext context, WidgetRef ref, int id) async {
                   borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Save Status'),
+            child: Text(tr(ref, 'saveStatus')),
           ),
         ],
       ),
@@ -408,15 +412,16 @@ Future<void> _showItems(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text('Order #$orderId Line Items',
+        title: Text(
+            tr(ref, 'orderLineItemsFor').replaceAll('{id}', '$orderId'),
             style: const TextStyle(fontWeight: FontWeight.bold)),
         content: SizedBox(
           width: 420,
           child: items.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 24),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24),
                   child: Center(
-                      child: Text('No line items recorded for this order')),
+                      child: Text(tr(ref, 'noLineItems'))),
                 )
               : ListView(
                   shrinkWrap: true,
@@ -436,7 +441,8 @@ Future<void> _showItems(
                           child: const Icon(Icons.inventory_rounded,
                               color: AppColors.primary),
                         ),
-                        title: Text('Product #${item['product_id']}',
+                        title: Text(
+                            '${tr(ref, 'productHash')}${item['product_id']}',
                             style:
                                 const TextStyle(fontWeight: FontWeight.w700)),
                         subtitle: Text(
@@ -447,7 +453,7 @@ Future<void> _showItems(
                             IconButton(
                               icon: const Icon(Icons.edit_rounded,
                                   color: AppColors.primary, size: 20),
-                              tooltip: 'Edit item',
+                              tooltip: tr(ref, 'editItem'),
                               onPressed: () {
                                 Navigator.pop(context);
                                 _showEditItem(
@@ -457,7 +463,7 @@ Future<void> _showItems(
                             IconButton(
                               icon: const Icon(Icons.delete_outline_rounded,
                                   color: Colors.red, size: 20),
-                              tooltip: 'Remove item',
+                              tooltip: tr(ref, 'removeItem'),
                               onPressed: () async {
                                 await ref
                                     .read(ordersProvider.notifier)
@@ -484,11 +490,11 @@ Future<void> _showItems(
               _showAddItem(context, ref, orderId);
             },
             icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add Line Item'),
+            label: Text(tr(ref, 'addLineItem')),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Close'),
+            child: Text(tr(ref, 'close')),
           ),
         ],
       ),
@@ -508,41 +514,48 @@ Future<void> _showAddItem(
 
   await CellfinFormModal.show(
     context: context,
-    title: 'Add Order Line Item',
-    cards: const [
-      CellfinCardItem(title: 'Item Units', icon: Icons.inventory_2_outlined),
-      CellfinCardItem(title: 'Master Box', icon: Icons.all_inbox_rounded),
-      CellfinCardItem(title: 'Sample Free', icon: Icons.card_giftcard_rounded),
+    title: tr(ref, 'addOrderLineItem'),
+    cards: [
       CellfinCardItem(
-          title: 'Urgent Dispatch', icon: Icons.local_shipping_outlined),
+          title: tr(ref, 'itemUnits'), icon: Icons.inventory_2_outlined),
+      CellfinCardItem(
+          title: tr(ref, 'masterBox'), icon: Icons.all_inbox_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'sampleFree'), icon: Icons.card_giftcard_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'urgentDispatch'),
+          icon: Icons.local_shipping_outlined),
     ],
-    submitText: 'Submit',
+    submitText: tr(ref, 'submit'),
     fields: [
       CellfinInputField(
         controller: productId,
         keyboardType: TextInputType.number,
-        hint: 'Product ID *',
+        hint: '${tr(ref, 'productId')} *',
         prefixIcon:
             const Icon(Icons.inventory_2_outlined, color: Color(0xFF6B7280)),
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Product ID is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'productIdRequired')
+            : null,
       ),
       CellfinInputField(
         controller: quantity,
         keyboardType: TextInputType.number,
-        hint: 'Quantity (Pcs / Units) *',
+        hint: '${tr(ref, 'quantityPcs')} *',
         prefixIcon: const Icon(Icons.format_list_numbered_rounded,
             color: Color(0xFF6B7280)),
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Quantity is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'quantityRequired')
+            : null,
       ),
       CellfinInputField(
         controller: price,
         keyboardType: TextInputType.number,
-        hint: 'Amount / Unit Price',
+        hint: tr(ref, 'amountUnitPrice'),
         suffixText: '৳',
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Price is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'priceRequired')
+            : null,
       ),
     ],
     onSubmit: () async {
@@ -560,8 +573,8 @@ Future<void> _showAddItem(
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Item added to order!'),
+            SnackBar(
+                content: Text(tr(ref, 'itemAdded')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -585,31 +598,36 @@ Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId,
 
   await CellfinFormModal.show(
     context: context,
-    title: 'Edit Line Item #$itemId',
-    cards: const [
-      CellfinCardItem(title: 'Update Qty', icon: Icons.edit_rounded),
-      CellfinCardItem(title: 'Reprice', icon: Icons.price_change_rounded),
-      CellfinCardItem(title: 'Correction', icon: Icons.edit_note_rounded),
-      CellfinCardItem(title: 'Discount', icon: Icons.discount_outlined),
+    title: tr(ref, 'editLineItem').replaceAll('{id}', '$itemId'),
+    cards: [
+      CellfinCardItem(title: tr(ref, 'updateQty'), icon: Icons.edit_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'reprice'), icon: Icons.price_change_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'correction'), icon: Icons.edit_note_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'discount'), icon: Icons.discount_outlined),
     ],
-    submitText: 'Update Item',
+    submitText: tr(ref, 'updateItem'),
     fields: [
       CellfinInputField(
         controller: quantity,
         keyboardType: TextInputType.number,
-        hint: 'Updated Quantity *',
+        hint: '${tr(ref, 'updatedQuantity')} *',
         prefixIcon: const Icon(Icons.format_list_numbered_rounded,
             color: Color(0xFF6B7280)),
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Quantity is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'quantityRequired')
+            : null,
       ),
       CellfinInputField(
         controller: price,
         keyboardType: TextInputType.number,
-        hint: 'Updated Unit Price',
+        hint: tr(ref, 'updatedUnitPrice'),
         suffixText: '৳',
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Price is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'priceRequired')
+            : null,
       ),
     ],
     onSubmit: () async {
@@ -625,8 +643,8 @@ Future<void> _showEditItem(BuildContext context, WidgetRef ref, int orderId,
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Item updated!'),
+            SnackBar(
+                content: Text(tr(ref, 'itemUpdated')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -677,7 +695,7 @@ class _ErrorView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12)),
               ),
               onPressed: onRetry,
-              child: const Text('Retry'),
+              child: Text(trOf(context, 'retry')),
             ),
           ],
         ),

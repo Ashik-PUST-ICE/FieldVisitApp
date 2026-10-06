@@ -31,6 +31,8 @@ mixin _$User {
   int get status => throw _privateConstructorUsedError;
   @JsonKey(name: 'last_login_at')
   String? get lastLoginAt => throw _privateConstructorUsedError;
+  @JsonKey(defaultValue: 'en')
+  String? get locale => throw _privateConstructorUsedError;
   List<String>? get roles => throw _privateConstructorUsedError;
   List<String>? get permissions => throw _privateConstructorUsedError;
 
@@ -56,6 +58,7 @@ abstract class $UserCopyWith<$Res> {
       @JsonKey(name: 'unique_id') String uniqueId,
       int status,
       @JsonKey(name: 'last_login_at') String? lastLoginAt,
+      @JsonKey(defaultValue: 'en') String? locale,
       List<String>? roles,
       List<String>? permissions});
 }
@@ -82,6 +85,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? uniqueId = null,
     Object? status = null,
     Object? lastLoginAt = freezed,
+    Object? locale = freezed,
     Object? roles = freezed,
     Object? permissions = freezed,
   }) {
@@ -114,6 +118,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.lastLoginAt
           : lastLoginAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      locale: freezed == locale
+          ? _value.locale
+          : locale // ignore: cast_nullable_to_non_nullable
+              as String?,
       roles: freezed == roles
           ? _value.roles
           : roles // ignore: cast_nullable_to_non_nullable
@@ -141,6 +149,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       @JsonKey(name: 'unique_id') String uniqueId,
       int status,
       @JsonKey(name: 'last_login_at') String? lastLoginAt,
+      @JsonKey(defaultValue: 'en') String? locale,
       List<String>? roles,
       List<String>? permissions});
 }
@@ -164,6 +173,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? uniqueId = null,
     Object? status = null,
     Object? lastLoginAt = freezed,
+    Object? locale = freezed,
     Object? roles = freezed,
     Object? permissions = freezed,
   }) {
@@ -196,6 +206,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.lastLoginAt
           : lastLoginAt // ignore: cast_nullable_to_non_nullable
               as String?,
+      locale: freezed == locale
+          ? _value.locale
+          : locale // ignore: cast_nullable_to_non_nullable
+              as String?,
       roles: freezed == roles
           ? _value._roles
           : roles // ignore: cast_nullable_to_non_nullable
@@ -219,6 +233,7 @@ class _$UserImpl implements _User {
       @JsonKey(name: 'unique_id') required this.uniqueId,
       required this.status,
       @JsonKey(name: 'last_login_at') this.lastLoginAt,
+      @JsonKey(defaultValue: 'en') this.locale,
       final List<String>? roles,
       final List<String>? permissions})
       : _roles = roles,
@@ -245,6 +260,9 @@ class _$UserImpl implements _User {
   @override
   @JsonKey(name: 'last_login_at')
   final String? lastLoginAt;
+  @override
+  @JsonKey(defaultValue: 'en')
+  final String? locale;
   final List<String>? _roles;
   @override
   List<String>? get roles {
@@ -267,7 +285,7 @@ class _$UserImpl implements _User {
 
   @override
   String toString() {
-    return 'User(id: $id, fullName: $fullName, email: $email, image: $image, uniqueId: $uniqueId, status: $status, lastLoginAt: $lastLoginAt, roles: $roles, permissions: $permissions)';
+    return 'User(id: $id, fullName: $fullName, email: $email, image: $image, uniqueId: $uniqueId, status: $status, lastLoginAt: $lastLoginAt, locale: $locale, roles: $roles, permissions: $permissions)';
   }
 
   @override
@@ -285,6 +303,7 @@ class _$UserImpl implements _User {
             (identical(other.status, status) || other.status == status) &&
             (identical(other.lastLoginAt, lastLoginAt) ||
                 other.lastLoginAt == lastLoginAt) &&
+            (identical(other.locale, locale) || other.locale == locale) &&
             const DeepCollectionEquality().equals(other._roles, _roles) &&
             const DeepCollectionEquality()
                 .equals(other._permissions, _permissions));
@@ -301,6 +320,7 @@ class _$UserImpl implements _User {
       uniqueId,
       status,
       lastLoginAt,
+      locale,
       const DeepCollectionEquality().hash(_roles),
       const DeepCollectionEquality().hash(_permissions));
 
@@ -329,6 +349,7 @@ abstract class _User implements User {
       @JsonKey(name: 'unique_id') required final String uniqueId,
       required final int status,
       @JsonKey(name: 'last_login_at') final String? lastLoginAt,
+      @JsonKey(defaultValue: 'en') final String? locale,
       final List<String>? roles,
       final List<String>? permissions}) = _$UserImpl;
 
@@ -352,6 +373,9 @@ abstract class _User implements User {
   @override
   @JsonKey(name: 'last_login_at')
   String? get lastLoginAt;
+  @override
+  @JsonKey(defaultValue: 'en')
+  String? get locale;
   @override
   List<String>? get roles;
   @override

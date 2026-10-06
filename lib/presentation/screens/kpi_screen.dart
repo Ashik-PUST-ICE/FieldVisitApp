@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/kpi_provider.dart';
 
@@ -16,11 +17,11 @@ class KpiScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Target & KPIs',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'kpi'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
-            tooltip: 'Configure Goal',
+            tooltip: tr(ref, 'configureGoal'),
             icon: const Icon(Icons.tune_rounded),
             onPressed: () {
               final kpi = kpiAsync.value;
@@ -28,7 +29,7 @@ class KpiScreen extends ConsumerWidget {
             },
           ),
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => ref.invalidate(kpiSummaryProvider),
           ),
@@ -45,13 +46,13 @@ class KpiScreen extends ConsumerWidget {
                 const Icon(Icons.error_outline_rounded,
                     color: Colors.redAccent, size: 48),
                 const SizedBox(height: 12),
-                Text('Error loading KPI data: $err',
+                Text('${tr(ref, 'kpiLoadError')}: $err',
                     textAlign: TextAlign.center),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: () => ref.invalidate(kpiSummaryProvider),
                   icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('Retry'),
+                  label: Text(tr(ref, 'retry')),
                 ),
               ],
             ),
@@ -77,17 +78,17 @@ class KpiScreen extends ConsumerWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'Core Field Targets',
+                    Text(
+                      tr(ref, 'coreFieldTargets'),
                       style:
-                          TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                          const TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
                     ),
                     TextButton.icon(
                       onPressed: () =>
                           _openTargetConfigModal(context, ref, kpi),
                       icon: const Icon(Icons.edit_note_rounded, size: 18),
-                      label: const Text('Edit Goal',
-                          style: TextStyle(
+                      label: Text(tr(ref, 'editGoal'),
+                          style: const TextStyle(
                               fontSize: 12, fontWeight: FontWeight.w700)),
                     ),
                   ],
@@ -97,44 +98,49 @@ class KpiScreen extends ConsumerWidget {
                 // Visit Target Card
                 _buildProgressKpiCard(
                   context,
-                  title: 'Visit Target',
-                  subtitle: '${kpi.periodType.toUpperCase()} store coverage',
+                  title: tr(ref, 'visitTarget'),
+                  subtitle: tr(ref, 'storeCoveragePeriod')
+                      .replaceAll(
+                          '{period}', kpi.periodType.toUpperCase()),
                   currentValue: '${kpi.completedVisits}',
-                  targetValue: '${kpi.visitTarget} Visits',
+                  targetValue:
+                      '${kpi.visitTarget} ${tr(ref, 'visitsSuffix')}',
                   percent: kpi.visitPercentage,
                   icon: Icons.storefront_rounded,
                   color: AppColors.primary,
                   isDark: isDark,
                   bottomNote: kpi.completedVisits >= kpi.visitTarget
-                      ? '🎯 Target Met! Great job!'
-                      : '${kpi.visitTarget - kpi.completedVisits} more visits needed to hit target',
+                      ? tr(ref, 'targetMet')
+                      : tr(ref, 'moreVisitsNeeded').replaceAll(
+                          '{n}',
+                          '${kpi.visitTarget - kpi.completedVisits}'),
                 ),
                 const SizedBox(height: 12),
 
                 // Sales Revenue Target Card
                 _buildProgressKpiCard(
                   context,
-                  title: 'Sales Order Target',
-                  subtitle: 'Gross order volume booked',
+                  title: tr(ref, 'salesOrderTarget'),
+                  subtitle: tr(ref, 'grossOrderVolume'),
                   currentValue: fmt.format(kpi.ordersAmount),
                   targetValue: fmt.format(kpi.salesTarget),
                   percent: kpi.salesPercentage,
                   icon: Icons.monetization_on_rounded,
                   color: const Color(0xFF10B981),
                   isDark: isDark,
-                  bottomNote:
-                      'Total orders placed in this period: ${kpi.ordersCount}',
+                  bottomNote: tr(ref, 'totalOrdersPeriod')
+                      .replaceAll('{n}', '${kpi.ordersCount}'),
                 ),
                 const SizedBox(height: 12),
 
                 // Outlet Coverage Card
                 _buildProgressKpiCard(
                   context,
-                  title: 'Outlet Coverage Ratio',
-                  subtitle: 'Assigned beat coverage',
+                  title: tr(ref, 'outletCoverageRatio'),
+                  subtitle: tr(ref, 'assignedBeatCoverage'),
                   currentValue: '${kpi.coveragePercentage.toStringAsFixed(1)}%',
                   targetValue:
-                      '${kpi.coverageTarget.toStringAsFixed(0)}% Target',
+                      '${kpi.coverageTarget.toStringAsFixed(0)}% ${tr(ref, 'targetPercent')}',
                   percent: (kpi.coveragePercentage /
                           (kpi.coverageTarget > 0 ? kpi.coverageTarget : 1) *
                           100)
@@ -142,19 +148,22 @@ class KpiScreen extends ConsumerWidget {
                   icon: Icons.pin_drop_rounded,
                   color: const Color(0xFF0EA5E9),
                   isDark: isDark,
-                  bottomNote:
-                      '${kpi.uniqueOutletsVisited} of ${kpi.totalAssignedOutlets} assigned outlets visited',
+                  bottomNote: tr(ref, 'assignedOutletsVisited')
+                      .replaceAll(
+                          '{visited}', '${kpi.uniqueOutletsVisited}')
+                      .replaceAll(
+                          '{total}', '${kpi.totalAssignedOutlets}'),
                 ),
                 const SizedBox(height: 12),
 
                 // Strike Rate Card
                 _buildProgressKpiCard(
                   context,
-                  title: 'Order Strike Rate',
-                  subtitle: 'Visits converted into orders',
+                  title: tr(ref, 'orderStrikeRate'),
+                  subtitle: tr(ref, 'visitsConverted'),
                   currentValue: '${kpi.strikeRate.toStringAsFixed(1)}%',
                   targetValue:
-                      '${kpi.strikeRateTarget.toStringAsFixed(0)}% Target',
+                      '${kpi.strikeRateTarget.toStringAsFixed(0)}% ${tr(ref, 'targetPercent')}',
                   percent: (kpi.strikeRate /
                           (kpi.strikeRateTarget > 0
                               ? kpi.strikeRateTarget
@@ -164,14 +173,15 @@ class KpiScreen extends ConsumerWidget {
                   icon: Icons.bolt_rounded,
                   color: const Color(0xFFF59E0B),
                   isDark: isDark,
-                  bottomNote: 'Percentage of visits generating verified orders',
+                  bottomNote: tr(ref, 'verifiedOrdersNote'),
                 ),
                 const SizedBox(height: 24),
 
                 // Call Productivity & Insights
-                const Text(
-                  'Call Productivity & Insights',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                Text(
+                  tr(ref, 'callProductivity'),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -179,7 +189,7 @@ class KpiScreen extends ConsumerWidget {
                     Expanded(
                       child: _buildMetricTile(
                         context,
-                        title: 'Avg Order Value',
+                        title: tr(ref, 'avgOrderValue'),
                         value: fmt.format(kpi.avgOrderValue),
                         icon: Icons.receipt_long_rounded,
                         color: const Color(0xFF6366F1),
@@ -190,7 +200,7 @@ class KpiScreen extends ConsumerWidget {
                     Expanded(
                       child: _buildMetricTile(
                         context,
-                        title: 'Total Booked Orders',
+                        title: tr(ref, 'totalBookedOrders'),
                         value: '${kpi.ordersCount}',
                         icon: Icons.shopping_basket_rounded,
                         color: const Color(0xFFEC4899),
@@ -202,13 +212,15 @@ class KpiScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
 
                 // Leaderboard Section
-                const Text(
-                  'Officer Performance Leaderboard',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800),
+                Text(
+                  tr(ref, 'officerLeaderboard'),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  'Rankings based on total visits in ${kpi.periodType} period',
+                  tr(ref, 'rankingsBasedOn')
+                      .replaceAll('{period}', kpi.periodType),
                   style: TextStyle(
                       fontSize: 12,
                       color: isDark ? Colors.white60 : Colors.black54),
@@ -224,9 +236,8 @@ class KpiScreen extends ConsumerWidget {
                           : Colors.grey.shade100,
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    child: const Center(
-                      child: Text(
-                          'No officer ranking data recorded for this period yet.'),
+                    child: Center(
+                      child: Text(tr(ref, 'noRankingData')),
                     ),
                   )
                 else
@@ -255,11 +266,11 @@ class KpiScreen extends ConsumerWidget {
       ),
       child: Row(
         children: [
-          _buildPeriodTab(ref, 'Today', KpiPeriod.today,
+          _buildPeriodTab(ref, tr(ref, 'periodToday'), KpiPeriod.today,
               selected == KpiPeriod.today, isDark),
-          _buildPeriodTab(ref, 'This Week', KpiPeriod.thisWeek,
+          _buildPeriodTab(ref, tr(ref, 'periodThisWeek'), KpiPeriod.thisWeek,
               selected == KpiPeriod.thisWeek, isDark),
-          _buildPeriodTab(ref, 'This Month', KpiPeriod.thisMonth,
+          _buildPeriodTab(ref, tr(ref, 'periodThisMonth'), KpiPeriod.thisMonth,
               selected == KpiPeriod.thisMonth, isDark),
         ],
       ),
@@ -406,14 +417,17 @@ class KpiScreen extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Visits Completed: ${kpi.completedVisits}/${kpi.visitTarget}',
+                trOf(context, 'visitsCompleted')
+                    .replaceAll('{done}', '${kpi.completedVisits}')
+                    .replaceAll('{total}', '${kpi.visitTarget}'),
                 style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12,
                     fontWeight: FontWeight.w600),
               ),
               Text(
-                '${kpi.visitPercentage.toStringAsFixed(0)}% Achieved',
+                trOf(context, 'percentAchieved').replaceAll(
+                    '{n}', kpi.visitPercentage.toStringAsFixed(0)),
                 style: const TextStyle(
                     color: Colors.amberAccent,
                     fontSize: 12,
@@ -506,7 +520,7 @@ class KpiScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('ACHIEVED',
+                  Text(trOf(context, 'achieved'),
                       style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -521,7 +535,7 @@ class KpiScreen extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('GOAL TARGET',
+                  Text(trOf(context, 'goalTarget'),
                       style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w700,
@@ -651,14 +665,17 @@ class KpiScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Field Officer #$userId',
+                Text(trOf(context, 'fieldOfficerNo')
+                    .replaceAll('{n}', '$userId'),
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 14)),
                 const SizedBox(height: 2),
-                Text('Active Field Executive',
+                Text(trOf(context, 'activeFieldExecutive'),
                     style: TextStyle(
                         fontSize: 11,
-                        color: isDark ? Colors.white54 : Colors.grey.shade600)),
+                        color: isDark
+                            ? Colors.white54
+                            : Colors.grey.shade600)),
               ],
             ),
           ),
@@ -669,7 +686,7 @@ class KpiScreen extends ConsumerWidget {
               borderRadius: BorderRadius.circular(10),
             ),
             child: Text(
-              '$totalVisits Visits',
+              '$totalVisits ${trOf(context, 'visitsSuffix')}',
               style: TextStyle(
                   fontWeight: FontWeight.w800,
                   color: AppColors.primary,
@@ -684,7 +701,7 @@ class KpiScreen extends ConsumerWidget {
   void _openTargetConfigModal(
       BuildContext context, WidgetRef ref, KpiData? kpi) {
     final titleCtrl = TextEditingController(
-        text: kpi?.targetTitle ?? 'Field Performance Goal');
+        text: kpi?.targetTitle ?? tr(ref, 'fieldPerformanceGoal'));
     final visitCtrl = TextEditingController(text: '${kpi?.visitTarget ?? 15}');
     final salesCtrl =
         TextEditingController(text: '${kpi?.salesTarget.toInt() ?? 50000}');
@@ -694,20 +711,24 @@ class KpiScreen extends ConsumerWidget {
 
     CellfinFormScreen.push(
       context: context,
-      title: 'Configure KPI Target',
-      officerName: 'FIELD OFFICER TARGET',
-      officerInfo: 'Target Performance Matrix',
-      cards: const [
-        CellfinCardItem(title: 'Daily Goal', icon: Icons.today_rounded),
-        CellfinCardItem(title: 'Weekly Beat', icon: Icons.view_week_rounded),
+      title: tr(ref, 'configureKpiTarget'),
+      officerName: tr(ref, 'fieldOfficerTarget'),
+      officerInfo: tr(ref, 'targetPerformanceMatrix'),
+      cards: [
         CellfinCardItem(
-            title: 'Monthly Plan', icon: Icons.calendar_month_rounded),
-        CellfinCardItem(title: 'High Growth', icon: Icons.trending_up_rounded),
+            title: tr(ref, 'dailyGoal'), icon: Icons.today_rounded),
+        CellfinCardItem(
+            title: tr(ref, 'weeklyBeat'), icon: Icons.view_week_rounded),
+        CellfinCardItem(
+            title: tr(ref, 'monthlyPlan'),
+            icon: Icons.calendar_month_rounded),
+        CellfinCardItem(
+            title: tr(ref, 'highGrowth'), icon: Icons.trending_up_rounded),
       ],
-      submitText: 'Save Target to Server',
+      submitText: tr(ref, 'saveTargetToServer'),
       onSubmit: () async {
         final title = titleCtrl.text.trim().isEmpty
-            ? 'Performance Target'
+            ? tr(ref, 'performanceTarget')
             : titleCtrl.text.trim();
         final visitTarget = int.tryParse(visitCtrl.text.trim()) ?? 15;
         final salesTarget = double.tryParse(salesCtrl.text.trim()) ?? 50000.0;
@@ -729,9 +750,9 @@ class KpiScreen extends ConsumerWidget {
 
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Target saved and synced with server!'),
-              backgroundColor: Color(0xFF136B3E),
+            SnackBar(
+              content: Text(tr(ref, 'targetSavedSynced')),
+              backgroundColor: const Color(0xFF136B3E),
             ),
           );
         }
@@ -739,20 +760,20 @@ class KpiScreen extends ConsumerWidget {
       fields: [
         CellfinInputField(
           controller: titleCtrl,
-          hint: 'Target Plan Name (e.g. Q4 Growth Target)',
+          hint: tr(ref, 'targetPlanNameHint'),
           prefixIcon:
               const Icon(Icons.badge_outlined, color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: visitCtrl,
-          hint: 'Visit Target (Stores to visit)',
+          hint: tr(ref, 'visitTargetHint'),
           keyboardType: TextInputType.number,
           prefixIcon:
               const Icon(Icons.storefront_outlined, color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: salesCtrl,
-          hint: 'Sales Revenue Target',
+          hint: tr(ref, 'salesRevenueTargetHint'),
           keyboardType: TextInputType.number,
           suffixText: '৳',
           prefixIcon: const Icon(Icons.monetization_on_outlined,
@@ -760,7 +781,7 @@ class KpiScreen extends ConsumerWidget {
         ),
         CellfinInputField(
           controller: coverageCtrl,
-          hint: 'Store Coverage Target (%)',
+          hint: tr(ref, 'coverageTargetHint'),
           keyboardType: TextInputType.number,
           suffixText: '%',
           prefixIcon:

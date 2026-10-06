@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 
@@ -64,8 +65,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
       });
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Account created successfully! Please sign in.'),
+        SnackBar(
+          content: Text(tr(ref, 'accountCreated')),
           backgroundColor: AppColors.cellfinGreen,
         ),
       );
@@ -127,9 +128,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
-                          const Text(
-                            'Create Account',
-                            style: TextStyle(
+                          Text(
+                            tr(ref, 'createAccount'),
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w800,
                               color: Color(0xFF1F2937),
@@ -137,9 +138,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'Register as a new field operations specialist',
-                            style: TextStyle(
+                          Text(
+                            tr(ref, 'registerAsFieldOps'),
+                            style: const TextStyle(
                                 fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                           const SizedBox(height: 20),
@@ -150,14 +151,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                               Expanded(
                                 child: CellfinInputField(
                                   controller: first,
-                                  hint: 'First Name *',
+                                  hint: '${tr(ref, 'firstNameStar')} *',
                                   prefixIcon: const Icon(
                                       Icons.person_outline_rounded,
                                       color: Color(0xFF6B7280),
                                       size: 20),
                                   validator: (v) =>
                                       v == null || v.trim().isEmpty
-                                          ? 'Required'
+                                          ? tr(ref, 'required')
                                           : null,
                                 ),
                               ),
@@ -165,7 +166,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                               Expanded(
                                 child: CellfinInputField(
                                   controller: last,
-                                  hint: 'Last Name',
+                                  hint: tr(ref, 'lastNameLower'),
                                   prefixIcon: const Icon(
                                       Icons.person_outline_rounded,
                                       color: Color(0xFF6B7280),
@@ -180,11 +181,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           CellfinInputField(
                             controller: email,
                             keyboardType: TextInputType.emailAddress,
-                            hint: 'Receiver / Work Email *',
+                            hint: '${tr(ref, 'workEmail')} *',
                             prefixIcon: const Icon(Icons.email_outlined,
                                 color: Color(0xFF6B7280), size: 20),
                             validator: (v) => v == null || !v.contains('@')
-                                ? 'Enter a valid email'
+                                ? tr(ref, 'enterValidEmail')
                                 : null,
                           ),
                           const SizedBox(height: 12),
@@ -193,7 +194,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           CellfinInputField(
                             controller: password,
                             obscureText: _obscurePass,
-                            hint: 'Password (8+ chars) *',
+                            hint: '${tr(ref, 'password8chars')} *',
                             prefixIcon: const Icon(Icons.lock_outline_rounded,
                                 color: Color(0xFF6B7280), size: 20),
                             suffixIcon: IconButton(
@@ -207,7 +208,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                   setState(() => _obscurePass = !_obscurePass),
                             ),
                             validator: (v) => v == null || v.length < 8
-                                ? 'Minimum 8 characters'
+                                ? tr(ref, 'passwordMinLength')
                                 : null,
                           ),
                           const SizedBox(height: 12),
@@ -216,7 +217,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                           CellfinInputField(
                             controller: confirm,
                             obscureText: _obscureConfirm,
-                            hint: 'Confirm Password *',
+                            hint: '${tr(ref, 'confirmPassword')} *',
                             prefixIcon: const Icon(Icons.lock_reset_rounded,
                                 color: Color(0xFF6B7280), size: 20),
                             suffixIcon: IconButton(
@@ -230,7 +231,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                   () => _obscureConfirm = !_obscureConfirm),
                             ),
                             validator: (v) => v != password.text
-                                ? 'Passwords do not match'
+                                ? tr(ref, 'passwordsDoNotMatch')
                                 : null,
                           ),
                           const SizedBox(height: 18),
@@ -252,9 +253,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                                     height: 22,
                                     child: CircularProgressIndicator(
                                         color: Colors.white, strokeWidth: 2.2))
-                                : const Text(
-                                    'Submit',
-                                    style: TextStyle(
+                                : Text(
+                                    tr(ref, 'submit'),
+                                    style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.w700,
                                         color: Colors.white),
@@ -270,14 +271,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text('Already registered? ',
-                          style:
-                              TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text(tr(ref, 'alreadyRegistered'),
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 13)),
                       GestureDetector(
                         onTap: () => Navigator.pop(context),
-                        child: const Text(
-                          'Sign In',
-                          style: TextStyle(
+                        child: Text(
+                          tr(ref, 'signIn'),
+                          style: const TextStyle(
                             color: Color(0xFFFFB300),
                             fontWeight: FontWeight.w800,
                             fontSize: 14,

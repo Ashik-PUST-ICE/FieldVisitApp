@@ -4,6 +4,7 @@ import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/theme/app_theme.dart';
 import 'package:field_visit_app/data/models/role_permission_models.dart';
 import 'package:field_visit_app/presentation/providers/role_permissions_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 /// Pick a role, then curate the permissions that role is allowed to use.
 class RolePermissionsScreen extends ConsumerStatefulWidget {
@@ -30,10 +31,10 @@ class _RolePermissionsScreenState extends ConsumerState<RolePermissionsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Role permissions'),
+        title: Text(tr(ref, 'rolePermissions')),
         actions: [
           IconButton(
-            tooltip: 'Manage roles',
+            tooltip: tr(ref, 'manageRoles'),
             icon: const Icon(Icons.admin_panel_settings_rounded),
             onPressed: () => Navigator.of(context).push(
               MaterialPageRoute(builder: (_) => const RoleDirectoryScreen()),
@@ -72,12 +73,12 @@ class _RolePermissionsScreenState extends ConsumerState<RolePermissionsScreen> {
     if (state.selectedRoleId == null) {
       return _EmptyState(
         icon: Icons.shield_outlined,
-        title: 'Select a role',
-        message: 'Choose a role above to curate the permissions it can use.',
+        title: tr(ref, 'selectRole'),
+        message: tr(ref, 'chooseRoleAbove'),
         action: FilledButton.icon(
           onPressed: () => _showCreateRoleSheet(context, ref),
           icon: const Icon(Icons.add_rounded, size: 18),
-          label: const Text('Create role'),
+          label: Text(tr(ref, 'createRole')),
         ),
       );
     }
@@ -85,19 +86,19 @@ class _RolePermissionsScreenState extends ConsumerState<RolePermissionsScreen> {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.permissions.isEmpty) {
-      return const _EmptyState(
+      return _EmptyState(
         icon: Icons.key_off_rounded,
-        title: 'No permissions available',
-        message: 'This server has not published any permissions yet.',
+        title: tr(ref, 'noPermissionsAvailable'),
+        message: tr(ref, 'noPermissionsPublished'),
       );
     }
 
-    final groups = _groupPermissions(state.permissions, _query);
+    final groups = _groupPermissions(state.permissions, _query, context);
     if (groups.isEmpty) {
-      return const _EmptyState(
+      return _EmptyState(
         icon: Icons.search_off_rounded,
-        title: 'No match',
-        message: 'No permission matches your search.',
+        title: tr(ref, 'noMatch'),
+        message: tr(ref, 'noPermissionMatches'),
       );
     }
 
@@ -150,8 +151,9 @@ class _RolePermissionsScreenState extends ConsumerState<RolePermissionsScreen> {
     messenger.showSnackBar(
       SnackBar(
         content: Text(ok
-            ? 'Permissions saved for "${role?.name ?? 'role'}"'
-            : 'Could not save permissions'),
+            ? tr(ref, 'permissionsSavedFor')
+                .replaceAll('{name}', role?.name ?? 'role')
+            : tr(ref, 'couldNotSavePermissions')),
         backgroundColor: ok ? AppColors.success : AppColors.error,
       ),
     );
@@ -208,9 +210,10 @@ class _RoleSelector extends StatelessWidget {
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               icon: const Icon(Icons.add_rounded, size: 16),
-              label: const Text(
-                'New role',
-                style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w700),
+              label: Text(
+                trOf(context, 'newRole'),
+                style: const TextStyle(
+                    fontSize: 12.5, fontWeight: FontWeight.w700),
               ),
             ),
           ],
@@ -248,7 +251,7 @@ class _RoleSelector extends StatelessWidget {
                         : AppColors.primary,
                   ),
                 const SizedBox(width: 12),
-                Expanded(child: _label(theme, isDark)),
+                Expanded(child: _label(context, theme, isDark)),
                 Icon(
                   Icons.unfold_more_rounded,
                   size: 20,
@@ -264,10 +267,10 @@ class _RoleSelector extends StatelessWidget {
     );
   }
 
-  Widget _label(ThemeData theme, bool isDark) {
+  Widget _label(BuildContext context, ThemeData theme, bool isDark) {
     if (selectedRole == null) {
       return Text(
-        'Select a role',
+        trOf(context, 'selectRole'),
         style: theme.textTheme.bodyLarge?.copyWith(
           color: isDark ? AppColors.darkTextSecondary : AppColors.textTertiary,
         ),
@@ -322,13 +325,16 @@ class _RoleMetaRow extends StatelessWidget {
           icon: role.isActive
               ? Icons.check_circle_rounded
               : Icons.pause_circle_rounded,
-          label: role.isActive ? 'Active' : 'Inactive',
+          label: role.isActive
+              ? trOf(context, 'active')
+              : trOf(context, 'inactive'),
           color: role.isActive ? AppColors.success : AppColors.textTertiary,
         ),
         if (role.permissionCount > 0)
           _MiniChip(
             icon: Icons.key_rounded,
-            label: '${role.permissionCount} assigned',
+            label: trOf(context, 'assignedCount')
+                .replaceAll('{n}', '${role.permissionCount}'),
             color: AppColors.primary,
           ),
       ],
@@ -415,8 +421,9 @@ class _RolePickerSheetState extends State<_RolePickerSheet> {
                       padding: const EdgeInsets.symmetric(vertical: 40),
                       child: Text(
                         widget.roles.isEmpty
-                            ? 'No roles yet'
-                            : 'No role matches "$_query"',
+                            ? trOf(context, 'noRolesYet')
+                            : trOf(context, 'noRoleMatches')
+                                .replaceAll('{name}', _query),
                         style: theme.textTheme.bodyMedium,
                       ),
                     )
@@ -569,8 +576,9 @@ class _PermissionGroupCard extends StatelessWidget {
                     ),
                   ),
                   Tooltip(
-                    message:
-                        allSelected ? 'Clear group' : 'Select all in group',
+                    message: allSelected
+                        ? trOf(context, 'clearGroup')
+                        : trOf(context, 'selectAllInGroup'),
                     child: Checkbox(
                       value: allSelected,
                       onChanged: (v) => onToggleAll(v ?? false),
@@ -673,7 +681,7 @@ class _SearchField extends StatelessWidget {
       onChanged: onChanged,
       style: const TextStyle(fontSize: 14),
       decoration: InputDecoration(
-        hintText: 'Search permissions',
+        hintText: trOf(context, 'searchPermissions'),
         prefixIcon: const Icon(Icons.search_rounded, size: 20),
         isDense: true,
         contentPadding:
@@ -717,12 +725,16 @@ class _SaveBar extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    '${state.selectedCount} of ${state.permissions.length} selected',
+                    trOf(context, 'selectedOfCount')
+                        .replaceAll('{done}', '${state.selectedCount}')
+                        .replaceAll(
+                            '{total}', '${state.permissions.length}'),
                     style: theme.textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   Text(
-                    state.selectedRole?.name ?? 'No role selected',
+                    state.selectedRole?.name ??
+                        trOf(context, 'noRoleSelected'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -747,7 +759,7 @@ class _SaveBar extends StatelessWidget {
                       ),
                     )
                   : const Icon(Icons.save_rounded, size: 18),
-              label: const Text('Save'),
+              label: Text(trOf(context, 'save')),
             ),
           ],
         ),
@@ -826,12 +838,12 @@ class _ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     return _EmptyState(
       icon: Icons.cloud_off_rounded,
-      title: 'Could not load roles',
+      title: trOf(context, 'couldNotLoadRoles'),
       message: message,
       action: FilledButton.icon(
         onPressed: onRetry,
         icon: const Icon(Icons.refresh_rounded, size: 18),
-        label: const Text('Retry'),
+        label: Text(trOf(context, 'retry')),
       ),
     );
   }
@@ -855,6 +867,7 @@ class _PermissionGroup {
 List<_PermissionGroup> _groupPermissions(
   List<PermissionItem> permissions,
   String query,
+  BuildContext context,
 ) {
   final q = query.trim().toLowerCase();
   final filtered = permissions
@@ -877,29 +890,31 @@ List<_PermissionGroup> _groupPermissions(
     final parts = key.split('|');
     return _PermissionGroup(
       key: key,
-      title: _humanize(parts[0]),
-      subtitle: _humanize(parts[1]),
+      title: _humanize(parts[0], context),
+      subtitle: _humanize(parts[1], context),
       permissions: buckets[key]!,
     );
   }).toList();
 }
 
 /// "uncategorized" -> "Uncategorized".
-String _humanize(String value) {
-  if (value.trim().isEmpty) return 'General';
+String _humanize(String value, BuildContext context) {
+  if (value.trim().isEmpty) return trOf(context, 'general');
   final text = value.replaceAll(RegExp('[-_]'), ' ').trim();
   return text[0].toUpperCase() + text.substring(1);
 }
 
 /// Turns a raw Dio/provider error into something readable.
-String _readableError(Object? error) {
-  if (error == null) return 'Could not create role';
+String _readableError(Object? error, BuildContext context) {
+  if (error == null) return trOf(context, 'couldNotCreateRole');
   var message = error
       .toString()
       .replaceFirst('DioException [connection error]: ', '')
       .replaceFirst('DioException: ', '')
       .trim();
-  if (message.isEmpty || message == 'null') return 'Could not create role';
+  if (message.isEmpty || message == 'null') {
+    return trOf(context, 'couldNotCreateRole');
+  }
   return message;
 }
 
@@ -930,13 +945,14 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'New role',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
+                Text(
+                  trOf(context, 'newRole'),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w800),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Create a role, then tick the permissions it should allow.',
+                  trOf(context, 'createRoleHint'),
                   style: TextStyle(
                     fontSize: 12.5,
                     color: isDark
@@ -950,8 +966,8 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
                   autofocus: true,
                   textCapitalization: TextCapitalization.words,
                   decoration: InputDecoration(
-                    labelText: 'Role name',
-                    hintText: 'e.g. Area Supervisor',
+                    labelText: trOf(context, 'roleName'),
+                    hintText: trOf(context, 'roleNamePlaceholder'),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
                     ),
@@ -961,7 +977,7 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
                 TextField(
                   controller: guardController,
                   decoration: InputDecoration(
-                    labelText: 'Guard name',
+                    labelText: trOf(context, 'guardName'),
                     hintText: 'api',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppTheme.radiusSm),
@@ -970,9 +986,10 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text(
-                    'Active',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                  title: Text(
+                    trOf(context, 'active'),
+                    style: const TextStyle(
+                        fontSize: 14, fontWeight: FontWeight.w600),
                   ),
                   value: isActive,
                   onChanged: (v) => setSheetState(() => isActive = v),
@@ -995,7 +1012,7 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () => Navigator.of(sheetContext).pop(),
-                        child: const Text('Cancel'),
+                        child: Text(trOf(sheetContext, 'cancel')),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1004,8 +1021,8 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
                         onPressed: () async {
                           final name = nameController.text.trim();
                           if (name.isEmpty) {
-                            setSheetState(
-                                () => localError = 'Role name is required');
+                            setSheetState(() =>
+                                localError = trOf(context, 'roleNameRequired'));
                             return;
                           }
                           final guard = guardController.text.trim();
@@ -1019,19 +1036,20 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
                             Navigator.of(sheetContext).pop();
                             messenger.showSnackBar(
                               SnackBar(
-                                content: Text('Role "$name" created'),
+                                content: Text(trOf(sheetContext, 'roleCreated')
+                                    .replaceAll('{name}', name)),
                                 backgroundColor: AppColors.success,
                               ),
                             );
                           } else {
                             final message = _readableError(
-                              ref.read(rolePermissionsProvider).error,
-                            );
+                                ref.read(rolePermissionsProvider).error,
+                                sheetContext);
                             setSheetState(() => localError = message);
                           }
                         },
                         icon: const Icon(Icons.check_rounded, size: 18),
-                        label: const Text('Create role'),
+                        label: Text(trOf(sheetContext, 'createRole')),
                       ),
                     ),
                   ],
@@ -1059,25 +1077,24 @@ class RoleDirectoryScreen extends ConsumerWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Roles')),
+      appBar: AppBar(title: Text(tr(ref, 'roles'))),
       floatingActionButton: FloatingActionButton.extended(
         heroTag: 'role_directory_add',
         onPressed: () => _showCreateRoleSheet(context, ref),
         icon: const Icon(Icons.add_rounded),
-        label: const Text('New role'),
+        label: Text(tr(ref, 'newRole')),
       ),
       body: state.loading
           ? const Center(child: CircularProgressIndicator())
           : state.roles.isEmpty
               ? _EmptyState(
                   icon: Icons.admin_panel_settings_outlined,
-                  title: 'No roles yet',
-                  message:
-                      'Create your first custom role to start assigning permissions.',
+                  title: tr(ref, 'noRolesYet'),
+                  message: tr(ref, 'createFirstRole'),
                   action: FilledButton.icon(
                     onPressed: () => _showCreateRoleSheet(context, ref),
                     icon: const Icon(Icons.add_rounded, size: 18),
-                    label: const Text('Create role'),
+                    label: Text(tr(ref, 'createRole')),
                   ),
                 )
               : RefreshIndicator(
@@ -1107,19 +1124,20 @@ class RoleDirectoryScreen extends ConsumerWidget {
     final result = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Delete role?'),
+        title: Text(trOf(dialogContext, 'deleteRoleTitle')),
         content: Text(
-          'This permanently removes "$roleName" and unassigns all of its permissions.',
+          trOf(dialogContext, 'deleteRoleBody')
+              .replaceAll('{name}', roleName),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: const Text('Cancel'),
+            child: Text(trOf(dialogContext, 'cancel')),
           ),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: const Text('Delete'),
+            child: Text(trOf(dialogContext, 'delete')),
           ),
         ],
       ),
@@ -1179,15 +1197,18 @@ class _RoleDirectoryTile extends StatelessWidget {
             ),
           ),
           PopupMenuButton<String>(
-            tooltip: 'Role actions',
+            tooltip: trOf(context, 'roleActions'),
             constraints: const BoxConstraints(minWidth: 180, maxWidth: 220),
             onSelected: (action) {
               if (action == 'toggle') onToggle();
               if (action == 'delete') onDelete();
             },
-            itemBuilder: (_) => const [
-              PopupMenuItem(value: 'toggle', child: Text('Toggle status')),
-              PopupMenuItem(value: 'delete', child: Text('Delete role')),
+            itemBuilder: (_) => [
+              PopupMenuItem(
+                  value: 'toggle',
+                  child: Text(trOf(context, 'toggleStatus'))),
+              PopupMenuItem(
+                  value: 'delete', child: Text(trOf(context, 'deleteRole'))),
             ],
           ),
         ],

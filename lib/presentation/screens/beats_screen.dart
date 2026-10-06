@@ -6,6 +6,7 @@ import 'package:field_visit_app/data/models/beat.dart';
 import 'package:field_visit_app/presentation/providers/beats_provider.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
 import 'package:field_visit_app/core/widgets/app_dropdown.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 const _green = Color(0xFF136B3E);
 const _golden = Color(0xFFFFB300);
@@ -22,13 +23,13 @@ class BeatsScreen extends ConsumerWidget {
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'Beat Routes',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        title: Text(
+          tr(ref, 'beatRoutes'),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: () => ref.read(beatsProvider.notifier).refresh(),
           ),
@@ -62,18 +63,18 @@ class BeatsScreen extends ConsumerWidget {
                                 color: _green, size: 36),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'No beat routes found',
-                            style: TextStyle(
+                          Text(
+                            tr(ref, 'noBeatRoutesFound'),
+                            style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
                               color: Color(0xFF374151),
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
-                            'Tap + below to add your first beat route',
-                            style: TextStyle(
+                          Text(
+                            tr(ref, 'tapPlusAddBeat'),
+                            style: const TextStyle(
                                 fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                         ],
@@ -97,8 +98,8 @@ class BeatsScreen extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: () => _showBeatForm(context, ref),
         icon: const Icon(Icons.add_road_rounded),
-        label: const Text('Add Beat',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(tr(ref, 'addBeat'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -190,19 +191,19 @@ class _BeatCard extends ConsumerWidget {
                     IconButton(
                       icon: const Icon(Icons.list_alt_rounded,
                           size: 20, color: Color(0xFF0284C7)),
-                      tooltip: 'Beat Outlets',
+                      tooltip: tr(ref, 'beatOutlets'),
                       onPressed: () => _showBeatOutlets(context, ref, beat),
                     ),
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           size: 20, color: _green),
-                      tooltip: 'Edit Beat',
+                      tooltip: tr(ref, 'editBeat'),
                       onPressed: () => _showBeatForm(context, ref, beat: beat),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           size: 20, color: Color(0xFFEF4444)),
-                      tooltip: 'Delete Beat',
+                      tooltip: tr(ref, 'deleteBeat'),
                       onPressed: () => _confirmDelete(context, ref, beat),
                     ),
                   ],
@@ -250,15 +251,15 @@ Future<void> _confirmDelete(
     context: context,
     builder: (ctx) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      title: const Text('Delete Beat Route?',
-          style: TextStyle(fontWeight: FontWeight.w700)),
+      title: Text(trOf(ctx, 'deleteBeatRouteTitle'),
+          style: const TextStyle(fontWeight: FontWeight.w700)),
       content: Text(
-          'Remove "${beat.name}" from beat routes? This cannot be undone.'),
+          trOf(ctx, 'removeBeatConfirm').replaceAll('{name}', beat.name)),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child:
-              const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          child: Text(trOf(ctx, 'cancel'),
+              style: const TextStyle(color: Color(0xFF6B7280))),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -269,7 +270,7 @@ Future<void> _confirmDelete(
             elevation: 0,
           ),
           onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Delete'),
+          child: Text(trOf(ctx, 'delete')),
         ),
       ],
     ),
@@ -279,8 +280,9 @@ Future<void> _confirmDelete(
       await ref.read(beatsProvider.notifier).remove(beat.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Beat route deleted'), backgroundColor: _green),
+          SnackBar(
+              content:
+                  Text(trOf(context, 'beatRouteDeleted')), backgroundColor: _green),
         );
       }
     } catch (e) {
@@ -326,11 +328,11 @@ Future<void> _showBeatOutlets(
         content: SizedBox(
           width: 400,
           child: items.isEmpty
-              ? const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 16),
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Center(
-                      child: Text('No outlets assigned to this beat',
-                          style: TextStyle(color: Color(0xFF6B7280)))),
+                      child: Text(trOf(context, 'noOutletsAssignedToBeat'),
+                          style: const TextStyle(color: Color(0xFF6B7280)))),
                 )
               : ListView.separated(
                   shrinkWrap: true,
@@ -351,15 +353,17 @@ Future<void> _showBeatOutlets(
                         child: const Icon(Icons.store_rounded,
                             color: _green, size: 18),
                       ),
-                      title: Text('Outlet #${item['outlet_id']}',
+                      title: Text(
+                          '${trOf(ctx, 'outletHash')}${item['outlet_id']}',
                           style: const TextStyle(
                               fontWeight: FontWeight.w600, fontSize: 14)),
-                      subtitle: Text('Sequence: ${item['sequence'] ?? '-'}',
+                      subtitle: Text(
+                          '${trOf(ctx, 'sequenceLabel')}${item['sequence'] ?? '-'}',
                           style: const TextStyle(fontSize: 12)),
                       trailing: IconButton(
                         icon: const Icon(Icons.remove_circle_outline_rounded,
                             color: Color(0xFFEF4444), size: 20),
-                        tooltip: 'Remove from beat',
+                        tooltip: trOf(ctx, 'removeFromBeat'),
                         onPressed: () async {
                           await ref.read(beatsProvider.notifier).removeOutlet(
                               beat.id, (item['id'] as num).toInt());
@@ -373,8 +377,8 @@ Future<void> _showBeatOutlets(
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child:
-                const Text('Close', style: TextStyle(color: Color(0xFF6B7280))),
+            child: Text(trOf(ctx, 'close'),
+                style: const TextStyle(color: Color(0xFF6B7280))),
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
@@ -385,7 +389,7 @@ Future<void> _showBeatOutlets(
               elevation: 0,
             ),
             icon: const Icon(Icons.add_rounded, size: 18),
-            label: const Text('Add Outlet'),
+            label: Text(trOf(context, 'addOutlet')),
             onPressed: () {
               Navigator.pop(ctx);
               _addBeatOutlet(context, ref, beat);
@@ -406,7 +410,7 @@ Future<void> _addBeatOutlet(
   final outlets = ref.read(outletsProvider).valueOrNull ?? const [];
   if (outlets.isEmpty) {
     ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Create an outlet first')));
+        .showSnackBar(SnackBar(content: Text(trOf(context, 'createOutletFirst'))));
     return;
   }
   int outletId = outlets.first.id;
@@ -417,14 +421,14 @@ Future<void> _addBeatOutlet(
     builder: (dialogContext) => StatefulBuilder(
       builder: (context, setLocalState) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        title: const Text('Add Outlet to Beat',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        title: Text(trOf(context, 'addOutletToBeat'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Outlet Dropdown (shared app style)
             AppDropdownField<int>(
-              label: 'Outlet',
+              label: trOf(context, 'outlet'),
               icon: Icons.storefront_rounded,
               value: outletId,
               options: outlets
@@ -439,7 +443,7 @@ Future<void> _addBeatOutlet(
             const SizedBox(height: 12),
             CellfinInputField(
               controller: sequence,
-              hint: 'Sequence Order (e.g. 1)',
+              hint: trOf(context, 'sequenceOrderHint'),
               keyboardType: TextInputType.number,
               prefixIcon: const Icon(Icons.format_list_numbered_rounded,
                   color: Color(0xFF6B7280)),
@@ -449,8 +453,8 @@ Future<void> _addBeatOutlet(
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel',
-                style: TextStyle(color: Color(0xFF6B7280))),
+            child: Text(trOf(dialogContext, 'cancel'),
+                style: const TextStyle(color: Color(0xFF6B7280))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -471,7 +475,7 @@ Future<void> _addBeatOutlet(
                       .showSnackBar(SnackBar(content: Text(_errorMessage(e))));
               }
             },
-            child: const Text('Add Outlet'),
+            child: Text(trOf(dialogContext, 'addOutlet')),
           ),
         ],
       ),
@@ -488,33 +492,41 @@ Future<void> _showBeatForm(BuildContext context, WidgetRef ref,
 
   await CellfinFormScreen.push(
     context: context,
-    title: beat == null ? 'Add Beat Route' : 'Edit Beat Route',
-    officerName: 'BEAT ROUTE MANAGER',
-    officerInfo: 'Field Visit Route Configuration',
-    cards: const [
-      CellfinCardItem(title: 'Daily Route', icon: Icons.today_rounded),
-      CellfinCardItem(title: 'Weekly', icon: Icons.date_range_rounded),
-      CellfinCardItem(title: 'Zone A', icon: Icons.location_on_outlined),
-      CellfinCardItem(title: 'Zone B', icon: Icons.explore_outlined),
+    title: beat == null
+        ? trOf(context, 'addBeatRoute')
+        : trOf(context, 'editBeatRoute'),
+    officerName: trOf(context, 'beatRouteManager'),
+    officerInfo: trOf(context, 'fieldVisitRouteConfig'),
+    cards: [
+      CellfinCardItem(
+          title: trOf(context, 'dailyRoute'), icon: Icons.today_rounded),
+      CellfinCardItem(
+          title: trOf(context, 'weekly'), icon: Icons.date_range_rounded),
+      CellfinCardItem(
+          title: trOf(context, 'zoneA'), icon: Icons.location_on_outlined),
+      CellfinCardItem(
+          title: trOf(context, 'zoneB'), icon: Icons.explore_outlined),
     ],
-    submitText: beat == null ? 'Create Beat Route' : 'Save Changes',
+    submitText: beat == null
+        ? trOf(context, 'createBeatRoute')
+        : trOf(context, 'saveChanges'),
     fields: [
       CellfinInputField(
         controller: name,
-        hint: 'Beat Route Name *',
+        hint: trOf(context, 'beatRouteNameHint'),
         prefixIcon: const Icon(Icons.route_rounded, color: Color(0xFF6B7280)),
         validator: (v) => v == null || v.trim().isEmpty
-            ? 'Beat route name is required'
+            ? trOf(context, 'beatRouteNameRequired')
             : null,
       ),
       CellfinInputField(
         controller: code,
-        hint: 'Beat Code (e.g. BT-001)',
+        hint: trOf(context, 'beatCodeHint'),
         prefixIcon: const Icon(Icons.tag_rounded, color: Color(0xFF6B7280)),
       ),
       CellfinInputField(
         controller: date,
-        hint: 'Scheduled Date (YYYY-MM-DD)',
+        hint: trOf(context, 'scheduledDateHint'),
         prefixIcon:
             const Icon(Icons.calendar_today_rounded, color: Color(0xFF6B7280)),
         keyboardType: TextInputType.datetime,
@@ -536,8 +548,9 @@ Future<void> _showBeatForm(BuildContext context, WidgetRef ref,
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(
-                  beat == null ? 'Beat route created!' : 'Beat route updated!'),
+              content: Text(beat == null
+                  ? trOf(context, 'beatRouteCreated')
+                  : trOf(context, 'beatRouteUpdated')),
               backgroundColor: _green,
             ),
           );
@@ -601,7 +614,7 @@ class _ErrorView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                 ),
                 onPressed: onRetry,
-                child: const Text('Try Again'),
+                child: Text(trOf(context, 'tryAgain')),
               ),
             ],
           ),

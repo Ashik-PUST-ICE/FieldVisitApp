@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/presentation/providers/theme_provider.dart';
 import 'package:field_visit_app/presentation/screens/account_screen.dart';
 import 'package:field_visit_app/presentation/screens/assignments_screen.dart';
@@ -25,11 +26,11 @@ class MoreScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Modules & Services',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'allModules'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
-            tooltip: dark ? 'Light mode' : 'Dark mode',
+            tooltip: dark ? tr(ref, 'lightMode') : tr(ref, 'darkMode'),
             onPressed: () => ref.read(themeProvider.notifier).toggle(),
             icon:
                 Icon(dark ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
@@ -39,36 +40,36 @@ class MoreScreen extends ConsumerWidget {
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         children: [
-          _buildCategoryHeader(
-              'Field Operations', 'Core day-to-day visiting and sales tools'),
+          _buildCategoryHeader(tr(ref, 'fieldOperations'),
+              tr(ref, 'fieldOperationsSub')),
           const SizedBox(height: 10),
           _buildGrid(
               context,
               [
                 _ModuleItem(
-                  title: 'Beats & Routes',
-                  subtitle: 'Assigned paths',
+                  title: tr(ref, 'beatsRoutes'),
+                  subtitle: tr(ref, 'beatsRoutesSub'),
                   icon: Icons.alt_route_rounded,
                   gradient: [const Color(0xFF0D9488), const Color(0xFF14B8A6)],
                   screen: const BeatsScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Orders',
-                  subtitle: 'Catalog sales',
+                  title: tr(ref, 'ordersTitle'),
+                  subtitle: tr(ref, 'ordersSub'),
                   icon: Icons.shopping_bag_rounded,
                   gradient: [const Color(0xFF3B82F6), const Color(0xFF60A5FA)],
                   screen: const OrdersScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Products',
-                  subtitle: 'Price & inventory',
+                  title: tr(ref, 'productsTitle'),
+                  subtitle: tr(ref, 'productsSub'),
                   icon: Icons.inventory_2_rounded,
                   gradient: [const Color(0xFF8B5CF6), const Color(0xFFA78BFA)],
                   screen: const ProductsScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Scan QR Code',
-                  subtitle: 'Instant check-in',
+                  title: tr(ref, 'scanQrTitle'),
+                  subtitle: tr(ref, 'scanQrSub'),
                   icon: Icons.qr_code_scanner_rounded,
                   gradient: [const Color(0xFFF59E0B), const Color(0xFFFBBF24)],
                   screen: const QrScannerScreen(),
@@ -76,43 +77,43 @@ class MoreScreen extends ConsumerWidget {
               ],
               isDark),
           const SizedBox(height: 24),
-          _buildCategoryHeader('Intelligence & Reports',
-              'Field metrics, targets, and references'),
+          _buildCategoryHeader(tr(ref, 'intelligenceReports'),
+              tr(ref, 'intelligenceReportsSub')),
           const SizedBox(height: 10),
           _buildGrid(
               context,
               [
                 _ModuleItem(
-                  title: 'Target & KPIs',
-                  subtitle: 'Goals & rankings',
+                  title: tr(ref, 'kpi'),
+                  subtitle: tr(ref, 'kpiSub'),
                   icon: Icons.fact_check_rounded,
                   gradient: [const Color(0xFF0F766E), const Color(0xFF14B8A6)],
                   screen: const KpiScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Analytics Reports',
-                  subtitle: 'Performance charts',
+                  title: tr(ref, 'analyticsReports'),
+                  subtitle: tr(ref, 'analyticsReportsSub'),
                   icon: Icons.analytics_rounded,
                   gradient: [const Color(0xFF10B981), const Color(0xFF34D399)],
                   screen: const ReportsScreen(),
                 ),
                 _ModuleItem(
-                  title: 'System Alerts',
-                  subtitle: 'Notifications feed',
+                  title: tr(ref, 'systemAlerts'),
+                  subtitle: tr(ref, 'systemAlertsSub'),
                   icon: Icons.notifications_active_rounded,
                   gradient: [const Color(0xFFEF4444), const Color(0xFFF87171)],
                   screen: const NotificationsScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Reference Data',
-                  subtitle: 'Metadata configs',
+                  title: tr(ref, 'referenceData'),
+                  subtitle: tr(ref, 'referenceDataSub'),
                   icon: Icons.tune_rounded,
                   gradient: [const Color(0xFF06B6D4), const Color(0xFF22D3EE)],
                   screen: const ReferenceDataScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Assignments',
-                  subtitle: 'Officer allocations',
+                  title: tr(ref, 'assignments'),
+                  subtitle: tr(ref, 'assignmentsSub'),
                   icon: Icons.person_pin_circle_rounded,
                   gradient: [const Color(0xFFEC4899), const Color(0xFFF472B6)],
                   screen: const AssignmentsScreen(),
@@ -120,36 +121,36 @@ class MoreScreen extends ConsumerWidget {
               ],
               isDark),
           const SizedBox(height: 24),
-          _buildCategoryHeader('Administration & Security',
-              'User access, security policies, and personal profile'),
+          _buildCategoryHeader(tr(ref, 'adminSecurity'),
+              tr(ref, 'adminSecuritySub')),
           const SizedBox(height: 10),
           _buildGrid(
               context,
               [
                 _ModuleItem(
-                  title: 'Company Directory',
-                  subtitle: 'Users & teams',
+                  title: tr(ref, 'directory'),
+                  subtitle: tr(ref, 'directorySub'),
                   icon: Icons.corporate_fare_rounded,
                   gradient: [const Color(0xFF6366F1), const Color(0xFF818CF8)],
                   screen: const DirectoryScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Role Permissions',
-                  subtitle: 'Access controls',
+                  title: tr(ref, 'rolesPermissions'),
+                  subtitle: tr(ref, 'rolesPermissionsSub'),
                   icon: Icons.security_rounded,
                   gradient: [const Color(0xFF64748B), const Color(0xFF94A3B8)],
                   screen: const RolePermissionsScreen(),
                 ),
                 _ModuleItem(
-                  title: 'Auth Settings',
-                  subtitle: 'Security parameters',
+                  title: tr(ref, 'authSettings'),
+                  subtitle: tr(ref, 'authSettingsSub'),
                   icon: Icons.lock_person_rounded,
                   gradient: [const Color(0xFF059669), const Color(0xFF10B981)],
                   screen: const AuthSettingsScreen(),
                 ),
                 _ModuleItem(
-                  title: 'My Profile',
-                  subtitle: 'Account & password',
+                  title: tr(ref, 'myProfile'),
+                  subtitle: tr(ref, 'myProfileSub'),
                   icon: Icons.account_circle_rounded,
                   gradient: [const Color(0xFF0D9488), const Color(0xFF0891B2)],
                   screen: const AccountScreen(),

@@ -8,6 +8,7 @@ import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/business_api.dart';
 import 'package:field_visit_app/data/models/location.dart';
 import 'package:field_visit_app/presentation/providers/business_api_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class _Level {
   final String type;
@@ -184,10 +185,10 @@ class _LocationManagementScreenState
       final match = (_children[_levels[i].type] ?? const <Location>[])
           .where((r) => r.id == id);
       parts.add(match.isNotEmpty
-          ? '${match.first.name} (${_levels[i].label})'
-          : '${_levels[i].label} #$id');
+          ? '${match.first.name} (${trOf(context, _levels[i].type)})'
+          : '${trOf(context, _levels[i].type)} #$id');
     }
-    return parts.isEmpty ? 'selected area' : parts.join('  >  ');
+    return parts.isEmpty ? trOf(context, 'selectedArea') : parts.join('  >  ');
   }
 
   void _toast(String message) {
@@ -221,11 +222,11 @@ class _LocationManagementScreenState
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Location Master',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(trOf(context, 'locationMaster'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: trOf(context, 'refresh'),
             onPressed: _loading ? null : _refresh,
             icon: const Icon(Icons.refresh_rounded),
           ),
@@ -238,7 +239,8 @@ class _LocationManagementScreenState
               foregroundColor: Colors.white,
               onPressed: () => _showAddSheet(context),
               icon: const Icon(Icons.add_location_alt_rounded),
-              label: Text('Add ${_browseLevel.label}'),
+              label: Text(
+                  '${trOf(context, 'add')} ${trOf(context, _browseLevel.type)}'),
             ),
       body: Column(
         children: [
@@ -247,7 +249,9 @@ class _LocationManagementScreenState
             color: const Color(0xFFF7F9F8),
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 10),
             child: Text(
-              _path == 'selected area' ? 'Select a location' : _path,
+              _path == trOf(context, 'selectedArea')
+                  ? trOf(context, 'selectLocation')
+                  : _path,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
@@ -282,8 +286,8 @@ class _LocationManagementScreenState
             const Icon(Icons.cloud_off_rounded,
                 size: 46, color: Colors.redAccent),
             const SizedBox(height: 12),
-            const Text('Could not load locations',
-                style: TextStyle(fontWeight: FontWeight.w700)),
+            Text(trOf(context, 'couldNotLoadLocations'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
             const SizedBox(height: 6),
             Text(
               _friendly(_error ?? ''),
@@ -291,7 +295,9 @@ class _LocationManagementScreenState
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
             const SizedBox(height: 14),
-            FilledButton(onPressed: _loadLevel, child: const Text('Retry')),
+            FilledButton(
+                onPressed: _loadLevel,
+                child: Text(trOf(context, 'retry'))),
           ],
         ),
       ),
@@ -317,16 +323,16 @@ class _LocationManagementScreenState
             const SizedBox(height: 14),
             Text(
               needParent
-                  ? 'Pick a ${_levels[_browseIndex - 1].label.toLowerCase()} above to continue'
-                  : 'No ${_browseLevel.label.toLowerCase()} under this place yet',
+                  ? trOf(context, 'pickParentToContinue')
+                  : '${trOf(context, 'noChildrenYet')} (${trOf(context, _browseLevel.type).toLowerCase()})',
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 6),
             Text(
               needParent
-                  ? 'Every level has to be chosen in order.'
-                  : 'Use the button below to add the first one.',
+                  ? trOf(context, 'chooseInOrder')
+                  : trOf(context, 'useButtonToAddFirst'),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 12.5, color: Colors.grey),
             ),
@@ -368,12 +374,12 @@ class _LocationManagementScreenState
               mainAxisSize: MainAxisSize.min,
               children: [
                 IconButton(
-                  tooltip: 'Edit',
+                  tooltip: trOf(context, 'edit'),
                   icon: const Icon(Icons.edit_outlined, size: 19),
                   onPressed: () => _showEditSheet(context, row),
                 ),
                 IconButton(
-                  tooltip: 'Delete',
+                  tooltip: trOf(context, 'delete'),
                   icon: const Icon(Icons.delete_outline_rounded,
                       size: 19, color: Colors.redAccent),
                   onPressed: () => _confirmDelete(row),
@@ -391,10 +397,12 @@ class _LocationManagementScreenState
     final parentChosen = parentType == null || _selected[parentType] != null;
 
     if (!parentChosen) {
-      final parentLabel = _levels[index - 1].label.toLowerCase();
+      final parentLabel =
+          trOf(context, _levels[index - 1].type).toLowerCase();
       return AppDropdownField<int>(
-        label: level.label,
-        hint: 'Choose $parentLabel first',
+        label: trOf(context, level.type),
+        hint: trOf(context, 'chooseParentFirst')
+            .replaceAll('{parent}', parentLabel),
         icon: level.icon,
         enabled: false,
         searchable: false,
@@ -406,8 +414,9 @@ class _LocationManagementScreenState
     final cache = _children[level.type] ?? const <Location>[];
 
     return AppDropdownField<int>(
-      label: level.label,
-      hint: 'Choose ${level.label.toLowerCase()}',
+      label: trOf(context, level.type),
+      hint: trOf(context, 'chooseLevel').replaceAll(
+          '{level}', trOf(context, level.type).toLowerCase()),
       icon: level.icon,
       searchable: true,
       value: _selected[level.type],
@@ -463,11 +472,13 @@ class _LocationManagementScreenState
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Add ${level.label}',
+                  Text(
+                      '${trOf(inner, 'add')} ${trOf(inner, level.type)}',
                       style: const TextStyle(
                           fontWeight: FontWeight.w800, fontSize: 16)),
                   const SizedBox(height: 4),
-                  Text('Under $_path',
+                  Text(
+                      trOf(inner, 'underPath').replaceAll('{path}', _path),
                       style:
                           const TextStyle(fontSize: 12.5, color: Colors.grey)),
                   const SizedBox(height: 14),
@@ -475,7 +486,7 @@ class _LocationManagementScreenState
                     children: [
                       Expanded(
                         child: ChoiceChip(
-                          label: const Text('One'),
+                          label: Text(trOf(inner, 'one')),
                           selected: !asBulk,
                           onSelected: (_) => setSheet(() => asBulk = false),
                         ),
@@ -483,7 +494,7 @@ class _LocationManagementScreenState
                       const SizedBox(width: 8),
                       Expanded(
                         child: ChoiceChip(
-                          label: const Text('Paste list'),
+                          label: Text(trOf(inner, 'pasteList')),
                           selected: asBulk,
                           onSelected: (_) => setSheet(() => asBulk = true),
                         ),
@@ -494,23 +505,26 @@ class _LocationManagementScreenState
                   if (asBulk) ...[
                     CellfinInputField(
                       controller: bulk,
-                      hint: 'One name per line',
+                      hint: trOf(inner, 'oneNamePerLine'),
                       maxLines: 6,
                     ),
                     const SizedBox(height: 6),
-                    const Text(
-                      'Blank lines and names that already exist are skipped.',
-                      style: TextStyle(fontSize: 11.5, color: Colors.grey),
+                    Text(
+                      trOf(inner, 'blankLinesSkipped'),
+                      style: const TextStyle(
+                          fontSize: 11.5, color: Colors.grey),
                     ),
                   ] else ...[
                     CellfinInputField(
                       controller: name,
-                      hint: '${level.label} name (English) *',
+                      hint: trOf(inner, 'nameEnglishHint')
+                          .replaceAll('{level}', trOf(inner, level.type)),
                     ),
                     const SizedBox(height: 10),
                     CellfinInputField(
                       controller: nameBn,
-                      hint: '${level.label} name (Bangla)',
+                      hint: trOf(inner, 'nameBanglaHint')
+                          .replaceAll('{level}', trOf(inner, level.type)),
                     ),
                   ],
                   if (error != null) ...[
@@ -526,7 +540,7 @@ class _LocationManagementScreenState
                         child: OutlinedButton(
                           onPressed:
                               _saving ? null : () => Navigator.of(inner).pop(),
-                          child: const Text('Cancel'),
+                          child: Text(trOf(inner, 'cancel')),
                         ),
                       ),
                       const SizedBox(width: 10),
@@ -559,7 +573,9 @@ class _LocationManagementScreenState
                                   child: CircularProgressIndicator(
                                       strokeWidth: 2, color: Colors.white),
                                 )
-                              : Text(asBulk ? 'Add all' : 'Add'),
+                              : Text(asBulk
+                                  ? trOf(inner, 'addAll')
+                                  : trOf(inner, 'add')),
                         ),
                       ),
                     ],
@@ -599,7 +615,7 @@ class _LocationManagementScreenState
             .where((e) => e.isNotEmpty)
             .toList();
 
-        if (names.isEmpty) return 'Enter at least one name.';
+        if (names.isEmpty) return trOf(context, 'enterAtLeastOneName');
 
         final created = parentId == null
             ? 0
@@ -621,15 +637,20 @@ class _LocationManagementScreenState
           }
           if (!mounted) return null;
           _toast(added == 0
-              ? 'Nothing new - those all already exist'
-              : 'Added $added $type(s)');
+              ? trOf(context, 'nothingNew')
+              : trOf(context, 'addedCount')
+                  .replaceAll('{n}', '$added')
+                  .replaceAll(
+                      '{type}', trOf(context, 'division')));
         } else {
           _toast(created == 0
-              ? 'Nothing new - those all already exist'
-              : 'Added $created $type(s)');
+              ? trOf(context, 'nothingNew')
+              : trOf(context, 'addedCount')
+                  .replaceAll('{n}', '$created')
+                  .replaceAll('{type}', trOf(context, type)));
         }
       } else {
-        if (singleName.trim().isEmpty) return 'Name is required.';
+        if (singleName.trim().isEmpty) return trOf(context, 'nameRequired');
 
         await _api.createLocation({
           'name': singleName.trim(),
@@ -639,7 +660,8 @@ class _LocationManagementScreenState
         });
 
         if (!mounted) return null;
-        _toast('$type added');
+        _toast(trOf(context, 'typeAdded')
+            .replaceAll('{type}', trOf(context, type)));
       }
 
       return null;
@@ -675,15 +697,20 @@ class _LocationManagementScreenState
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Edit ${row.type}',
+              Text(
+                  '${trOf(sheet, 'edit')} ${trOf(sheet, row.type)}',
                   style: const TextStyle(
                       fontWeight: FontWeight.w800, fontSize: 16)),
               const SizedBox(height: 14),
               CellfinInputField(
-                  controller: name, hint: '${row.type} name (English) *'),
+                  controller: name,
+                  hint: trOf(sheet, 'nameEnglishHint')
+                      .replaceAll('{level}', trOf(sheet, row.type))),
               const SizedBox(height: 10),
               CellfinInputField(
-                  controller: nameBn, hint: '${row.type} name (Bangla)'),
+                  controller: nameBn,
+                  hint: trOf(sheet, 'nameBanglaHint')
+                      .replaceAll('{level}', trOf(sheet, row.type))),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -691,7 +718,7 @@ class _LocationManagementScreenState
                     child: OutlinedButton(
                       onPressed:
                           _saving ? null : () => Navigator.of(sheet).pop(),
-                      child: const Text('Cancel'),
+                      child: Text(trOf(sheet, 'cancel')),
                     ),
                   ),
                   const SizedBox(width: 10),
@@ -715,7 +742,7 @@ class _LocationManagementScreenState
                                 });
                                 if (!sheet.mounted) return;
                                 Navigator.of(sheet).pop();
-                                _toast('Updated');
+                                _toast(trOf(sheet, 'updated'));
                               } catch (e) {
                                 if (!sheet.mounted) return;
                                 ScaffoldMessenger.of(sheet).showSnackBar(
@@ -726,7 +753,7 @@ class _LocationManagementScreenState
                                 }
                               }
                             },
-                      child: const Text('Save'),
+                      child: Text(trOf(sheet, 'save')),
                     ),
                   ),
                 ],
@@ -749,19 +776,20 @@ class _LocationManagementScreenState
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialog) => AlertDialog(
-        title: Text('Delete ${row.name}?'),
+        title: Text(
+            trOf(dialog, 'deleteQuestion').replaceAll('{name}', row.name)),
         content: Text(
-          'This ${row.type} will be removed. If it still has places under it, '
-          'the server will refuse and ask you to clear them first.',
+          trOf(dialog, 'deleteTypeWarning')
+              .replaceAll('{type}', trOf(dialog, row.type)),
         ),
         actions: [
           TextButton(
               onPressed: () => Navigator.of(dialog).pop(false),
-              child: const Text('Cancel')),
+              child: Text(trOf(dialog, 'cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: Colors.redAccent),
             onPressed: () => Navigator.of(dialog).pop(true),
-            child: const Text('Delete'),
+            child: Text(trOf(dialog, 'delete')),
           ),
         ],
       ),
@@ -773,7 +801,7 @@ class _LocationManagementScreenState
 
     try {
       await _api.deleteLocation(row.id);
-      if (mounted) _toast('Deleted');
+      if (mounted) _toast(trOf(context, 'deleted'));
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)

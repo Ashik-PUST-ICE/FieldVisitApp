@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/presentation/providers/reports_provider.dart';
 
 class ReportsScreen extends ConsumerWidget {
@@ -15,19 +16,20 @@ class ReportsScreen extends ConsumerWidget {
     return Scaffold(
       backgroundColor: isDark ? AppColors.darkBackground : AppColors.background,
       appBar: AppBar(
-        title: const Text('Reports',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'reports'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           if (filter.from != null || filter.to != null)
             TextButton.icon(
               onPressed: () => ref.read(reportsFilterProvider.notifier).state =
                   const ReportsFilter(),
               icon: const Icon(Icons.clear, size: 16),
-              label: const Text('Clear', style: TextStyle(fontSize: 12)),
+              label: Text(tr(ref, 'clear'),
+                  style: const TextStyle(fontSize: 12)),
               style: TextButton.styleFrom(foregroundColor: AppColors.error),
             ),
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             onPressed: () => ref.invalidate(reportsProvider),
             icon: const Icon(Icons.refresh_rounded),
           ),
@@ -57,8 +59,8 @@ class ReportsScreen extends ConsumerWidget {
                             size: 48, color: AppColors.error),
                       ),
                       const SizedBox(height: 16),
-                      const Text('Unable to load reports',
-                          style: TextStyle(
+                      Text(tr(ref, 'unableLoadReports'),
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 8),
                       Text(e.toString(),
@@ -72,14 +74,14 @@ class ReportsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                   children: [
                     _ReportSection(
-                      title: 'Visit Report',
+                      title: tr(ref, 'visitReport'),
                       icon: Icons.directions_walk_rounded,
                       color: AppColors.primary,
                       values: data['visits'] as Map<String, dynamic>,
                       isDark: isDark,
                     ),
                     _ReportSection(
-                      title: 'Order Report',
+                      title: tr(ref, 'orderReport'),
                       icon: Icons.shopping_bag_rounded,
                       color: AppColors.blue,
                       values: data['orders'] as Map<String, dynamic>,
@@ -261,7 +263,7 @@ class _QuickRangeMenu extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return PopupMenuButton<int>(
-      tooltip: 'Quick ranges',
+      tooltip: tr(ref, 'quickRanges'),
       icon: Icon(Icons.tune_rounded, color: AppColors.primary, size: 22),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
       itemBuilder: (_) => [
@@ -346,11 +348,11 @@ class _ReportSection extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.all(16),
             child: entries.isEmpty
-                ? const Center(
+                ? Center(
                     child: Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text('No data',
-                            style: TextStyle(color: Colors.grey))))
+                        padding: const EdgeInsets.all(8),
+                        child: Text(trOf(context, 'noData'),
+                            style: const TextStyle(color: Colors.grey))))
                 : Wrap(
                     spacing: 12,
                     runSpacing: 12,
@@ -462,16 +464,17 @@ class _OfficersSection extends StatelessWidget {
                     color: AppColors.purple, size: 20),
               ),
               const SizedBox(width: 12),
-              const Text('Officer Performance',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w800)),
+              Text(trOf(context, 'officerPerformance'),
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w800)),
             ]),
           ),
           if (rows is! List || (rows as List).isEmpty)
-            const Padding(
-              padding: EdgeInsets.all(20),
+            Padding(
+              padding: const EdgeInsets.all(20),
               child: Center(
-                  child: Text('No officer data available',
-                      style: TextStyle(color: Colors.grey))),
+                  child: Text(trOf(context, 'noOfficerData'),
+                      style: const TextStyle(color: Colors.grey))),
             )
           else
             ...(rows as List).asMap().entries.map((entry) {
@@ -510,19 +513,19 @@ class _OfficersSection extends StatelessWidget {
                                 fontWeight: FontWeight.w700, fontSize: 14),
                           ),
                           if (row['user_id'] != null)
-                            Text('ID: ${row['user_id']}',
+                            Text('${trOf(context, 'idLabel')}: ${row['user_id']}',
                                 style: const TextStyle(
                                     fontSize: 11, color: Colors.grey)),
                         ]),
                   ),
                   Row(children: [
                     _MiniStat(
-                        label: 'Visits',
+                        label: trOf(context, 'visits'),
                         value: '$visits',
                         color: AppColors.primary),
                     const SizedBox(width: 8),
                     _MiniStat(
-                        label: 'Orders',
+                        label: trOf(context, 'orders'),
                         value: '$orders',
                         color: AppColors.blue),
                   ]),

@@ -7,6 +7,7 @@ import 'package:field_visit_app/presentation/providers/products_provider.dart';
 import 'package:field_visit_app/presentation/providers/reference_data_provider.dart';
 import 'package:field_visit_app/presentation/providers/visits_provider.dart';
 import 'package:field_visit_app/core/widgets/app_dropdown.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 const Color _green = Color(0xFF136B3E);
 
@@ -49,20 +50,26 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
     if (!mounted) return;
     await CellfinFormScreen.push(
       context: context,
-      title: 'Add Photo Caption',
-      officerName: 'VISIT #${widget.visit.id} EVIDENCE',
-      officerInfo: 'Photo Documentation Upload',
-      cards: const [
-        CellfinCardItem(title: 'Store Front', icon: Icons.storefront_rounded),
-        CellfinCardItem(title: 'Shelf Display', icon: Icons.grid_view_rounded),
-        CellfinCardItem(title: 'Stock Check', icon: Icons.inventory_2_outlined),
-        CellfinCardItem(title: 'Promotion', icon: Icons.campaign_outlined),
+      title: trOf(context, 'addPhotoCaption'),
+      officerName: trOf(context, 'visitEvidence')
+          .replaceAll('{id}', '${widget.visit.id}'),
+      officerInfo: trOf(context, 'photoDocUpload'),
+      cards: [
+        CellfinCardItem(
+            title: trOf(context, 'storeFront'), icon: Icons.storefront_rounded),
+        CellfinCardItem(
+            title: trOf(context, 'shelfDisplay'), icon: Icons.grid_view_rounded),
+        CellfinCardItem(
+            title: trOf(context, 'stockCheck'),
+            icon: Icons.inventory_2_outlined),
+        CellfinCardItem(
+            title: trOf(context, 'promotion'), icon: Icons.campaign_outlined),
       ],
-      submitText: 'Upload Photo',
+      submitText: trOf(context, 'uploadPhoto'),
       fields: [
         CellfinInputField(
           controller: captionCtrl,
-          hint: 'Caption (e.g., Shelf display, store front banner)',
+          hint: trOf(context, 'photoCaptionHint'),
           prefixIcon:
               const Icon(Icons.short_text_rounded, color: Color(0xFF6B7280)),
         ),
@@ -78,8 +85,8 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
           if (mounted) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Photo uploaded successfully!'),
+              SnackBar(
+                  content: Text(trOf(context, 'photoUploaded')),
                   backgroundColor: _green),
             );
             _loadPhotos();
@@ -108,18 +115,22 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Visit #${widget.visit.id} Photos',
+            Text(
+                trOf(context, 'visitIdPhotos')
+                    .replaceAll('{id}', '${widget.visit.id}'),
                 style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     color: Colors.white)),
-            Text('Outlet #${widget.visit.outletId}',
+            Text(
+                trOf(context, 'outletNumber')
+                    .replaceAll('{id}', '${widget.visit.outletId}'),
                 style: const TextStyle(fontSize: 12, color: Color(0xFFD1FAE5))),
           ],
         ),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: trOf(context, 'refresh'),
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: _loadPhotos,
           ),
@@ -140,14 +151,16 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
                   const Icon(Icons.error_outline_rounded,
                       color: Colors.red, size: 48),
                   const SizedBox(height: 12),
-                  Text('Failed to load photos: ${snapshot.error}',
+                  Text(
+                      trOf(context, 'failedToLoadPhotos')
+                          .replaceAll('{error}', '${snapshot.error}'),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: _green, foregroundColor: Colors.white),
                     onPressed: _loadPhotos,
-                    child: const Text('Retry'),
+                    child: Text(trOf(context, 'retry')),
                   ),
                 ],
               ),
@@ -171,15 +184,14 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
                           size: 54, color: _green),
                     ),
                     const SizedBox(height: 16),
-                    const Text('No Photos Uploaded Yet',
-                        style: TextStyle(
+                    Text(trOf(context, 'noPhotosYet'),
+                        style: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 16)),
                     const SizedBox(height: 6),
-                    const Text(
-                        'Capture or select shelf displays, storefronts, and promotion proofs.',
+                    Text(trOf(context, 'captureHint'),
                         textAlign: TextAlign.center,
-                        style:
-                            TextStyle(color: Color(0xFF6B7280), fontSize: 13)),
+                        style: const TextStyle(
+                            color: Color(0xFF6B7280), fontSize: 13)),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -192,8 +204,9 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
                       ),
                       onPressed: _pickAndUploadPhoto,
                       icon: const Icon(Icons.camera_alt_rounded, size: 18),
-                      label: const Text('Upload First Photo',
-                          style: TextStyle(fontWeight: FontWeight.w700)),
+                      label: Text(trOf(context, 'uploadFirstPhoto'),
+                          style:
+                              const TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -273,8 +286,8 @@ class _VisitPhotosScreenState extends ConsumerState<VisitPhotosScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: _pickAndUploadPhoto,
         icon: const Icon(Icons.add_a_photo_rounded),
-        label: const Text('Take / Upload',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(trOf(context, 'takeOrUpload'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -332,26 +345,33 @@ class _VisitCompetitorsScreenState
 
     await CellfinFormScreen.push(
       context: context,
-      title: 'Log Competitor Activity',
-      officerName: 'VISIT #${widget.visit.id} AUDIT',
-      officerInfo: 'Market Intelligence Record',
-      cards: const [
-        CellfinCardItem(title: 'Pricing', icon: Icons.price_change_outlined),
-        CellfinCardItem(title: 'Promo', icon: Icons.campaign_outlined),
-        CellfinCardItem(title: 'Placement', icon: Icons.view_sidebar_outlined),
-        CellfinCardItem(title: 'Stock', icon: Icons.inventory_outlined),
+      title: trOf(context, 'logCompetitorActivity'),
+      officerName: trOf(context, 'visitIdAudit')
+          .replaceAll('{id}', '${widget.visit.id}'),
+      officerInfo: trOf(context, 'marketIntelligence'),
+      cards: [
+        CellfinCardItem(
+            title: trOf(context, 'pricing'), icon: Icons.price_change_outlined),
+        CellfinCardItem(
+            title: trOf(context, 'promo'), icon: Icons.campaign_outlined),
+        CellfinCardItem(
+            title: trOf(context, 'placement'), icon: Icons.view_sidebar_outlined),
+        CellfinCardItem(
+            title: trOf(context, 'stock'), icon: Icons.inventory_outlined),
       ],
-      submitText: 'Save Competitor',
+      submitText: trOf(context, 'saveCompetitor'),
       fields: [
         StatefulBuilder(
           builder: (context, setDropState) => AppDropdownField<int>(
-            label: 'Select Competitor',
-            hint: 'Choose competitor',
+            label: trOf(context, 'selectCompetitor'),
+            hint: trOf(context, 'chooseCompetitor'),
             value: selectedCompetitorId,
             options: allCompetitors
                 .map((c) => AppDropdownOption<int>(
                       value: c['id'] as int,
-                      title: c['name']?.toString() ?? 'Competitor #${c['id']}',
+                      title: c['name']?.toString() ??
+                          trOf(context, 'competitorHash')
+                              .replaceAll('{id}', '${c['id']}'),
                       leadingIcon: Icons.store_outlined,
                     ))
                 .toList(),
@@ -360,7 +380,7 @@ class _VisitCompetitorsScreenState
         ),
         CellfinInputField(
           controller: notesCtrl,
-          hint: 'Market observations, offer details, shelf presence...',
+          hint: trOf(context, 'competitorObservationsHint'),
           maxLines: 3,
           prefixIcon: const Icon(Icons.notes_rounded, color: Color(0xFF6B7280)),
         ),
@@ -368,7 +388,8 @@ class _VisitCompetitorsScreenState
       onSubmit: () async {
         if (selectedCompetitorId == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please select a competitor')));
+              SnackBar(
+                  content: Text(trOf(context, 'pleaseSelectCompetitor'))));
           return;
         }
         try {
@@ -380,8 +401,8 @@ class _VisitCompetitorsScreenState
           if (mounted) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Competitor activity logged!'),
+              SnackBar(
+                  content: Text(trOf(context, 'competitorLogged')),
                   backgroundColor: _green),
             );
             _loadCompetitors();
@@ -404,19 +425,19 @@ class _VisitCompetitorsScreenState
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Remove Competitor',
-            style: TextStyle(fontWeight: FontWeight.w700)),
-        content:
-            Text('Are you sure you want to remove "$name" from this visit?'),
+        title: Text(trOf(ctx, 'removeCompetitorTitle'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
+        content: Text(trOf(ctx, 'removeFromVisit')
+            .replaceAll('{name}', name)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(trOf(ctx, 'cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFFEF4444)),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove'),
+            child: Text(trOf(ctx, 'remove')),
           ),
         ],
       ),
@@ -428,8 +449,8 @@ class _VisitCompetitorsScreenState
             .removeCompetitor(widget.visit.id, visitCompetitorId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Competitor removed successfully'),
+            SnackBar(
+                content: Text(trOf(context, 'competitorRemoved')),
                 backgroundColor: _green),
           );
           _loadCompetitors();
@@ -457,18 +478,22 @@ class _VisitCompetitorsScreenState
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Visit #${widget.visit.id} Competitors',
+            Text(
+                trOf(context, 'visitIdCompetitors')
+                    .replaceAll('{id}', '${widget.visit.id}'),
                 style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     color: Colors.white)),
-            Text('Outlet #${widget.visit.outletId}',
+            Text(
+                trOf(context, 'outletNumber')
+                    .replaceAll('{id}', '${widget.visit.outletId}'),
                 style: const TextStyle(fontSize: 12, color: Color(0xFFD1FAE5))),
           ],
         ),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: trOf(context, 'refresh'),
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: _loadCompetitors,
           ),
@@ -489,14 +514,16 @@ class _VisitCompetitorsScreenState
                   const Icon(Icons.error_outline_rounded,
                       color: Colors.red, size: 48),
                   const SizedBox(height: 12),
-                  Text('Failed to load competitors: ${snapshot.error}',
+                  Text(
+                      trOf(context, 'failedToLoadCompetitors')
+                          .replaceAll('{error}', '${snapshot.error}'),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: _green, foregroundColor: Colors.white),
                     onPressed: _loadCompetitors,
-                    child: const Text('Retry'),
+                    child: Text(trOf(context, 'retry')),
                   ),
                 ],
               ),
@@ -520,15 +547,14 @@ class _VisitCompetitorsScreenState
                           size: 54, color: _green),
                     ),
                     const SizedBox(height: 16),
-                    const Text('No Competitor Activity Logged',
-                        style: TextStyle(
+                    Text(trOf(context, 'noCompetitorActivity'),
+                        style: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 16)),
                     const SizedBox(height: 6),
-                    const Text(
-                        'Log competitor products, promotional schemes, and pricing observed at this outlet.',
+                    Text(trOf(context, 'competitorEmptyHint'),
                         textAlign: TextAlign.center,
-                        style:
-                            TextStyle(color: Color(0xFF6B7280), fontSize: 13)),
+                        style: const TextStyle(
+                            color: Color(0xFF6B7280), fontSize: 13)),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -541,8 +567,9 @@ class _VisitCompetitorsScreenState
                       ),
                       onPressed: _addCompetitor,
                       icon: const Icon(Icons.add_rounded, size: 18),
-                      label: const Text('Add Competitor',
-                          style: TextStyle(fontWeight: FontWeight.w700)),
+                      label: Text(trOf(context, 'addCompetitor'),
+                          style:
+                              const TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -568,10 +595,14 @@ class _VisitCompetitorsScreenState
                     (c) => c['id'] == competitorId,
                     orElse: () => {},
                   );
-                  compName =
-                      found['name']?.toString() ?? 'Competitor #$competitorId';
+                  compName = found['name']?.toString() ??
+                      trOf(context, 'competitorHash')
+                          .replaceAll('{id}', '$competitorId');
                 }
-                if (compName.isEmpty) compName = 'Competitor #$competitorId';
+                if (compName.isEmpty) {
+                  compName = trOf(context, 'competitorHash')
+                      .replaceAll('{id}', '$competitorId');
+                }
 
                 final notes = item['notes']?.toString() ?? '';
 
@@ -610,15 +641,15 @@ class _VisitCompetitorsScreenState
                                 style: const TextStyle(
                                     fontSize: 12, color: Color(0xFF4B5563))),
                           )
-                        : const Text('No observations noted',
-                            style: TextStyle(
+                        : Text(trOf(context, 'noObservations'),
+                            style: const TextStyle(
                                 fontSize: 11,
                                 fontStyle: FontStyle.italic,
                                 color: Color(0xFF9CA3AF))),
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           color: Color(0xFFEF4444), size: 22),
-                      tooltip: 'Remove',
+                      tooltip: trOf(context, 'remove'),
                       onPressed: () => _deleteCompetitor(id, compName),
                     ),
                   ),
@@ -636,8 +667,8 @@ class _VisitCompetitorsScreenState
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: _addCompetitor,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Add Competitor',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(trOf(context, 'addCompetitor'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -695,29 +726,35 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
 
     await CellfinFormScreen.push(
       context: context,
-      title: 'Log Product Check',
-      officerName: 'VISIT #${widget.visit.id} INVENTORY',
-      officerInfo: 'Shelf Stock & Order Logging',
-      cards: const [
-        CellfinCardItem(title: 'Stock Audit', icon: Icons.inventory_2_outlined),
-        CellfinCardItem(title: 'Order Log', icon: Icons.shopping_cart_outlined),
+      title: trOf(context, 'logProductCheck'),
+      officerName: trOf(context, 'visitIdInventory')
+          .replaceAll('{id}', '${widget.visit.id}'),
+      officerInfo: trOf(context, 'shelfStockOrder'),
+      cards: [
         CellfinCardItem(
-            title: 'Sample', icon: Icons.volunteer_activism_outlined),
+            title: trOf(context, 'stockAudit'),
+            icon: Icons.inventory_2_outlined),
         CellfinCardItem(
-            title: 'Return', icon: Icons.assignment_return_outlined),
+            title: trOf(context, 'orderLog'), icon: Icons.shopping_cart_outlined),
+        CellfinCardItem(
+            title: trOf(context, 'sample'),
+            icon: Icons.volunteer_activism_outlined),
+        CellfinCardItem(
+            title: trOf(context, 'return'),
+            icon: Icons.assignment_return_outlined),
       ],
-      submitText: 'Save Product',
+      submitText: trOf(context, 'saveProduct'),
       fields: [
         StatefulBuilder(
           builder: (context, setDropState) => AppDropdownField<int>(
-            label: 'Select Product',
-            hint: 'Choose product',
+            label: trOf(context, 'selectProduct'),
+            hint: trOf(context, 'chooseProduct'),
             value: selectedProductId,
             options: productsList
                 .map((p) => AppDropdownOption<int>(
                       value: p['id'] as int,
                       title:
-                          '${p['name'] ?? 'Product #${p['id']}'}${p['price'] != null ? ' (৳${p['price']})' : ''}',
+                          '${p['name'] ?? trOf(context, 'productNumber').replaceAll('{id}', '${p['id']}')}${p['price'] != null ? ' (৳${p['price']})' : ''}',
                       subtitle: p['sku']?.toString(),
                       leadingIcon: Icons.inventory_2_outlined,
                     ))
@@ -727,25 +764,25 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
         ),
         CellfinInputField(
           controller: qtyCtrl,
-          hint: 'Quantity (Optional, e.g. 10)',
+          hint: trOf(context, 'quantityOptional'),
           keyboardType: TextInputType.number,
           prefixIcon: const Icon(Icons.format_list_numbered_rounded,
               color: Color(0xFF6B7280)),
         ),
         StatefulBuilder(
           builder: (context, setDropState) => AppDropdownField<bool>(
-            label: 'Availability Status',
+            label: trOf(context, 'availabilityStatus'),
             value: availability,
             searchable: false,
-            options: const [
+            options: [
               AppDropdownOption<bool>(
                 value: true,
-                title: 'In Stock / Available',
+                title: trOf(context, 'inStockAvailable'),
                 leadingIcon: Icons.check_circle_outline_rounded,
               ),
               AppDropdownOption<bool>(
                 value: false,
-                title: 'Out of Stock / Unavailable',
+                title: trOf(context, 'outOfStockUnavailable'),
                 leadingIcon: Icons.cancel_outlined,
               ),
             ],
@@ -754,7 +791,7 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
         ),
         CellfinInputField(
           controller: notesCtrl,
-          hint: 'Notes (e.g. Expiring soon, low shelf space)',
+          hint: trOf(context, 'productNotesHint'),
           maxLines: 2,
           prefixIcon: const Icon(Icons.notes_rounded, color: Color(0xFF6B7280)),
         ),
@@ -762,7 +799,8 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
       onSubmit: () async {
         if (selectedProductId == null) {
           ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Please select a product')));
+              SnackBar(
+                  content: Text(trOf(context, 'pleaseSelectProduct'))));
           return;
         }
         final qty = int.tryParse(qtyCtrl.text.trim());
@@ -777,8 +815,8 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
           if (mounted) {
             Navigator.pop(context);
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                  content: Text('Product audit saved!'),
+              SnackBar(
+                  content: Text(trOf(context, 'productAuditSaved')),
                   backgroundColor: _green),
             );
             _loadProducts();
@@ -802,19 +840,19 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Remove Product Log',
-            style: TextStyle(fontWeight: FontWeight.w700)),
-        content:
-            Text('Are you sure you want to remove "$name" from this visit?'),
+        title: Text(trOf(ctx, 'removeProductLogTitle'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
+        content: Text(trOf(ctx, 'removeFromVisit')
+            .replaceAll('{name}', name)),
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Cancel')),
+              child: Text(trOf(ctx, 'cancel'))),
           FilledButton(
             style: FilledButton.styleFrom(
                 backgroundColor: const Color(0xFFEF4444)),
             onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Remove'),
+            child: Text(trOf(ctx, 'remove')),
           ),
         ],
       ),
@@ -826,8 +864,8 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
             .removeProduct(widget.visit.id, visitProductId);
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Product entry removed'),
+            SnackBar(
+                content: Text(trOf(context, 'productEntryRemoved')),
                 backgroundColor: _green),
           );
           _loadProducts();
@@ -855,18 +893,22 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Visit #${widget.visit.id} Products',
+            Text(
+                trOf(context, 'visitIdProducts')
+                    .replaceAll('{id}', '${widget.visit.id}'),
                 style: const TextStyle(
                     fontWeight: FontWeight.w700,
                     fontSize: 17,
                     color: Colors.white)),
-            Text('Outlet #${widget.visit.outletId}',
+            Text(
+                trOf(context, 'outletNumber')
+                    .replaceAll('{id}', '${widget.visit.outletId}'),
                 style: const TextStyle(fontSize: 12, color: Color(0xFFD1FAE5))),
           ],
         ),
         actions: [
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: trOf(context, 'refresh'),
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: _loadProducts,
           ),
@@ -887,14 +929,16 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
                   const Icon(Icons.error_outline_rounded,
                       color: Colors.red, size: 48),
                   const SizedBox(height: 12),
-                  Text('Failed to load products: ${snapshot.error}',
+                  Text(
+                      trOf(context, 'failedToLoadProducts')
+                          .replaceAll('{error}', '${snapshot.error}'),
                       textAlign: TextAlign.center),
                   const SizedBox(height: 12),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                         backgroundColor: _green, foregroundColor: Colors.white),
                     onPressed: _loadProducts,
-                    child: const Text('Retry'),
+                    child: Text(trOf(context, 'retry')),
                   ),
                 ],
               ),
@@ -918,15 +962,14 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
                           size: 54, color: _green),
                     ),
                     const SizedBox(height: 16),
-                    const Text('No Products Checked Yet',
-                        style: TextStyle(
+                    Text(trOf(context, 'noProductsYet'),
+                        style: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 16)),
                     const SizedBox(height: 6),
-                    const Text(
-                        'Record product stock availability, quantity, and orders during this visit.',
+                    Text(trOf(context, 'productsEmptyHint'),
                         textAlign: TextAlign.center,
-                        style:
-                            TextStyle(color: Color(0xFF6B7280), fontSize: 13)),
+                        style: const TextStyle(
+                            color: Color(0xFF6B7280), fontSize: 13)),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       style: ElevatedButton.styleFrom(
@@ -939,8 +982,9 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
                       ),
                       onPressed: _addProduct,
                       icon: const Icon(Icons.add_rounded, size: 18),
-                      label: const Text('Log Product',
-                          style: TextStyle(fontWeight: FontWeight.w700)),
+                      label: Text(trOf(context, 'logProduct'),
+                          style:
+                              const TextStyle(fontWeight: FontWeight.w700)),
                     ),
                   ],
                 ),
@@ -965,10 +1009,14 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
                     (p) => p['id'] == productId,
                     orElse: () => {},
                   );
-                  productName =
-                      found['name']?.toString() ?? 'Product #$productId';
+                  productName = found['name']?.toString() ??
+                      trOf(context, 'productNumber')
+                          .replaceAll('{id}', '$productId');
                 }
-                if (productName.isEmpty) productName = 'Product #$productId';
+                if (productName.isEmpty) {
+                  productName = trOf(context, 'productNumber')
+                      .replaceAll('{id}', '$productId');
+                }
 
                 final quantity = item['quantity'];
                 final availability = item['availability'];
@@ -1036,7 +1084,9 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
                       children: [
                         const SizedBox(height: 4),
                         if (quantity != null)
-                          Text('Quantity: $quantity',
+                          Text(
+                    trOf(context, 'quantityLabel')
+                        .replaceAll('{n}', '$quantity'),
                               style: const TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
@@ -1053,7 +1103,7 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
                     trailing: IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           color: Color(0xFFEF4444), size: 22),
-                      tooltip: 'Remove',
+                      tooltip: trOf(context, 'remove'),
                       onPressed: () => _deleteProduct(id, productName),
                     ),
                   ),
@@ -1071,8 +1121,8 @@ class _VisitProductsScreenState extends ConsumerState<VisitProductsScreen> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: _addProduct,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Log Product',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(trOf(context, 'logProduct'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }

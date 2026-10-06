@@ -13,6 +13,7 @@ class User with _$User {
     @JsonKey(name: 'unique_id') required String uniqueId,
     required int status,
     @JsonKey(name: 'last_login_at') String? lastLoginAt,
+    @JsonKey(defaultValue: 'en') String? locale,
     List<String>? roles,
     List<String>? permissions,
   }) = _User;

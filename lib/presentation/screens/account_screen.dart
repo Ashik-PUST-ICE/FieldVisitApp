@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/constants/app_constants.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/core/widgets/tunneled_image.dart';
@@ -89,8 +90,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(hasImage
-              ? 'Profile image updated successfully'
-              : 'Image uploaded but not returned by server'),
+              ? tr(ref, 'profileImageUpdated')
+              : tr(ref, 'imageNotReturned')),
           backgroundColor: hasImage ? AppColors.success : AppColors.warning,
         ),
       );
@@ -112,7 +113,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
       });
       await ref.read(authProvider.notifier).getProfile();
       messenger.showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully!')),
+        SnackBar(content: Text(tr(ref, 'profileUpdated'))),
       );
     } catch (e) {
       _show(messenger, e);
@@ -152,8 +153,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Profile',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'myProfile'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -233,7 +234,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        user?.fullName ?? 'Field Officer',
+                        user?.fullName ?? tr(ref, 'fieldOfficerTitle'),
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -259,7 +260,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
                         child: Text(
                           user?.roles?.isNotEmpty == true
                               ? (user!.roles as List).join(' • ')
-                              : 'Field Operations Specialist',
+                              : tr(ref, 'fieldOpsSpecialist'),
                           style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,
@@ -278,19 +279,19 @@ class _AccountState extends ConsumerState<AccountScreen> {
           _buildSectionCard(
             context,
             isDark: isDark,
-            title: 'Personal Details',
+            title: tr(ref, 'personalDetails'),
             icon: Icons.badge_outlined,
             children: [
               CellfinInputField(
                 controller: first,
-                hint: 'First Name',
+                hint: tr(ref, 'firstName'),
                 prefixIcon: const Icon(Icons.person_outline_rounded,
                     color: Color(0xFF6B7280)),
               ),
               const SizedBox(height: 12),
               CellfinInputField(
                 controller: last,
-                hint: 'Last Name',
+                hint: tr(ref, 'lastName'),
                 prefixIcon: const Icon(Icons.person_outline_rounded,
                     color: Color(0xFF6B7280)),
               ),
@@ -298,7 +299,7 @@ class _AccountState extends ConsumerState<AccountScreen> {
               CellfinInputField(
                 controller: mobile,
                 keyboardType: TextInputType.phone,
-                hint: 'Mobile Number',
+                hint: tr(ref, 'mobileNumber'),
                 prefixIcon:
                     const Icon(Icons.phone_outlined, color: Color(0xFF6B7280)),
               ),
@@ -319,8 +320,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
                         height: 20,
                         child: CircularProgressIndicator(
                             color: Colors.white, strokeWidth: 2))
-                    : const Text('Submit Profile Changes',
-                        style: TextStyle(
+                    : Text(tr(ref, 'submitProfileChanges'),
+                        style: const TextStyle(
                             fontWeight: FontWeight.w700, fontSize: 16)),
               ),
             ],
@@ -337,8 +338,8 @@ class _AccountState extends ConsumerState<AccountScreen> {
                   borderRadius: BorderRadius.circular(14)),
             ),
             icon: const Icon(Icons.logout_rounded),
-            label: const Text('Log Out of FieldVisit',
-                style: TextStyle(fontWeight: FontWeight.w700)),
+            label: Text(tr(ref, 'logOutFieldVisit'),
+                style: const TextStyle(fontWeight: FontWeight.w700)),
             onPressed: () => ref.read(authProvider.notifier).logout(),
           ),
           const SizedBox(height: 40),

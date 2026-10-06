@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 import 'package:field_visit_app/presentation/screens/account_screen.dart';
@@ -27,7 +28,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _currentIndex = 0;
 
-  final List<Widget> _screens = const [
+  List<Widget> _screens = const [
     DashboardScreen(), // 0: Dashboard
     OutletsScreen(), // 1: Outlets
     VisitsScreen(), // 2: Visits
@@ -141,7 +142,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                   // Profile Icon
                   IconButton(
-                    tooltip: 'My Profile',
+                    tooltip: tr(ref, 'myProfile'),
                     icon: const Icon(Icons.person_outline_rounded,
                         color: Colors.white, size: 24),
                     onPressed: () => _openScreen(const AccountScreen()),
@@ -156,7 +157,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                         clipBehavior: Clip.none,
                         children: [
                           IconButton(
-                            tooltip: 'Alerts',
+                            tooltip: tr(ref, 'alerts'),
                             icon: const Icon(Icons.notifications_none_rounded,
                                 color: Colors.white, size: 24),
                             onPressed: () =>
@@ -193,7 +194,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
 
                   // Logout Icon
                   IconButton(
-                    tooltip: 'Logout',
+                    tooltip: tr(ref, 'logout'),
                     icon: const Icon(Icons.logout_rounded,
                         color: Colors.white, size: 24),
                     onPressed: () => ref.read(authProvider.notifier).logout(),
@@ -232,7 +233,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               _buildBottomNavItem(
                 icon: Icons.dashboard_outlined,
                 activeIcon: Icons.dashboard_rounded,
-                label: 'Dashboard',
+                label: tr(ref, 'dashboard'),
                 isSelected: _currentIndex == 0,
                 onTap: () => setState(() => _currentIndex = 0),
               ),
@@ -241,7 +242,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               _buildBottomNavItem(
                 icon: Icons.storefront_outlined,
                 activeIcon: Icons.storefront_rounded,
-                label: 'Outlets',
+                label: tr(ref, 'navOutlets'),
                 isSelected: _currentIndex == 1,
                 onTap: () => setState(() => _currentIndex = 1),
               ),
@@ -253,7 +254,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               _buildBottomNavItem(
                 icon: Icons.assignment_outlined,
                 activeIcon: Icons.assignment_rounded,
-                label: 'Visits',
+                label: tr(ref, 'navVisits'),
                 isSelected: _currentIndex == 2,
                 onTap: () => setState(() => _currentIndex = 2),
               ),
@@ -262,7 +263,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               _buildBottomNavItem(
                 icon: Icons.grid_view_rounded,
                 activeIcon: Icons.grid_view_rounded,
-                label: 'More',
+                label: tr(ref, 'more'),
                 isSelected: _currentIndex == 4,
                 onTap: () => setState(() => _currentIndex = 4),
               ),
@@ -296,19 +297,19 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                       ],
                     ),
                     padding: const EdgeInsets.all(8),
-                    child: const Column(
+                    child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          'CHECK-IN',
-                          style: TextStyle(
+                          tr(ref, 'checkIn'),
+                          style: const TextStyle(
                             color: Color(0xFFD32F2F),
                             fontSize: 7,
                             fontWeight: FontWeight.w900,
                             letterSpacing: -0.2,
                           ),
                         ),
-                        Icon(
+                        const Icon(
                           Icons.qr_code_2_rounded,
                           color: Color(0xFF136B3E),
                           size: 26,
@@ -317,9 +318,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                     ),
                   ),
                   const SizedBox(height: 3),
-                  const Text(
-                    'Scan QR',
-                    style: TextStyle(
+                  Text(
+                    tr(ref, 'scanQr'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
@@ -440,9 +441,9 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                               ],
                             ),
                           ),
-                          const Text(
-                            'Field Operations & Sales',
-                            style: TextStyle(
+                          Text(
+                            tr(ref, 'fieldOpsSales'),
+                            style: const TextStyle(
                               color: Color(0xFF6B7280),
                               fontSize: 9.5,
                               fontWeight: FontWeight.w500,
@@ -461,29 +462,29 @@ class _MainScreenState extends ConsumerState<MainScreen> {
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 children: [
-                  _buildDrawerTile(Icons.home_rounded, 'Home Dashboard',
+                  _buildDrawerTile(Icons.home_rounded, tr(ref, 'drawerHome'),
                       () => _selectTab(0)),
-                  _buildDrawerTile(Icons.storefront_rounded, 'Outlets & Stores',
+                  _buildDrawerTile(Icons.storefront_rounded, tr(ref, 'drawerOutlets'),
                       () => _selectTab(1)),
-                  _buildDrawerTile(Icons.assignment_rounded, 'My Field Visits',
+                  _buildDrawerTile(Icons.assignment_rounded, tr(ref, 'drawerVisits'),
                       () => _selectTab(2)),
-                  _buildDrawerTile(Icons.fact_check_rounded, 'Target & KPIs',
+                  _buildDrawerTile(Icons.fact_check_rounded, tr(ref, 'drawerKpi'),
                       () => _openScreen(const KpiScreen())),
-                  _buildDrawerTile(Icons.map_rounded, 'Field Route & Map',
+                  _buildDrawerTile(Icons.map_rounded, tr(ref, 'drawerMap'),
                       () => _openScreen(const MapScreen())),
-                  _buildDrawerTile(Icons.bar_chart_rounded, 'Targets & Reports',
+                  _buildDrawerTile(Icons.bar_chart_rounded, tr(ref, 'drawerReports'),
                       () => _openScreen(const ReportsScreen())),
-                  _buildDrawerTile(Icons.settings_rounded, 'Settings',
+                  _buildDrawerTile(Icons.settings_rounded, tr(ref, 'drawerSettings'),
                       () => _openScreen(const SettingsScreen())),
                   if ((ref.watch(authProvider).valueOrNull?.roles ?? []).any(
                       (role) =>
                           role == 'super-admin' ||
                           role == 'special-super-admin'))
-                    _buildDrawerTile(Icons.cloud_outlined, 'Storage Settings',
+                    _buildDrawerTile(Icons.cloud_outlined, tr(ref, 'drawerStorage'),
                         () => _openScreen(const StorageSettingsScreen())),
-                  _buildDrawerTile(Icons.person_outline_rounded, 'My Profile',
+                  _buildDrawerTile(Icons.person_outline_rounded, tr(ref, 'myProfile'),
                       () => _openScreen(const AccountScreen())),
-                  _buildDrawerTile(Icons.logout_rounded, 'Logout',
+                  _buildDrawerTile(Icons.logout_rounded, tr(ref, 'logout'),
                       () => ref.read(authProvider.notifier).logout()),
                 ],
               ),
@@ -497,7 +498,7 @@ class _MainScreenState extends ConsumerState<MainScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(
-                    'Version 2.4.0 (Build 395)',
+                    tr(ref, 'version'),
                     style: TextStyle(
                       color: isDark
                           ? const Color(0xFF9CA3AF)

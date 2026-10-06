@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/products_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class ProductsScreen extends ConsumerStatefulWidget {
   const ProductsScreen({super.key});
@@ -39,7 +40,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen>
         ),
         actions: [
           IconButton(
-            tooltip: 'Refresh Catalog',
+            tooltip: tr(ref, 'refreshCatalog'),
             icon: const Icon(Icons.refresh_rounded, color: Colors.white),
             onPressed: () {
               ref.read(productsProvider.notifier).refresh();
@@ -85,7 +86,7 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen>
               onChanged: (val) =>
                   setState(() => _searchQuery = val.trim().toLowerCase()),
               decoration: InputDecoration(
-                hintText: 'Search catalog by name or SKU code...',
+                hintText: tr(ref, 'searchCatalog'),
                 hintStyle:
                     const TextStyle(color: Color(0xFF757575), fontSize: 14),
                 prefixIcon: const Icon(Icons.search_rounded,
@@ -223,7 +224,7 @@ class _ProductList extends ConsumerWidget {
         onPressed: () =>
             _showProductOrCategoryForm(context, ref, product: true),
         icon: const Icon(Icons.add_circle_outline_rounded),
-        label: const Text('Add Product',
+        label: Text(tr(ref, 'addProduct'),
             style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
@@ -314,7 +315,7 @@ class _CategoryList extends ConsumerWidget {
         onPressed: () =>
             _showProductOrCategoryForm(context, ref, product: false),
         icon: const Icon(Icons.add_circle_outline_rounded),
-        label: const Text('Add Category',
+        label: Text(tr(ref, 'addCategory'),
             style: TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
@@ -476,14 +477,14 @@ class _ProductCard extends ConsumerWidget {
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           size: 20, color: Color(0xFF136B3E)),
-                      tooltip: 'Edit Product',
+                      tooltip: tr(ref, 'editProduct'),
                       onPressed: () => _showProductOrCategoryForm(context, ref,
                           product: true, item: item),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           size: 20, color: Color(0xFFEF4444)),
-                      tooltip: 'Delete Product',
+                      tooltip: tr(ref, 'deleteProduct'),
                       onPressed: () => _confirmDelete(context, () async {
                         await ref.read(productsProvider.notifier).remove(id);
                       }),
@@ -628,14 +629,14 @@ class _CategoryCard extends ConsumerWidget {
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           size: 20, color: Color(0xFF136B3E)),
-                      tooltip: 'Edit Category',
+                      tooltip: tr(ref, 'editCategory'),
                       onPressed: () => _showProductOrCategoryForm(context, ref,
                           product: false, item: item),
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           size: 20, color: Color(0xFFEF4444)),
-                      tooltip: 'Delete Category',
+                      tooltip: tr(ref, 'deleteCategory'),
                       onPressed: () => _confirmDelete(context, () async {
                         await ref.read(categoriesProvider.notifier).remove(id);
                       }),
@@ -658,15 +659,14 @@ Future<void> _confirmDelete(
     context: context,
     builder: (ctx) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-      title: const Text('Confirm Deletion',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
-      content: const Text(
-          'Are you sure you want to remove this item from the catalog? This action cannot be undone.'),
+      title: Text(trOf(ctx, 'confirmDeletion'),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18)),
+      content: Text(trOf(ctx, 'removeCatalogItem')),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx, false),
-          child:
-              const Text('Cancel', style: TextStyle(color: Color(0xFF6B7280))),
+          child: Text(trOf(ctx, 'cancel'),
+              style: const TextStyle(color: Color(0xFF6B7280))),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -677,7 +677,7 @@ Future<void> _confirmDelete(
             elevation: 0,
           ),
           onPressed: () => Navigator.pop(ctx, true),
-          child: const Text('Delete'),
+          child: Text(trOf(ctx, 'delete')),
         ),
       ],
     ),
@@ -688,9 +688,9 @@ Future<void> _confirmDelete(
       await onConfirm();
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Item deleted successfully'),
-              backgroundColor: Color(0xFF136B3E)),
+          SnackBar(
+              content: Text(trOf(context, 'itemDeleted')),
+              backgroundColor: const Color(0xFF136B3E)),
         );
       }
     } catch (e) {
@@ -719,45 +719,53 @@ Future<void> _showProductOrCategoryForm(
 
   // 4 Top Cards per user's reference photograph
   final cards = product
-      ? const [
-          CellfinCardItem(title: 'Standard', icon: Icons.inventory_2_outlined),
+      ? [
           CellfinCardItem(
-              title: 'Best Seller', icon: Icons.star_outline_rounded),
-          CellfinCardItem(title: 'New SKU', icon: Icons.fiber_new_rounded),
-          CellfinCardItem(title: 'Bulk Carton', icon: Icons.all_inbox_rounded),
+              title: tr(ref, 'standard'), icon: Icons.inventory_2_outlined),
+          CellfinCardItem(
+              title: tr(ref, 'bestSeller'), icon: Icons.star_outline_rounded),
+          CellfinCardItem(
+              title: tr(ref, 'newSku'), icon: Icons.fiber_new_rounded),
+          CellfinCardItem(
+              title: tr(ref, 'bulkCarton'), icon: Icons.all_inbox_rounded),
         ]
-      : const [
-          CellfinCardItem(title: 'FMCG Goods', icon: Icons.category_outlined),
-          CellfinCardItem(title: 'Beverages', icon: Icons.local_drink_outlined),
+      : [
           CellfinCardItem(
-              title: 'Snacks & Food', icon: Icons.fastfood_outlined),
-          CellfinCardItem(title: 'Personal Care', icon: Icons.spa_outlined),
+              title: tr(ref, 'fmcgGoods'), icon: Icons.category_outlined),
+          CellfinCardItem(
+              title: tr(ref, 'beverages'), icon: Icons.local_drink_outlined),
+          CellfinCardItem(
+              title: tr(ref, 'snacksFood'), icon: Icons.fastfood_outlined),
+          CellfinCardItem(
+              title: tr(ref, 'personalCare'), icon: Icons.spa_outlined),
         ];
 
   await CellfinFormScreen.push(
     context: context,
     title: item == null
-        ? (product ? 'Add New Product' : 'Add New Category')
-        : (product ? 'Edit Product SKU' : 'Edit Category'),
+        ? (product ? tr(ref, 'addNewProduct') : tr(ref, 'addNewCategory'))
+        : (product ? tr(ref, 'editProductSku') : tr(ref, 'editCategory')),
     cards: cards,
     officerName: 'MD. ASHIKUR RAHMAN',
-    officerInfo: '01748 031 295 (Sales Catalog Officer)',
+    officerInfo: tr(ref, 'salesCatalogOfficer'),
     submitText: item == null
-        ? (product ? 'Submit Product' : 'Submit Category')
-        : 'Save Changes',
+        ? (product ? tr(ref, 'submitProduct') : tr(ref, 'submitCategory'))
+        : tr(ref, 'saveChangesLower'),
     fields: [
       // Name Field
       CellfinInputField(
         controller: name,
-        hint: product ? 'Product Title / Name *' : 'Category Title / Name *',
+        hint: product
+            ? '${tr(ref, 'productTitleName')} *'
+            : '${tr(ref, 'categoryTitleName')} *',
         prefixIcon: Icon(
           product ? Icons.inventory_2_outlined : Icons.category_outlined,
           color: const Color(0xFF6B7280),
         ),
         validator: (v) => v == null || v.trim().isEmpty
             ? (product
-                ? 'Product name is required'
-                : 'Category name is required')
+                ? tr(ref, 'productNameRequired')
+                : tr(ref, 'categoryNameRequired'))
             : null,
       ),
 
@@ -765,8 +773,8 @@ Future<void> _showProductOrCategoryForm(
       CellfinInputField(
         controller: code,
         hint: product
-            ? 'SKU / Item Code (e.g. PRD-102)'
-            : 'Category Code (e.g. CAT-01)',
+            ? tr(ref, 'skuItemCode')
+            : tr(ref, 'categoryCodeHint'),
         prefixIcon: const Icon(Icons.qr_code_rounded, color: Color(0xFF6B7280)),
       ),
 
@@ -775,14 +783,14 @@ Future<void> _showProductOrCategoryForm(
         CellfinInputField(
           controller: price,
           keyboardType: TextInputType.number,
-          hint: 'Retail Unit Price',
+          hint: tr(ref, 'retailUnitPrice'),
           prefixIcon: const Icon(Icons.sell_outlined, color: Color(0xFF6B7280)),
           suffixText: '৳',
           validator: (v) {
             if (v != null &&
                 v.trim().isNotEmpty &&
                 int.tryParse(v.trim()) == null) {
-              return 'Enter a valid number';
+              return trOf(context, 'enterValidNumber');
             }
             return null;
           },
@@ -894,7 +902,7 @@ class _ErrorView extends StatelessWidget {
                       borderRadius: BorderRadius.circular(10)),
                 ),
                 onPressed: retry,
-                child: const Text('Try Again'),
+                child: Text(trOf(context, 'tryAgainBtn')),
               ),
             ],
           ),

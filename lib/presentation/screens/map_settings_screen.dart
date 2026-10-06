@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/utils/map_credentials_store.dart';
 import 'package:field_visit_app/presentation/screens/map_screen.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 /// In-app form for the Google Maps credential.
 ///
@@ -71,7 +72,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
     setState(() {
       _busy = false;
       _obscure = true;
-      _status = 'Saved - the map now uses this key.';
+      _status = trOf(context, 'mapKeySaved');
       _check = null;
     });
   }
@@ -81,7 +82,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
     if (!mounted) return;
     setState(() {
       _controller.clear();
-      _status = 'Key removed.';
+      _status = trOf(context, 'keyRemoved');
       _check = null;
     });
   }
@@ -89,7 +90,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Map API Credential')),
+      appBar: AppBar(title: Text(trOf(context, 'mapApiCredential'))),
       body: _loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
@@ -102,17 +103,16 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Google Maps API Key',
+                          tr(ref, 'googleMapsApiKey'),
                           style: Theme.of(context)
                               .textTheme
                               .titleMedium
                               ?.copyWith(fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
-                        const Text(
-                          'Stored encrypted on this device and used by the '
-                          'Live Route map. Applies immediately.',
-                          style: TextStyle(fontSize: 12.5),
+                        Text(
+                          tr(ref, 'mapKeyHelp'),
+                          style: const TextStyle(fontSize: 12.5),
                         ),
                         const SizedBox(height: 16),
                         Form(
@@ -122,7 +122,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
                             obscureText: _obscure,
                             autocorrect: false,
                             decoration: InputDecoration(
-                              labelText: 'API Key',
+                              labelText: tr(ref, 'apiKey'),
                               hintText: 'AIza...',
                               border: const OutlineInputBorder(),
                               suffixIcon: IconButton(
@@ -134,7 +134,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
                               ),
                             ),
                             validator: (v) => (v == null || v.trim().isEmpty)
-                                ? 'Enter your Google Maps API key'
+                                ? tr(ref, 'enterApiKey')
                                 : null,
                           ),
                         ),
@@ -170,7 +170,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
               child: OutlinedButton.icon(
                 onPressed: _busy ? null : _test,
                 icon: const Icon(Icons.wifi_tethering_rounded),
-                label: const Text('Test key'),
+                label: Text(tr(ref, 'testKey')),
               ),
             ),
             const SizedBox(width: 12),
@@ -178,7 +178,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
               child: FilledButton.icon(
                 onPressed: _busy ? null : _save,
                 icon: const Icon(Icons.save_rounded),
-                label: const Text('Save'),
+                label: Text(tr(ref, 'save')),
               ),
             ),
           ],
@@ -187,7 +187,7 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
         OutlinedButton.icon(
           onPressed: _busy ? null : _clear,
           icon: const Icon(Icons.delete_outline),
-          label: const Text('Remove saved key'),
+          label: Text(tr(ref, 'removeSavedKey')),
         ),
       ],
     );
@@ -197,8 +197,8 @@ class _MapSettingsScreenState extends ConsumerState<MapSettingsScreen> {
     return Card(
       child: ListTile(
         leading: const Icon(Icons.map_outlined, color: AppColors.cellfinGreen),
-        title: const Text('Open Live Route map'),
-        subtitle: const Text('See the map using the saved key'),
+        title: Text(trOf(context, 'openLiveRoute')),
+        subtitle: Text(trOf(context, 'seeMapWithKey')),
         trailing: const Icon(Icons.chevron_right_rounded),
         onTap: () => Navigator.of(context)
             .push(MaterialPageRoute(builder: (_) => const MapScreen())),
@@ -237,20 +237,19 @@ class _HelpCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Card(
+    return Card(
       child: Padding(
-        padding: EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Before the key works',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+            Text(trOf(context, 'beforeKeyWorks'),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w800, fontSize: 14)),
             SizedBox(height: 8),
             Text(
-              '1. In Google Cloud Console enable "Maps JavaScript API".\n'
-              '2. Create an API key and restrict it to this app.\n'
-              '3. Paste it above and press Save.',
-              style: TextStyle(fontSize: 12.5, height: 1.5),
+              trOf(context, 'keyStepsHelp'),
+              style: const TextStyle(fontSize: 12.5, height: 1.5),
             ),
           ],
         ),

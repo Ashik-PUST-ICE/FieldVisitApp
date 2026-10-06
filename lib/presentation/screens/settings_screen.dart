@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
 import 'package:field_visit_app/presentation/screens/location_management_screen.dart';
 import 'package:field_visit_app/presentation/screens/map_settings_screen.dart';
@@ -19,43 +20,47 @@ class SettingsScreen extends ConsumerWidget {
     final roles = ref.watch(authProvider).valueOrNull?.roles ?? const [];
     final isAdmin =
         roles.any((r) => r == 'super-admin' || r == 'special-super-admin');
+    final isBangla = ref.watch(localeProvider).languageCode == 'bn';
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'settings'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
         children: [
-          _groupLabel(context, 'SECURITY'),
+          _groupLabel(context, tr(ref, 'language').toUpperCase()),
+          _languageTile(context, ref, isBangla),
+          const SizedBox(height: 20),
+          _groupLabel(context, tr(ref, 'security').toUpperCase()),
           _tile(
             context,
             icon: Icons.lock_person_rounded,
             color: const Color(0xFF059669),
-            title: 'Security & Privacy',
-            subtitle: 'PIN, biometrics, OTP channel',
+            title: tr(ref, 'securityPrivacy'),
+            subtitle: tr(ref, 'securitySubtitle'),
             screen: const SecuritySettingsScreen(),
           ),
           const SizedBox(height: 20),
-          _groupLabel(context, 'MAPS'),
+          _groupLabel(context, tr(ref, 'maps').toUpperCase()),
           _tile(
             context,
             icon: Icons.map_rounded,
             color: const Color(0xFF0EA5E9),
-            title: 'Map API Credential',
-            subtitle: 'Google Maps key for Live Route',
+            title: tr(ref, 'mapCredential'),
+            subtitle: tr(ref, 'mapCredentialSubtitle'),
             screen: const MapSettingsScreen(),
           ),
           if (isAdmin) ...[
             const SizedBox(height: 20),
-            _groupLabel(context, 'ADMINISTRATION'),
+            _groupLabel(context, tr(ref, 'administration').toUpperCase()),
             _tile(
               context,
               icon: Icons.account_tree_rounded,
               color: const Color(0xFF0F766E),
-              title: 'Location Master',
-              subtitle: 'Add or edit villages, wards and unions',
+              title: tr(ref, 'locationMaster'),
+              subtitle: tr(ref, 'locationMasterSubtitle'),
               screen: const LocationManagementScreen(),
             ),
             const SizedBox(height: 12),
@@ -63,12 +68,87 @@ class SettingsScreen extends ConsumerWidget {
               context,
               icon: Icons.cloud_outlined,
               color: const Color(0xFF6366F1),
-              title: 'Storage Settings',
-              subtitle: 'Provider, bucket and connection test',
+              title: tr(ref, 'storageSettings'),
+              subtitle: tr(ref, 'storageSubtitle'),
               screen: const StorageSettingsScreen(),
             ),
           ],
         ],
+      ),
+    );
+  }
+
+  /// English / বাংলা switch. Applies instantly on-device, then syncs to
+  /// the account in the background so other phones follow.
+  Widget _languageTile(BuildContext context, WidgetRef ref, bool isBangla) {
+    return Card(
+      elevation: 0,
+      color: const Color(0xFF136B3E).withOpacity(0.06),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: const Color(0xFF136B3E).withOpacity(0.25)),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: const Color(0xFF136B3E).withOpacity(0.15),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: const Icon(Icons.translate_rounded,
+                  color: Color(0xFF136B3E), size: 22),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(tr(ref, 'language'),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.w700, fontSize: 15)),
+                  Text(tr(ref, 'languageSubtitle'),
+                      style: const TextStyle(fontSize: 12.5)),
+                ],
+              ),
+            ),
+            SegmentedButton<String>(
+              segments: [
+                ButtonSegment(
+                    value: 'en',
+                    label: Text(tr(ref, 'english'),
+                        style: const TextStyle(fontSize: 12.5))),
+                ButtonSegment(
+                    value: 'bn',
+                    label: Text(tr(ref, 'bangla'),
+                        style: const TextStyle(fontSize: 12.5))),
+              ],
+              selected: {isBangla ? 'bn' : 'en'},
+              showSelectedIcon: false,
+              style: SegmentedButton.styleFrom(
+                visualDensity: VisualDensity.compact,
+              ),
+              onSelectionChanged: (codes) async {
+                final code = codes.first;
+                final synced =
+                    await ref.read(localeProvider.notifier).setLocale(code);
+                if (!context.mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '${tr(ref, 'languageChanged')} — '
+                      '${synced ? tr(ref, 'languageSavedOnline') : tr(ref, 'languageSavedOffline')}',
+                    ),
+                    backgroundColor: const Color(0xFF136B3E),
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/reference_data_provider.dart';
 
@@ -31,9 +32,9 @@ class _ReferenceDataState extends ConsumerState<ReferenceDataScreen>
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'Reference Data',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        title: Text(
+          tr(ref, 'referenceData'),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(46),
@@ -47,13 +48,13 @@ class _ReferenceDataState extends ConsumerState<ReferenceDataScreen>
               unselectedLabelColor: Colors.white70,
               labelStyle:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-              tabs: const [
+              tabs: [
                 Tab(
-                    icon: Icon(Icons.straighten_outlined, size: 18),
-                    text: 'Units'),
+                    icon: const Icon(Icons.straighten_outlined, size: 18),
+                    text: tr(ref, 'units')),
                 Tab(
-                    icon: Icon(Icons.warning_amber_outlined, size: 18),
-                    text: 'Competitors'),
+                    icon: const Icon(Icons.warning_amber_outlined, size: 18),
+                    text: tr(ref, 'competitors')),
               ],
             ),
           ),
@@ -113,7 +114,7 @@ class _ReferenceList extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: notifier.fetch,
-                    child: const Text('Retry'),
+                    child: Text(tr(ref, 'retry')),
                   ),
                 ],
               ),
@@ -143,7 +144,9 @@ class _ReferenceList extends ConsumerWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            units ? 'No units defined' : 'No competitors added',
+                            units
+                                ? tr(ref, 'noUnitsAdded')
+                                : tr(ref, 'noCompetitorsAdded'),
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
@@ -151,9 +154,9 @@ class _ReferenceList extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
-                            'Tap + below to add a record',
-                            style: TextStyle(
+                          Text(
+                            tr(ref, 'tapBelowToAddRecord'),
+                            style: const TextStyle(
                                 fontSize: 13, color: Color(0xFF6B7280)),
                           ),
                         ],
@@ -179,15 +182,21 @@ class _ReferenceList extends ConsumerWidget {
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14)),
                             title: Text(
-                                units ? 'Delete Unit?' : 'Delete Competitor?',
+                                units
+                                    ? tr(ref, 'deleteUnitTitle')
+                                    : tr(ref, 'deleteCompetitorTitle'),
                                 style: const TextStyle(
                                     fontWeight: FontWeight.w700)),
-                            content: Text('Remove "${item['name'] ?? ''}"?'),
+                            content: Text(
+                                tr(ref, 'removeQuestion')
+                                    .replaceAll('{name}',
+                                        (item['name'] ?? '').toString())),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel',
-                                    style: TextStyle(color: Color(0xFF6B7280))),
+                                child: Text(trOf(context, 'cancel'),
+                                    style: const TextStyle(
+                                        color: Color(0xFF6B7280))),
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -198,7 +207,7 @@ class _ReferenceList extends ConsumerWidget {
                                   elevation: 0,
                                 ),
                                 onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Delete'),
+                                child: Text(tr(ref, 'delete')),
                               ),
                             ],
                           ),
@@ -227,7 +236,8 @@ class _ReferenceList extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: () => _edit(context, ref, units, null),
         icon: const Icon(Icons.add_rounded),
-        label: Text(units ? 'Add Unit' : 'Add Competitor',
+        label: Text(
+            units ? tr(ref, 'addUnit') : tr(ref, 'addCompetitor'),
             style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
@@ -369,13 +379,13 @@ class _RefCard extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           size: 20, color: _green),
-                      tooltip: 'Edit',
+                      tooltip: trOf(context, 'edit'),
                       onPressed: onEdit,
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           size: 20, color: Color(0xFFEF4444)),
-                      tooltip: 'Delete',
+                      tooltip: trOf(context, 'delete'),
                       onPressed: onDelete,
                     ),
                   ],
@@ -399,47 +409,60 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units,
   await CellfinFormScreen.push(
     context: context,
     title: item == null
-        ? (units ? 'Add Measurement Unit' : 'Add Competitor')
-        : (units ? 'Edit Unit' : 'Edit Competitor'),
-    officerName: 'REFERENCE DATA MANAGER',
+        ? (units
+            ? tr(ref, 'addMeasurementUnit')
+            : tr(ref, 'addCompetitor'))
+        : (units ? tr(ref, 'editUnit') : tr(ref, 'editCompetitor')),
+    officerName: tr(ref, 'referenceDataManager'),
     officerInfo:
-        units ? 'Measurement Unit Configuration' : 'Market Competitor Profile',
+        units ? tr(ref, 'unitConfig') : tr(ref, 'competitorProfile'),
     cards: units
-        ? const [
+        ? [
             CellfinCardItem(
-                title: 'Weight', icon: Icons.monitor_weight_outlined),
-            CellfinCardItem(title: 'Volume', icon: Icons.water_drop_outlined),
+                title: tr(ref, 'weight'), icon: Icons.monitor_weight_outlined),
             CellfinCardItem(
-                title: 'Count', icon: Icons.format_list_numbered_rounded),
-            CellfinCardItem(title: 'Length', icon: Icons.straighten_rounded),
+                title: tr(ref, 'volume'), icon: Icons.water_drop_outlined),
+            CellfinCardItem(
+                title: tr(ref, 'count'),
+                icon: Icons.format_list_numbered_rounded),
+            CellfinCardItem(
+                title: tr(ref, 'length'), icon: Icons.straighten_rounded),
           ]
-        : const [
-            CellfinCardItem(title: 'Local', icon: Icons.store_outlined),
-            CellfinCardItem(title: 'National', icon: Icons.flag_outlined),
-            CellfinCardItem(title: 'Import', icon: Icons.flight_land_rounded),
-            CellfinCardItem(title: 'Premium', icon: Icons.star_outline_rounded),
+        : [
+            CellfinCardItem(
+                title: tr(ref, 'local'), icon: Icons.store_outlined),
+            CellfinCardItem(
+                title: tr(ref, 'national'), icon: Icons.flag_outlined),
+            CellfinCardItem(
+                title: tr(ref, 'import'), icon: Icons.flight_land_rounded),
+            CellfinCardItem(
+                title: tr(ref, 'premium'), icon: Icons.star_outline_rounded),
           ],
-    submitText: item == null ? 'Add Record' : 'Save Changes',
+    submitText:
+        item == null ? tr(ref, 'addRecord') : tr(ref, 'saveChangesLower'),
     fields: [
       CellfinInputField(
         controller: name,
-        hint: units ? 'Unit Name (e.g. Kilogram) *' : 'Competitor Name *',
+        hint: units
+            ? '${tr(ref, 'unitNameHint')} *'
+            : '${tr(ref, 'competitorNameHint')} *',
         prefixIcon: Icon(
           units ? Icons.straighten_rounded : Icons.warning_amber_outlined,
           color: const Color(0xFF6B7280),
         ),
         validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Name is required' : null,
+            v == null || v.trim().isEmpty ? tr(ref, 'nameIsRequired') : null,
       ),
       CellfinInputField(
         controller: code,
-        hint: units ? 'Unit Code (e.g. kg, pcs, ltr)' : 'Competitor Code',
+        hint:
+            units ? tr(ref, 'unitCodeHint') : tr(ref, 'competitorCode'),
         prefixIcon: const Icon(Icons.tag_rounded, color: Color(0xFF6B7280)),
       ),
       if (!units)
         CellfinInputField(
           controller: description,
-          hint: 'Description & Notes',
+          hint: tr(ref, 'descriptionNotes'),
           maxLines: 3,
           prefixIcon:
               const Icon(Icons.note_alt_outlined, color: Color(0xFF6B7280)),
@@ -461,7 +484,9 @@ Future<void> _edit(BuildContext context, WidgetRef ref, bool units,
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(item == null ? 'Record added!' : 'Record updated!'),
+              content: Text(item == null
+                  ? tr(ref, 'recordAdded')
+                  : tr(ref, 'recordUpdated')),
               backgroundColor: _green,
             ),
           );

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
@@ -34,16 +35,16 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Outlets Directory',
-            style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
+        title: Text(tr(ref, 'outletsDirectory'),
+            style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 18)),
         actions: [
           IconButton(
-            tooltip: 'Verify QR Code',
+            tooltip: tr(ref, 'verifyQrCode'),
             icon: const Icon(Icons.qr_code_scanner_rounded),
             onPressed: () => _verifyOutletQr(context, ref),
           ),
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             icon: const Icon(Icons.refresh_rounded),
             onPressed: () => ref.read(outletsProvider.notifier).refresh(),
           ),
@@ -59,7 +60,7 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
               onChanged: (val) =>
                   setState(() => _searchQuery = val.trim().toLowerCase()),
               decoration: InputDecoration(
-                hintText: 'Search by store name, code, or address...',
+                hintText: tr(ref, 'searchOutletHint'),
                 prefixIcon: const Icon(Icons.search_rounded,
                     color: AppColors.primary, size: 20),
                 suffixIcon: _searchQuery.isNotEmpty
@@ -122,14 +123,13 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
                                     size: 48, color: AppColors.primary),
                               ),
                               const SizedBox(height: 16),
-                              const Text('No outlets found',
-                                  style: TextStyle(
+                              Text(tr(ref, 'noOutlets'),
+                                  style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
                               const SizedBox(height: 6),
-                              const Text(
-                                  'Tap "+" below to add a new retail outlet',
-                                  style: TextStyle(
+                              Text(tr(ref, 'tapPlusAddOutlet'),
+                                  style: const TextStyle(
                                       color: Colors.grey, fontSize: 13)),
                             ],
                           ),
@@ -157,8 +157,8 @@ class _OutletsScreenState extends ConsumerState<OutletsScreen> {
         elevation: 6,
         onPressed: () => _showOutletForm(context, ref),
         icon: const Icon(Icons.add_business_rounded, size: 22),
-        label: const Text('Add Outlet',
-            style: TextStyle(fontWeight: FontWeight.w700)),
+        label: Text(tr(ref, 'addOutlet'),
+            style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
   }
@@ -268,7 +268,7 @@ class _OutletCard extends ConsumerWidget {
                           Expanded(
                             child: Text(
                               outlet.address ??
-                                  'No physical address configured',
+                                  tr(ref, 'noAddressConfigured'),
                               style: TextStyle(
                                 fontSize: 12,
                                 color: isDark
@@ -330,17 +330,17 @@ class _OutletCard extends ConsumerWidget {
                       onTap: () =>
                           _showOutletForm(context, ref, outlet: outlet),
                       borderRadius: BorderRadius.circular(8),
-                      child: const Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.edit_outlined,
+                            const Icon(Icons.edit_outlined,
                                 size: 16, color: Color(0xFF136B3E)),
-                            SizedBox(width: 4),
-                            Text('Edit',
-                                style: TextStyle(
+                            const SizedBox(width: 4),
+                            Text(tr(ref, 'edit'),
+                                style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFF136B3E))),
@@ -352,17 +352,17 @@ class _OutletCard extends ConsumerWidget {
                     InkWell(
                       onTap: () => _showOutletQrDialog(context, ref, outlet),
                       borderRadius: BorderRadius.circular(8),
-                      child: const Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.qr_code_2_rounded,
+                            const Icon(Icons.qr_code_2_rounded,
                                 size: 16, color: Color(0xFFD97706)),
-                            SizedBox(width: 4),
-                            Text('QR Code',
-                                style: TextStyle(
+                            const SizedBox(width: 4),
+                            Text(tr(ref, 'qrCode'),
+                                style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: Color(0xFFD97706))),
@@ -385,15 +385,15 @@ class _OutletCard extends ConsumerWidget {
                       await notifier.regenerateQr(outlet.id);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('QR code regenerated')));
+                            SnackBar(
+                                content: Text(tr(ref, 'qrRegenerated'))));
                       }
                     } else if (action == 'deactivate') {
                       await notifier.deactivateQr(outlet.id);
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('QR code deactivated')));
+                            SnackBar(
+                                content: Text(tr(ref, 'qrDeactivated'))));
                       }
                     } else if (action == 'verify') {
                       await _verifyOutletQr(context, ref);
@@ -403,18 +403,18 @@ class _OutletCard extends ConsumerWidget {
                         builder: (_) => AlertDialog(
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20)),
-                          title: const Text('Delete Outlet?'),
+                          title: Text(tr(ref, 'deleteOutletTitle')),
                           content: Text(
-                              'Are you sure you want to delete ${outlet.name}? This action cannot be undone.'),
+                              '${tr(ref, 'confirmDeleteOutlet1')}${outlet.name}${tr(ref, 'confirmDeleteOutlet2')}'),
                           actions: [
                             TextButton(
                                 onPressed: () => Navigator.pop(context, false),
-                                child: const Text('Cancel')),
+                                child: Text(tr(ref, 'cancel'))),
                             FilledButton(
                               style: FilledButton.styleFrom(
                                   backgroundColor: Colors.red),
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete'),
+                              child: Text(tr(ref, 'delete')),
                             ),
                           ],
                         ),
@@ -422,18 +422,22 @@ class _OutletCard extends ConsumerWidget {
                       if (ok == true) await notifier.remove(outlet.id);
                     }
                   },
-                  itemBuilder: (_) => const [
+                  itemBuilder: (_) => [
                     PopupMenuItem(
-                        value: 'qr_view', child: Text('View & Download QR')),
-                    PopupMenuItem(value: 'edit', child: Text('Edit Info')),
+                        value: 'qr_view',
+                        child: Text(tr(ref, 'viewDownloadQr'))),
                     PopupMenuItem(
-                        value: 'qr', child: Text('Regenerate QR Token')),
+                        value: 'edit', child: Text(tr(ref, 'editInfo'))),
                     PopupMenuItem(
-                        value: 'deactivate', child: Text('Deactivate QR')),
+                        value: 'qr',
+                        child: Text(tr(ref, 'regenerateQrToken'))),
+                    PopupMenuItem(
+                        value: 'deactivate',
+                        child: Text(tr(ref, 'deactivateQr'))),
                     PopupMenuItem(
                         value: 'delete',
-                        child: Text('Delete Outlet',
-                            style: TextStyle(color: Colors.red))),
+                        child: Text(tr(ref, 'deleteOutlet'),
+                            style: const TextStyle(color: Colors.red))),
                   ],
                 ),
               ],
@@ -541,7 +545,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                 Text(outlet.name,
                     style: const TextStyle(
                         fontWeight: FontWeight.w700, fontSize: 16)),
-                Text('Code: ${outlet.code ?? "#${outlet.id}"}',
+                Text('${tr(ref, 'code')}: ${outlet.code ?? "#${outlet.id}"}',
                     style: const TextStyle(
                         fontSize: 12, color: Color(0xFF6B7280))),
               ],
@@ -583,7 +587,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                               child: CircularProgressIndicator(
                                   color: Color(0xFF136B3E))),
                         ),
-                  errorBuilder: (_, __, ___) => const SizedBox(
+                  errorBuilder: (_, __, ___) => SizedBox(
                     width: 200,
                     height: 200,
                     child: Center(
@@ -593,7 +597,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                           Icon(Icons.broken_image_rounded,
                               size: 40, color: Colors.grey),
                           SizedBox(height: 8),
-                          Text('Unable to load QR image',
+                          Text(tr(ref, 'qrImageError'),
                               style:
                                   TextStyle(fontSize: 12, color: Colors.grey)),
                         ],
@@ -699,7 +703,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  'Token: $qrToken',
+                  '${tr(ref, 'tokenLabel')}$qrToken',
                   style: const TextStyle(
                       fontSize: 11,
                       fontFamily: 'monospace',
@@ -716,7 +720,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                   Expanded(
                     child: _QrActionButton(
                       icon: Icons.close_rounded,
-                      label: 'Close',
+                      label: tr(ref, 'close'),
                       onTap: () => Navigator.pop(ctx),
                     ),
                   ),
@@ -724,7 +728,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                   Expanded(
                     child: _QrActionButton(
                       icon: Icons.download_rounded,
-                      label: 'Download',
+                      label: tr(ref, 'download'),
                       onTap: () async {
                         // Do NOT gate on canLaunchUrl(): on Android 11+ it
                         // returns false even for a plain https link unless the
@@ -744,8 +748,8 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                         ScaffoldMessenger.of(ctx).showSnackBar(
                           SnackBar(
                             content: Text(opened
-                                ? 'Browser opened - the PNG will download'
-                                : 'Could not open the download link'),
+                                ? tr(ref, 'browserOpened')
+                                : tr(ref, 'couldNotOpenLink')),
                             backgroundColor:
                                 opened ? const Color(0xFF136B3E) : null,
                           ),
@@ -757,7 +761,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                   Expanded(
                     child: _QrActionButton(
                       icon: Icons.refresh_rounded,
-                      label: 'Regenerate',
+                      label: tr(ref, 'regenerate'),
                       filled: true,
                       busy: regenerating,
                       onTap: regenerating
@@ -771,9 +775,11 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
                                 if (ctx.mounted) Navigator.pop(ctx);
                                 if (context.mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('QR token regenerated!'),
-                                      backgroundColor: Color(0xFF136B3E),
+                                    SnackBar(
+                                      content: Text(
+                                          tr(ref, 'qrTokenRegenerated')),
+                                      backgroundColor:
+                                          const Color(0xFF136B3E),
                                     ),
                                   );
                                 }
@@ -886,18 +892,18 @@ Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
     context: context,
     builder: (dialogContext) => AlertDialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      title: const Text('Verify Outlet QR Token'),
+      title: Text(tr(ref, 'verifyOutletQrToken')),
       content: TextField(
         controller: token,
         decoration: InputDecoration(
-          labelText: 'Enter or scan QR token',
+          labelText: tr(ref, 'enterScanQrToken'),
           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
         ),
       ),
       actions: [
         TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel')),
+            child: Text(tr(ref, 'cancel'))),
         FilledButton(
           style: FilledButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -916,7 +922,7 @@ Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                       content: Text(payload['message']?.toString() ??
-                          'QR verified successfully')),
+                          tr(ref, 'qrVerified'))),
                 );
               }
             } catch (e) {
@@ -926,7 +932,7 @@ Future<void> _verifyOutletQr(BuildContext context, WidgetRef ref) async {
               }
             }
           },
-          child: const Text('Verify Token'),
+          child: Text(tr(ref, 'verifyToken')),
         ),
       ],
     ),
@@ -956,44 +962,52 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
 
   await CellfinFormScreen.push(
     context: context,
-    title: outlet == null ? 'Add Retail Outlet' : 'Edit Outlet Details',
-    officerName: 'OUTLET REGISTRATION',
-    officerInfo: 'Retail Partner Directory Entry',
-    cards: const [
-      CellfinCardItem(title: 'Retail Store', icon: Icons.store_rounded),
-      CellfinCardItem(title: 'Wholesale', icon: Icons.warehouse_rounded),
-      CellfinCardItem(title: 'Supermarket', icon: Icons.local_mall_outlined),
-      CellfinCardItem(title: 'Dealer Hub', icon: Icons.business_center_rounded),
+    title: outlet == null
+        ? tr(ref, 'addRetailOutlet')
+        : tr(ref, 'editOutletDetails'),
+    officerName: tr(ref, 'outletRegistration'),
+    officerInfo: tr(ref, 'retailPartnerEntry'),
+    cards: [
+      CellfinCardItem(
+          title: tr(ref, 'retailStore'), icon: Icons.store_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'wholesale'), icon: Icons.warehouse_rounded),
+      CellfinCardItem(
+          title: tr(ref, 'supermarket'), icon: Icons.local_mall_outlined),
+      CellfinCardItem(
+          title: tr(ref, 'dealerHub'), icon: Icons.business_center_rounded),
     ],
-    submitText: outlet == null ? 'Create Outlet' : 'Save Changes',
+    submitText: outlet == null
+        ? tr(ref, 'createOutlet')
+        : tr(ref, 'saveChanges'),
     fields: [
       CellfinInputField(
         controller: name,
-        hint: 'Receiver / Outlet Store Name *',
+        hint: '${tr(ref, 'receiverNameHint')} *',
         prefixIcon:
             const Icon(Icons.storefront_rounded, color: Color(0xFF6B7280)),
         validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Outlet name is required' : null,
+            v == null || v.trim().isEmpty ? tr(ref, 'outletNameRequired') : null,
       ),
       CellfinInputField(
         controller: code,
-        hint: 'Outlet Code (Optional e.g. OUT-104)',
+        hint: tr(ref, 'outletCodeHint'),
         prefixIcon: const Icon(Icons.tag_rounded, color: Color(0xFF6B7280)),
       ),
       CellfinInputField(
         controller: address,
-        hint: 'Full Store / Market Address *',
+        hint: '${tr(ref, 'fullAddressHint')} *',
         prefixIcon:
             const Icon(Icons.location_on_outlined, color: Color(0xFF6B7280)),
         validator: (v) =>
-            v == null || v.trim().isEmpty ? 'Address is required' : null,
+            v == null || v.trim().isEmpty ? tr(ref, 'addressRequired') : null,
       ),
       const SizedBox(height: 10),
       // ── Administrative hierarchy ────────────────────────────────────
-      const Padding(
-        padding: EdgeInsets.only(top: 6, bottom: 8),
-        child: Text('LOCATION HIERARCHY',
-            style: TextStyle(
+      Padding(
+        padding: const EdgeInsets.only(top: 6, bottom: 8),
+        child: Text(tr(ref, 'locationHierarchy'),
+            style: const TextStyle(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1,
@@ -1010,7 +1024,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
       CellfinInputField(
         controller: phone,
         keyboardType: TextInputType.phone,
-        hint: 'Store Contact Phone Number',
+        hint: tr(ref, 'phoneHint'),
         prefixIcon: const Icon(Icons.phone_outlined, color: Color(0xFF6B7280)),
       ),
       Row(
@@ -1018,7 +1032,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
           Expanded(
             child: CellfinInputField(
               controller: latitude,
-              hint: 'GPS Latitude',
+              hint: tr(ref, 'gpsLatitude'),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               prefixIcon: const Icon(Icons.my_location_rounded,
@@ -1029,7 +1043,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
           Expanded(
             child: CellfinInputField(
               controller: longitude,
-              hint: 'GPS Longitude',
+              hint: tr(ref, 'gpsLongitude'),
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               prefixIcon: const Icon(Icons.location_on_outlined,
@@ -1041,7 +1055,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
       CellfinInputField(
         controller: radius,
         keyboardType: TextInputType.number,
-        hint: 'Geofence Radius (Meters)',
+        hint: tr(ref, 'geofenceRadius'),
         prefixIcon: const Icon(Icons.radar_rounded, color: Color(0xFF6B7280)),
       ),
     ],
@@ -1073,8 +1087,8 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
         if (context.mounted) {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-                content: Text('Outlet saved successfully!'),
+            SnackBar(
+                content: Text(tr(ref, 'outletSaved')),
                 backgroundColor: AppColors.cellfinGreen),
           );
         }
@@ -1110,7 +1124,8 @@ class _ErrorView extends StatelessWidget {
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
           const Icon(Icons.error_outline_rounded, size: 48, color: Colors.red),
           const SizedBox(height: 16),
-          Text('Error: $error', textAlign: TextAlign.center),
+          Text('${trOf(context, 'errorPrefix')}: $error',
+              textAlign: TextAlign.center),
           const SizedBox(height: 16),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -1120,7 +1135,7 @@ class _ErrorView extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: onRetry,
-            child: const Text('Retry'),
+            child: Text(trOf(context, 'retry')),
           ),
         ]),
       );

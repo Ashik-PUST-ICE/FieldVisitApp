@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/directory_provider.dart';
 
@@ -31,9 +32,9 @@ class _DirectoryState extends ConsumerState<DirectoryScreen>
         backgroundColor: _green,
         foregroundColor: Colors.white,
         elevation: 0,
-        title: const Text(
-          'User Directory',
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+        title: Text(
+          tr(ref, 'userDirectory'),
+          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(46),
@@ -47,13 +48,13 @@ class _DirectoryState extends ConsumerState<DirectoryScreen>
               unselectedLabelColor: Colors.white70,
               labelStyle:
                   const TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-              tabs: const [
+              tabs: [
                 Tab(
-                    icon: Icon(Icons.person_outline_rounded, size: 18),
-                    text: 'Users'),
+                    icon: const Icon(Icons.person_outline_rounded, size: 18),
+                    text: tr(ref, 'users')),
                 Tab(
-                    icon: Icon(Icons.business_outlined, size: 18),
-                    text: 'Companies'),
+                    icon: const Icon(Icons.business_outlined, size: 18),
+                    text: tr(ref, 'companies')),
               ],
             ),
           ),
@@ -116,7 +117,7 @@ class _DirectoryList extends ConsumerWidget {
                           borderRadius: BorderRadius.circular(10)),
                     ),
                     onPressed: notifier.fetch,
-                    child: const Text('Retry'),
+                    child: Text(tr(ref, 'retry')),
                   ),
                 ],
               ),
@@ -146,7 +147,7 @@ class _DirectoryList extends ConsumerWidget {
                           ),
                           const SizedBox(height: 16),
                           Text(
-                            users ? 'No users found' : 'No companies found',
+                            users ? tr(ref, 'noUsersFound') : tr(ref, 'noCompaniesFound'),
                             style: const TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 16,
@@ -154,8 +155,8 @@ class _DirectoryList extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 6),
-                          const Text(
-                            'Tap + below to add a new record',
+                          Text(
+                            tr(ref, 'tapBelowToAdd'),
                             style: TextStyle(
                                 fontSize: 13, color: Color(0xFF6B7280)),
                           ),
@@ -193,15 +194,17 @@ class _DirectoryList extends ConsumerWidget {
                           builder: (ctx) => AlertDialog(
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(14)),
-                            title: const Text('Confirm Delete',
-                                style: TextStyle(fontWeight: FontWeight.w700)),
-                            content: Text(
-                                'Remove "${users ? (item['full_name'] ?? item['first_name'] ?? '') : item['name'] ?? ''}" from directory?'),
+                            title: Text(tr(ref, 'confirmDelete'),
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w700)),
+                            content: Text(tr(ref, 'removeFromDirectory')
+                                .replaceAll('{name}', (users ? (item['full_name'] ?? item['first_name'] ?? '') : (item['name'] ?? '')).toString())),
                             actions: [
                               TextButton(
                                 onPressed: () => Navigator.pop(ctx, false),
-                                child: const Text('Cancel',
-                                    style: TextStyle(color: Color(0xFF6B7280))),
+                                child: Text(tr(ref, 'cancel'),
+                                    style: const TextStyle(
+                                        color: Color(0xFF6B7280))),
                               ),
                               ElevatedButton(
                                 style: ElevatedButton.styleFrom(
@@ -212,7 +215,7 @@ class _DirectoryList extends ConsumerWidget {
                                   elevation: 0,
                                 ),
                                 onPressed: () => Navigator.pop(ctx, true),
-                                child: const Text('Delete'),
+                                child: Text(tr(ref, 'delete')),
                               ),
                             ],
                           ),
@@ -241,7 +244,8 @@ class _DirectoryList extends ConsumerWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         onPressed: () => _form(context, ref, users, null),
         icon: const Icon(Icons.person_add_outlined),
-        label: Text(users ? 'Add User' : 'Add Company',
+        label: Text(
+            users ? tr(ref, 'addUser') : tr(ref, 'addCompany'),
             style: const TextStyle(fontWeight: FontWeight.w700)),
       ),
     );
@@ -330,7 +334,7 @@ class _DirectoryCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name.isEmpty ? 'Unnamed' : name,
+                        name.isEmpty ? trOf(context, 'unnamed') : name,
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
@@ -361,8 +365,10 @@ class _DirectoryCard extends StatelessWidget {
                         ),
                         child: Text(
                           isActive
-                              ? 'Active'
-                              : (status.isEmpty ? 'N/A' : status),
+                              ? trOf(context, 'active')
+                              : (status.isEmpty
+                                  ? trOf(context, 'notAvailable')
+                                  : status),
                           style: TextStyle(
                             fontSize: 11,
                             fontWeight: FontWeight.w600,
@@ -387,19 +393,19 @@ class _DirectoryCard extends StatelessWidget {
                           size: 22,
                           color: isActive ? _green : const Color(0xFF9CA3AF),
                         ),
-                        tooltip: 'Toggle Status',
+                        tooltip: trOf(context, 'toggleStatus'),
                         onPressed: onToggle,
                       ),
                     IconButton(
                       icon: const Icon(Icons.edit_outlined,
                           size: 20, color: _green),
-                      tooltip: 'Edit',
+                      tooltip: trOf(context, 'edit'),
                       onPressed: onEdit,
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline_rounded,
                           size: 20, color: Color(0xFFEF4444)),
-                      tooltip: 'Delete',
+                      tooltip: trOf(context, 'delete'),
                       onPressed: onDelete,
                     ),
                   ],
@@ -429,71 +435,87 @@ Future<void> _form(
   await CellfinFormScreen.push(
     context: context,
     title: item == null
-        ? (users ? 'Add New User' : 'Add Company')
-        : (users ? 'Edit User Profile' : 'Edit Company'),
-    officerName: 'DIRECTORY MANAGEMENT',
-    officerInfo: users ? 'User Account Configuration' : 'Company Profile Setup',
+        ? (users
+            ? tr(ref, 'addNewUser')
+            : tr(ref, 'addCompany'))
+        : (users ? tr(ref, 'editUserProfile') : tr(ref, 'editCompany')),
+    officerName: tr(ref, 'directoryManagement'),
+    officerInfo:
+        users ? tr(ref, 'userAccountConfig') : tr(ref, 'companyProfileSetup'),
     cards: users
-        ? const [
-            CellfinCardItem(title: 'Sales Rep', icon: Icons.badge_outlined),
+        ? [
             CellfinCardItem(
-                title: 'Manager', icon: Icons.manage_accounts_outlined),
+                title: tr(ref, 'salesRep'), icon: Icons.badge_outlined),
             CellfinCardItem(
-                title: 'Supervisor', icon: Icons.supervisor_account_outlined),
+                title: tr(ref, 'manager'),
+                icon: Icons.manage_accounts_outlined),
             CellfinCardItem(
-                title: 'Admin', icon: Icons.admin_panel_settings_outlined),
+                title: tr(ref, 'supervisor'),
+                icon: Icons.supervisor_account_outlined),
+            CellfinCardItem(
+                title: tr(ref, 'admin'),
+                icon: Icons.admin_panel_settings_outlined),
           ]
-        : const [
+        : [
             CellfinCardItem(
-                title: 'Distributor', icon: Icons.local_shipping_outlined),
-            CellfinCardItem(title: 'Retailer', icon: Icons.store_outlined),
+                title: tr(ref, 'distributor'),
+                icon: Icons.local_shipping_outlined),
             CellfinCardItem(
-                title: 'Wholesaler', icon: Icons.warehouse_outlined),
-            CellfinCardItem(title: 'Partner', icon: Icons.handshake_outlined),
+                title: tr(ref, 'retailer'), icon: Icons.store_outlined),
+            CellfinCardItem(
+                title: tr(ref, 'wholesaler'), icon: Icons.warehouse_outlined),
+            CellfinCardItem(
+                title: tr(ref, 'partner'), icon: Icons.handshake_outlined),
           ],
-    submitText:
-        item == null ? (users ? 'Create User' : 'Add Company') : 'Save Changes',
+    submitText: item == null
+        ? (users ? tr(ref, 'createUser') : tr(ref, 'addCompany'))
+        : tr(ref, 'saveChangesLower'),
     fields: [
       CellfinInputField(
         controller: first,
-        hint: users ? 'First Name *' : 'Company Name *',
+        hint: users
+            ? '${tr(ref, 'firstNameStar')} *'
+            : '${tr(ref, 'companyName')} *',
         prefixIcon: Icon(
           users ? Icons.person_outline_rounded : Icons.business_outlined,
           color: const Color(0xFF6B7280),
         ),
-        validator: (v) =>
-            v == null || v.trim().isEmpty ? 'This field is required' : null,
+        validator: (v) => v == null || v.trim().isEmpty
+            ? tr(ref, 'thisFieldRequired')
+            : null,
       ),
       if (users) ...[
         CellfinInputField(
           controller: last,
-          hint: 'Last Name',
+          hint: tr(ref, 'lastNameLower'),
           prefixIcon: const Icon(Icons.person_outline_rounded,
               color: Color(0xFF6B7280)),
         ),
         CellfinInputField(
           controller: email,
-          hint: 'Email Address *',
+          hint: '${tr(ref, 'emailAddress')} *',
           keyboardType: TextInputType.emailAddress,
           prefixIcon:
               const Icon(Icons.email_outlined, color: Color(0xFF6B7280)),
-          validator: (v) =>
-              v == null || v.trim().isEmpty ? 'Email is required' : null,
+          validator: (v) => v == null || v.trim().isEmpty
+              ? tr(ref, 'emailRequired')
+              : null,
         ),
         if (item == null)
           CellfinInputField(
             controller: password,
-            hint: 'Password *',
+            hint: '${tr(ref, 'passwordStar')} *',
             obscureText: true,
             prefixIcon: const Icon(Icons.lock_outline_rounded,
                 color: Color(0xFF6B7280)),
-            validator: (v) =>
-                v == null || v.trim().isEmpty ? 'Password is required' : null,
+            validator: (v) => v == null || v.trim().isEmpty
+                ? tr(ref, 'passwordRequired')
+                : null,
           ),
       ] else
         CellfinInputField(
           controller: slug,
-          hint: 'Company Slug (e.g. my-company)',
+          hint: tr(ref, 'companySlug'),
           prefixIcon: const Icon(Icons.link_rounded, color: Color(0xFF6B7280)),
         ),
     ],
@@ -519,7 +541,9 @@ Future<void> _form(
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content:
-                  Text(item == null ? 'Record created!' : 'Record updated!'),
+                  Text(item == null
+                      ? tr(ref, 'recordCreated')
+                      : tr(ref, 'recordUpdated')),
               backgroundColor: _green,
             ),
           );

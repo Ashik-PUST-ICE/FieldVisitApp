@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 /// Item representing one top card in the Cellfin card system (matches media_1790873625141.jpg)
 class CellfinCardItem {
@@ -356,11 +357,13 @@ class _CellfinFormScreenState extends State<CellfinFormScreen> {
   @override
   Widget build(BuildContext context) {
     final displayCards = widget.cards ??
-        const [
+        [
           CellfinCardItem(title: 'CellFin', icon: Icons.phone_android_rounded),
           CellfinCardItem(
-              title: 'Account', icon: Icons.account_balance_outlined),
-          CellfinCardItem(title: 'Card', icon: Icons.credit_card_outlined),
+              title: trOf(context, 'account'),
+              icon: Icons.account_balance_outlined),
+          CellfinCardItem(
+              title: trOf(context, 'card'), icon: Icons.credit_card_outlined),
           CellfinCardItem(
               title: 'mCash', icon: Icons.account_balance_wallet_outlined),
         ];

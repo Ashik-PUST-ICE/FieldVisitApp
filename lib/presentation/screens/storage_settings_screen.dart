@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/presentation/providers/auth_api_provider.dart';
 import 'package:field_visit_app/core/widgets/app_dropdown.dart';
 
@@ -73,7 +74,7 @@ class _StorageSettingsState extends ConsumerState<StorageSettingsScreen> {
       });
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Storage settings saved securely')));
+            SnackBar(content: Text(trOf(context, 'storageSavedSecure'))));
     } catch (e) {
       _showError(e);
     } finally {
@@ -86,7 +87,7 @@ class _StorageSettingsState extends ConsumerState<StorageSettingsScreen> {
       await ref.read(authApiProvider).testStorageSettings();
       if (mounted)
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Storage connection successful')));
+            SnackBar(content: Text(trOf(context, 'storageConnectionOk'))));
     } catch (e) {
       _showError(e);
     }
@@ -107,43 +108,43 @@ class _StorageSettingsState extends ConsumerState<StorageSettingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Storage Settings')),
+      appBar: AppBar(title: Text(trOf(context, 'storageSettings'))),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                const Text('File storage provider',
-                    style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.w800)),
+                Text(tr(ref, 'fileStorageProvider'),
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w800)),
                 const SizedBox(height: 8),
                 AppDropdownField<String>(
-                  label: 'Provider',
+                  label: tr(ref, 'provider'),
                   icon: Icons.cloud_outlined,
                   value: provider,
-                  options: const [
+                  options: [
                     AppDropdownOption(
                       value: 'local',
-                      title: 'Local Storage',
-                      subtitle: 'Store files on this server',
+                      title: tr(ref, 'localStorage'),
+                      subtitle: tr(ref, 'storeFilesLocal'),
                       leadingIcon: Icons.sd_storage_outlined,
                     ),
                     AppDropdownOption(
                       value: 's3',
                       title: 'Amazon S3',
-                      subtitle: 'AWS S3 bucket',
+                      subtitle: tr(ref, 'awsS3Bucket'),
                       leadingIcon: Icons.cloud_outlined,
                     ),
                     AppDropdownOption(
                       value: 'gcs',
                       title: 'Google Cloud Storage',
-                      subtitle: 'GCS bucket',
+                      subtitle: tr(ref, 'gcsBucket'),
                       leadingIcon: Icons.cloud_outlined,
                     ),
                     AppDropdownOption(
                       value: 'azure',
                       title: 'Azure Blob Storage',
-                      subtitle: 'Azure container',
+                      subtitle: tr(ref, 'azureContainer'),
                       leadingIcon: Icons.cloud_outlined,
                     ),
                   ],
@@ -152,35 +153,40 @@ class _StorageSettingsState extends ConsumerState<StorageSettingsScreen> {
                 ),
                 SwitchListTile(
                   contentPadding: EdgeInsets.zero,
-                  title: const Text('Use selected provider'),
+                  title: Text(tr(ref, 'useSelectedProvider')),
                   value: enabled,
                   activeColor: AppColors.cellfinGreen,
                   onChanged: (value) => setState(() => enabled = value),
                 ),
                 if (provider != 'local') ...[
-                  _field(accessKey, 'Access key / Account name'),
-                  _field(secretKey, 'Secret key / Account key', obscure: true),
-                  _field(region, 'Region / Project ID'),
-                  _field(bucket,
-                      provider == 'azure' ? 'Container name' : 'Bucket name'),
-                  _field(endpoint, 'Custom endpoint (optional)',
+                  _field(accessKey, tr(ref, 'accessKeyLabel')),
+                  _field(secretKey, tr(ref, 'secretKeyLabel'),
+                      obscure: true),
+                  _field(region, tr(ref, 'regionLabel')),
+                  _field(
+                      bucket,
+                      provider == 'azure'
+                          ? tr(ref, 'containerName')
+                          : tr(ref, 'bucketName')),
+                  _field(endpoint, tr(ref, 'customEndpoint'),
                       keyboard: TextInputType.url),
-                  const Padding(
-                    padding: EdgeInsets.only(bottom: 12),
-                    child: Text(
-                        'Credentials are encrypted on the server and are never returned to the app after saving.',
-                        style: TextStyle(color: Colors.grey)),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: Text(tr(ref, 'credentialsEncryptedNote'),
+                        style: const TextStyle(color: Colors.grey)),
                   ),
                 ],
                 FilledButton.icon(
                     onPressed: saving ? null : _save,
                     icon: const Icon(Icons.save_outlined),
-                    label: Text(saving ? 'Saving...' : 'Save settings')),
+                    label: Text(saving
+                        ? tr(ref, 'saving')
+                        : tr(ref, 'saveSettings'))),
                 const SizedBox(height: 10),
                 OutlinedButton.icon(
                     onPressed: _test,
                     icon: const Icon(Icons.wifi_tethering),
-                    label: const Text('Test connection')),
+                    label: Text(tr(ref, 'testConnection'))),
               ],
             ),
     );

@@ -6,6 +6,7 @@ import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/presentation/providers/assignments_provider.dart';
 import 'package:field_visit_app/presentation/providers/directory_provider.dart';
 import 'package:field_visit_app/presentation/providers/outlets_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class AssignmentsScreen extends ConsumerWidget {
   const AssignmentsScreen({super.key});
@@ -18,7 +19,7 @@ class AssignmentsScreen extends ConsumerWidget {
 
     String outletName(Object? id) {
       final match = outlets.where((o) => o.id == id).firstOrNull;
-      return match?.name ?? 'Outlet #$id';
+      return match?.name ?? '${trOf(context, 'outletHash')}$id';
     }
 
     String userName(Object? id) {
@@ -26,20 +27,22 @@ class AssignmentsScreen extends ConsumerWidget {
           users.where((u) => (u['id'] as num?)?.toInt() == id).firstOrNull;
       final name =
           (match?['full_name'] ?? match?['name'] ?? '').toString().trim();
-      return name.isEmpty ? 'User #$id' : name;
+      return name.isEmpty ? '${trOf(context, 'userHash')}$id' : name;
     }
 
     return Scaffold(
-        appBar: AppBar(title: const Text('Outlet assignments')),
+        appBar:
+            AppBar(title: Text(trOf(context, 'outletAssignments'))),
         body: RefreshIndicator(
             onRefresh: ref.read(assignmentsProvider.notifier).fetch,
             child: state.when(
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text(_message(e))),
                 data: (items) => items.isEmpty
-                    ? ListView(children: const [
-                        SizedBox(height: 220),
-                        Center(child: Text('No assignments found'))
+                    ? ListView(children: [
+                        const SizedBox(height: 220),
+                        Center(
+                            child: Text(trOf(context, 'noAssignmentsFound')))
                       ])
                     : ListView.builder(
                         padding: const EdgeInsets.all(12),
@@ -72,13 +75,13 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
   final outlets = ref.read(outletsProvider).valueOrNull ?? const [];
   if (outlets.isEmpty) {
     ScaffoldMessenger.of(context)
-        .showSnackBar(const SnackBar(content: Text('Create an outlet first')));
+        .showSnackBar(SnackBar(content: Text(trOf(context, 'createOutletFirst'))));
     return;
   }
   final users = ref.read(usersProvider).valueOrNull ?? const [];
   if (users.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No users available to assign')));
+        SnackBar(content: Text(trOf(context, 'noUsersToAssign'))));
     return;
   }
 
@@ -88,20 +91,20 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
 
   String outletLabel() =>
       outlets.where((o) => o.id == outletId).map((o) => o.name).firstOrNull ??
-      'not selected';
+      trOf(context, 'notSelected');
 
   String officerLabel() {
     final match =
         users.where((u) => (u['id'] as num?)?.toInt() == userId).firstOrNull;
     final name =
         (match?['full_name'] ?? match?['name'] ?? '').toString().trim();
-    return name.isEmpty ? 'not selected' : name;
+    return name.isEmpty ? trOf(context, 'notSelected') : name;
   }
 
   Future<void> submit() async {
     if (userId == null) {
       messenger.showSnackBar(
-          const SnackBar(content: Text('Please select a field officer')));
+          SnackBar(content: Text(trOf(context, 'selectFieldOfficer'))));
       return;
     }
     try {
@@ -120,7 +123,7 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
       ref.read(usersProvider.notifier).fetch(),
     ]);
     messenger.showSnackBar(
-        const SnackBar(content: Text('Outlets and officers refreshed')));
+        SnackBar(content: Text(trOf(context, 'listsRefreshed'))));
   }
 
   void info(String message) {
@@ -129,16 +132,20 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
 
   await CellfinFormModal.show<void>(
     context: context,
-    title: 'Assign Outlet',
-    officerName: 'OUTLET ALLOCATION',
-    officerInfo: 'Assign a field officer to an outlet',
-    cards: const [
-      CellfinCardItem(title: 'Outlet', icon: Icons.storefront_outlined),
-      CellfinCardItem(title: 'Officer', icon: Icons.badge_outlined),
-      CellfinCardItem(title: 'Confirm', icon: Icons.verified_outlined),
-      CellfinCardItem(title: 'Sync', icon: Icons.sync_rounded),
+    title: trOf(context, 'assignOutlet'),
+    officerName: trOf(context, 'outletAllocation'),
+    officerInfo: trOf(context, 'assignFieldOfficerToOutlet'),
+    cards: [
+      CellfinCardItem(
+          title: trOf(context, 'outlet'), icon: Icons.storefront_outlined),
+      CellfinCardItem(
+          title: trOf(context, 'officer'), icon: Icons.badge_outlined),
+      CellfinCardItem(
+          title: trOf(context, 'confirm'), icon: Icons.verified_outlined),
+      CellfinCardItem(
+          title: trOf(context, 'sync'), icon: Icons.sync_rounded),
     ],
-    submitText: 'Assign Outlet',
+    submitText: trOf(context, 'assignOutlet'),
     // Every card now does its OWN job instead of only highlighting:
     //   0 Outlet  -> reports the outlet currently picked
     //   1 Officer -> reports the officer currently picked
@@ -147,12 +154,12 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
     onCardTap: (index) {
       switch (index) {
         case 0:
-          info('Outlet: ${outletLabel()}');
+          info('${trOf(context, 'outletStatus')}${outletLabel()}');
         case 1:
-          info('Field officer: ${officerLabel()}');
+          info('${trOf(context, 'officerStatus')}${officerLabel()}');
         case 2:
           if (userId == null) {
-            info('Pick a field officer to confirm');
+            info(trOf(context, 'pickFieldOfficer'));
           } else {
             submit();
           }
@@ -163,8 +170,8 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
     fields: [
       StatefulBuilder(
         builder: (context, setDropState) => AppDropdownField<int>(
-          label: 'Outlet',
-          hint: 'Select outlet',
+          label: trOf(context, 'outlet'),
+          hint: trOf(context, 'selectOutletLower'),
           value: outletId,
           options: outlets
               .map((o) => AppDropdownOption<int>(
@@ -178,8 +185,8 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
       ),
       StatefulBuilder(
         builder: (context, setDropState) => AppDropdownField<int>(
-          label: 'Field Officer',
-          hint: 'Select officer',
+          label: trOf(context, 'fieldOfficer'),
+          hint: trOf(context, 'selectOfficer'),
           value: userId,
           options: users
               .map((u) {
@@ -188,7 +195,9 @@ Future<void> _create(BuildContext context, WidgetRef ref) async {
                     (u['full_name'] ?? u['name'] ?? '').toString().trim();
                 return AppDropdownOption<int>(
                   value: id ?? 0,
-                  title: name.isEmpty ? 'User #$id' : name,
+                  title: name.isEmpty
+                      ? '${trOf(context, 'userHash')}$id'
+                      : name,
                   subtitle: (u['email'] ?? u['unique_id'])?.toString(),
                   leadingIcon: Icons.person_outline_rounded,
                 );

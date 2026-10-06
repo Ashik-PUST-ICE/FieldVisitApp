@@ -4,6 +4,7 @@ import 'package:field_visit_app/core/widgets/app_dropdown.dart';
 import 'package:field_visit_app/core/widgets/cellfin_form_modal.dart';
 import 'package:field_visit_app/data/models/location.dart';
 import 'package:field_visit_app/presentation/providers/location_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class _Level {
   final String type;
@@ -161,10 +162,11 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
 
     // Nothing deeper can be chosen until its parent exists.
     if (parentType != null && _selectedId[parentType] == null) {
-      final parentLabel = _levels[index - 1].label.toLowerCase();
+      final parentLabel = trOf(context, _levels[index - 1].type).toLowerCase();
       return AppDropdownField<int>(
-        label: level.label,
-        hint: 'Choose $parentLabel first',
+        label: trOf(context, level.type),
+        hint: trOf(context, 'chooseParentFirst')
+            .replaceAll('{parent}', parentLabel),
         icon: level.icon,
         enabled: false,
         searchable: false,
@@ -180,14 +182,22 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
     if (rows.isEmpty) {
       return CellfinInputField(
         controller: _ctrlFor(level.type),
-        hint: '${level.label} (type manually)',
+        hint: trOf(context, 'typeManually')
+            .replaceAll('{level}', trOf(context, level.type)),
         prefixIcon: Icon(level.icon, color: const Color(0xFF6B7280)),
       );
     }
 
     return AppDropdownField<int>(
-      label: level.label,
-      hint: level.hint,
+      label: trOf(context, level.type),
+      hint: trOf(context, switch (level.type) {
+        'division' => 'chooseDivision',
+        'district' => 'chooseDistrict',
+        'upazila' => 'chooseUpazila',
+        'union' => 'unionPourashava',
+        'ward' => 'wardNumber',
+        _ => 'villageOrPara',
+      }),
       icon: level.icon,
       value: _selectedId[level.type],
       options: [

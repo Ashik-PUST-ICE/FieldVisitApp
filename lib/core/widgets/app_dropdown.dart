@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/theme/app_theme.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 /// One selectable row inside [AppDropdownField].
 class AppDropdownOption<T> {
@@ -100,7 +101,10 @@ class AppDropdownField<T> extends StatelessWidget {
                   const SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      title ?? hint ?? 'Select $label',
+                      title ??
+                          hint ??
+                          trOf(context, 'selectLabel')
+                              .replaceAll('{label}', label),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: title == null
@@ -229,7 +233,8 @@ class _DropdownSheetState<T> extends State<_DropdownSheet<T>> {
                     children: [
                       Expanded(
                         child: Text(
-                          'Select ${widget.label.toLowerCase()}',
+                          trOf(context, 'selectLabel')
+                              .replaceAll('{label}', widget.label),
                           style: theme.textTheme.titleMedium
                               ?.copyWith(fontWeight: FontWeight.w700),
                         ),
@@ -251,7 +256,7 @@ class _DropdownSheetState<T> extends State<_DropdownSheet<T>> {
                       onChanged: (v) => setState(() => _query = v),
                       style: const TextStyle(fontSize: 14),
                       decoration: InputDecoration(
-                        hintText: 'Search',
+                        hintText: trOf(context, 'search'),
                         prefixIcon: const Icon(Icons.search_rounded, size: 20),
                         isDense: true,
                         contentPadding: const EdgeInsets.symmetric(

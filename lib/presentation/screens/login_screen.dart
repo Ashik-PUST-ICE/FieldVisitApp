@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/theme/app_colors.dart';
 import 'package:field_visit_app/core/theme/app_theme.dart';
 import 'package:field_visit_app/presentation/providers/auth_provider.dart';
@@ -88,16 +89,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       final enable = await showDialog<bool>(
         context: context,
         builder: (dialogContext) => AlertDialog(
-          title: const Text('Enable biometric login?'),
-          content: const Text(
-              'Use fingerprint or Face ID for faster and safer sign-in on this device.'),
+          title: Text(trOf(dialogContext, 'enableBiometricTitle')),
+          content: Text(trOf(dialogContext, 'biometricDialogBody')),
           actions: [
             TextButton(
                 onPressed: () => Navigator.pop(dialogContext, false),
-                child: const Text('Not now')),
+                child: Text(trOf(dialogContext, 'notNow'))),
             FilledButton(
                 onPressed: () => Navigator.pop(dialogContext, true),
-                child: const Text('Enable')),
+                child: Text(trOf(dialogContext, 'enable'))),
           ],
         ),
       );
@@ -155,14 +155,21 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              const Text(
-                                'Sign In',
-                                style: TextStyle(
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.w800,
-                                  color: Color(0xFF1F2937),
-                                  letterSpacing: -0.5,
-                                ),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      tr(ref, 'login'),
+                                      style: const TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.w800,
+                                        color: Color(0xFF1F2937),
+                                        letterSpacing: -0.5,
+                                      ),
+                                    ),
+                                  ),
+                                  _LanguageSwitch(),
+                                ],
                               ),
                               const SizedBox(height: 12),
                               FutureBuilder<bool>(
@@ -199,14 +206,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                           },
                                     icon: const Icon(Icons.fingerprint_rounded),
                                     label:
-                                        const Text('Sign in with biometrics'),
+                                        Text(tr(ref, 'signInWithBiometrics')),
                                   );
                                 },
                               ),
                               const SizedBox(height: 4),
-                              const Text(
-                                'Enter your credentials to access field operations',
-                                style: TextStyle(
+                              Text(
+                                tr(ref, 'loginSubtitle'),
+                                style: const TextStyle(
                                   fontSize: 13,
                                   color: Color(0xFF6B7280),
                                 ),
@@ -217,14 +224,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               CellfinInputField(
                                 controller: _emailController,
                                 keyboardType: TextInputType.emailAddress,
-                                hint: 'Email Address',
+                                hint: tr(ref, 'email'),
                                 prefixIcon: const Icon(
                                     Icons.account_circle_outlined,
                                     color: Color(0xFF6B7280),
                                     size: 22),
                                 validator: (value) {
                                   if (value == null || value.trim().isEmpty) {
-                                    return 'Please enter your email or user ID';
+                                    return tr(ref, 'email');
                                   }
                                   return null;
                                 },
@@ -235,7 +242,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                               CellfinInputField(
                                 controller: _passwordController,
                                 obscureText: _obscurePassword,
-                                hint: 'PIN or Password',
+                                hint: tr(ref, 'password'),
                                 prefixIcon: const Icon(
                                     Icons.lock_outline_rounded,
                                     color: Color(0xFF6B7280),
@@ -253,7 +260,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 ),
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
-                                    return 'Please enter your PIN or password';
+                                    return tr(ref, 'password');
                                   }
                                   return null;
                                 },
@@ -266,14 +273,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                 child: TextButton(
                                   onPressed: () {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Contact your field administrator to reset password.')),
+                                      SnackBar(
+                                          content: Text(tr(
+                                              ref, 'contactAdminReset'))),
                                     );
                                   },
-                                  child: const Text(
-                                    'Forgot password?',
-                                    style: TextStyle(
+                                  child: Text(
+                                    tr(ref, 'forgotPassword'),
+                                    style: const TextStyle(
                                       color: Color(0xFF136B3E),
                                       fontWeight: FontWeight.w700,
                                       fontSize: 13,
@@ -303,9 +310,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                             color: Colors.white,
                                             strokeWidth: 2.2),
                                       )
-                                    : const Text(
-                                        'Submit',
-                                        style: TextStyle(
+                                    : Text(
+                                        tr(ref, 'loginButton'),
+                                        style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w700,
                                           color: Colors.white,
@@ -335,9 +342,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                                     builder: (_) => const RegisterScreen()),
                               );
                             },
-                            child: const Text(
-                              'Register here',
-                              style: TextStyle(
+                            child: Text(
+                              tr(ref, 'registerHere'),
+                              style: const TextStyle(
                                 color: Color(0xFFFFB300), // Golden Yellow
                                 fontWeight: FontWeight.w800,
                                 fontSize: 14,
@@ -416,9 +423,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                   ],
                 ),
               ),
-              const Text(
-                'Operations & Sales Management',
-                style: TextStyle(
+              Text(
+                tr(ref, 'appTagline'),
+                style: const TextStyle(
                   color: Color(0xFF6B7280),
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
@@ -428,6 +435,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Compact English / বাংলা toggle for the login card header.
+class _LanguageSwitch extends ConsumerWidget {
+  const _LanguageSwitch();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isBangla = ref.watch(localeProvider).languageCode == 'bn';
+    return SegmentedButton<String>(
+      segments: const [
+        ButtonSegment(value: 'en', label: Text('EN')),
+        ButtonSegment(value: 'bn', label: Text('বাং')),
+      ],
+      selected: {isBangla ? 'bn' : 'en'},
+      showSelectedIcon: false,
+      style: SegmentedButton.styleFrom(visualDensity: VisualDensity.compact),
+      onSelectionChanged: (codes) =>
+          ref.read(localeProvider.notifier).setLocale(codes.first),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 import 'package:field_visit_app/core/utils/map_credentials_store.dart';
 import 'package:field_visit_app/core/widgets/runtime_google_map.dart';
 import 'package:field_visit_app/data/models/outlet.dart';
@@ -284,8 +285,9 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           }
         }
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${outlets.length} nearby outlets loaded')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(tr(ref, 'nearbyLoaded')
+              .replaceAll('{n}', '${outlets.length}'))));
     } catch (e) {
       if (mounted)
         ScaffoldMessenger.of(context)
@@ -329,10 +331,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Live Route',
-                style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
+            Text(tr(ref, 'liveRoute'),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w800, fontSize: 17)),
             Text(
-              '${located.length} of ${all.length} outlets located',
+              tr(ref, 'locatedOfTotal')
+                  .replaceAll('{located}', '${located.length}')
+                  .replaceAll('{total}', '${all.length}'),
               style: const TextStyle(
                   fontSize: 11.5,
                   color: Colors.white70,
@@ -343,7 +348,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
         actions: [
           if (_apiKey == null)
             IconButton(
-              tooltip: 'Add map API key',
+              tooltip: tr(ref, 'addMapApiKey'),
               icon: const Icon(Icons.key_rounded, color: Colors.white),
               onPressed: () => Navigator.of(context)
                   .push(MaterialPageRoute(
@@ -351,7 +356,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                   .then((_) => _loadApiKey()),
             ),
           IconButton(
-            tooltip: 'Refresh',
+            tooltip: tr(ref, 'refresh'),
             icon: const Icon(Icons.refresh, color: Colors.white),
             onPressed: _buildMarkers,
           ),
@@ -400,13 +405,13 @@ class _MapScreenState extends ConsumerState<MapScreen> {
               children: [
                 _MapAction(
                   icon: Icons.fit_screen_outlined,
-                  tooltip: 'Fit all outlets',
+                  tooltip: tr(ref, 'fitAllOutlets'),
                   onTap: _fitOutlets,
                 ),
                 const SizedBox(height: 8),
                 _MapAction(
                   icon: Icons.my_location_rounded,
-                  tooltip: 'Recenter on me',
+                  tooltip: tr(ref, 'recenterOnMe'),
                   onTap: hasLocation ? _recenter : null,
                 ),
                 const SizedBox(height: 8),
@@ -486,7 +491,7 @@ class _MapScreenState extends ConsumerState<MapScreen> {
                 _buildMarkers();
               },
               decoration: InputDecoration(
-                hintText: 'Search outlet',
+                hintText: tr(ref, 'searchOutlet'),
                 hintStyle: TextStyle(fontSize: 13, color: Colors.grey.shade500),
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
@@ -576,16 +581,20 @@ class _NearbyButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PopupMenuButton<double>(
-      tooltip: 'Outlets near me',
+      tooltip: trOf(context, 'outletsNearMe'),
       enabled: enabled,
       offset: const Offset(0, 46),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       onSelected: onChanged,
-      itemBuilder: (_) => const [
-        PopupMenuItem(value: 1000, child: Text('Within 1 km')),
-        PopupMenuItem(value: 3000, child: Text('Within 3 km')),
-        PopupMenuItem(value: 5000, child: Text('Within 5 km')),
-        PopupMenuItem(value: 10000, child: Text('Within 10 km')),
+      itemBuilder: (_) => [
+        PopupMenuItem(
+            value: 1000, child: Text(trOf(context, 'within1km'))),
+        PopupMenuItem(
+            value: 3000, child: Text(trOf(context, 'within3km'))),
+        PopupMenuItem(
+            value: 5000, child: Text(trOf(context, 'within5km'))),
+        PopupMenuItem(
+            value: 10000, child: Text(trOf(context, 'within10km'))),
       ],
       child: Material(
         color: Colors.white,
@@ -680,15 +689,20 @@ class _OutletSheet extends StatelessWidget {
                     Expanded(
                       child: Text(
                         outlets.isEmpty
-                            ? 'No outlets on the map'
-                            : '${outlets.length} outlet'
-                                '${outlets.length == 1 ? '' : 's'} on map',
+                            ? trOf(context, 'noOutletsOnMap')
+                            : (outlets.length == 1
+                                ? trOf(context, 'outletOnMapOne')
+                                    .replaceAll('{n}', '1')
+                                : trOf(context, 'outletOnMapMany')
+                                    .replaceAll(
+                                        '{n}', '${outlets.length}')),
                         style: const TextStyle(
                             fontWeight: FontWeight.w800, fontSize: 14.5),
                       ),
                     ),
-                    const Text('drag to expand',
-                        style: TextStyle(fontSize: 10.5, color: Colors.grey)),
+                    Text(trOf(context, 'dragToExpand'),
+                        style: const TextStyle(
+                            fontSize: 10.5, color: Colors.grey)),
                   ],
                 ),
               ),
@@ -831,19 +845,21 @@ class _EmptyOutlets extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
+    return Center(
       child: Padding(
-        padding: EdgeInsets.all(20),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.location_off_rounded, size: 34, color: Colors.grey),
-            SizedBox(height: 8),
-            Text('No outlet matches your search',
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
-            SizedBox(height: 4),
-            Text('Try a different name, or clear the search box.',
-                style: TextStyle(fontSize: 11.5, color: Colors.grey),
+            const Icon(Icons.location_off_rounded,
+                size: 34, color: Colors.grey),
+            const SizedBox(height: 8),
+            Text(trOf(context, 'noOutletMatches'),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w700, fontSize: 13.5)),
+            const SizedBox(height: 4),
+            Text(trOf(context, 'tryDifferentName'),
+                style: const TextStyle(fontSize: 11.5, color: Colors.grey),
                 textAlign: TextAlign.center),
           ],
         ),

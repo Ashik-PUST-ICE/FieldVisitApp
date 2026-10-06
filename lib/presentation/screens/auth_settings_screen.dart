@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:field_visit_app/presentation/providers/auth_settings_provider.dart';
+import 'package:field_visit_app/core/l10n/locale_provider.dart';
 
 class AuthSettingsScreen extends ConsumerStatefulWidget {
   const AuthSettingsScreen({super.key});
@@ -21,10 +22,13 @@ class _AuthSettingsState extends ConsumerState<AuthSettingsScreen>
   @override
   Widget build(BuildContext context) => Scaffold(
       appBar: AppBar(
-          title: const Text('Auth settings'),
+          title: Text(trOf(context, 'authSettings')),
           bottom: TabBar(
               controller: tabs,
-              tabs: const [Tab(text: 'Roles'), Tab(text: 'Permissions')])),
+              tabs: [
+                Tab(text: trOf(context, 'roles')),
+                Tab(text: trOf(context, 'permissions'))
+              ])),
       body: TabBarView(
           controller: tabs,
           children: const [_RolesList(), _PermissionsList()]));
@@ -43,9 +47,9 @@ class _RolesList extends ConsumerWidget {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (e, _) => Center(child: Text(_message(e))),
                 data: (items) => items.isEmpty
-                    ? ListView(children: const [
-                        SizedBox(height: 220),
-                        Center(child: Text('No roles found'))
+                    ? ListView(children: [
+                        const SizedBox(height: 220),
+                        Center(child: Text(trOf(context, 'noRolesFound')))
                       ])
                     : ListView.builder(
                         padding: const EdgeInsets.all(12),
@@ -76,13 +80,15 @@ class _RolesList extends ConsumerWidget {
                                                         Text(_message(e))));
                                         }
                                       },
-                                      itemBuilder: (_) => const [
+                                      itemBuilder: (_) => [
                                             PopupMenuItem(
                                                 value: 'toggle',
-                                                child: Text('Toggle status')),
+                                                child: Text(
+                                                    trOf(context, 'toggleStatus'))),
                                             PopupMenuItem(
                                                 value: 'delete',
-                                                child: Text('Delete'))
+                                                child: Text(
+                                                    trOf(context, 'delete')))
                                           ])));
                         }))),
         floatingActionButton: FloatingActionButton(
@@ -104,9 +110,10 @@ class _PermissionsList extends ConsumerWidget {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(child: Text(_message(e))),
               data: (items) => items.isEmpty
-                  ? ListView(children: const [
-                      SizedBox(height: 220),
-                      Center(child: Text('No permissions found'))
+                  ? ListView(children: [
+                      const SizedBox(height: 220),
+                      Center(
+                          child: Text(trOf(context, 'noPermissionsFound')))
                     ])
                   : ListView.builder(
                       padding: const EdgeInsets.all(12),
@@ -132,26 +139,31 @@ Future<void> _roleForm(
   await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-              title: Text('${item == null ? 'Add' : 'Edit'} role'),
+              title: Text(item == null
+                  ? trOf(dialogContext, 'addRole')
+                  : trOf(dialogContext, 'editRole')),
               content: Column(mainAxisSize: MainAxisSize.min, children: [
                 TextField(
                     controller: name,
-                    decoration: const InputDecoration(labelText: 'Name')),
+                    decoration: InputDecoration(
+                        labelText: trOf(dialogContext, 'name'))),
                 TextField(
                     controller: guard,
-                    decoration: const InputDecoration(labelText: 'Guard name'))
+                    decoration: InputDecoration(
+                        labelText: trOf(dialogContext, 'guardName')))
               ]),
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(dialogContext),
-                    child: const Text('Cancel')),
+                    child: Text(trOf(dialogContext, 'cancel'))),
                 FilledButton(
                     onPressed: () async {
                       if (name.text.trim().isEmpty) {
                         if (dialogContext.mounted)
                           ScaffoldMessenger.of(dialogContext).showSnackBar(
-                              const SnackBar(
-                                  content: Text('Role name is required')));
+                              SnackBar(
+                                  content: Text(trOf(dialogContext,
+                                      'roleNameRequired'))));
                         return;
                       }
                       try {
@@ -167,7 +179,7 @@ Future<void> _roleForm(
                               SnackBar(content: Text(_message(e))));
                       }
                     },
-                    child: const Text('Save'))
+                    child: Text(trOf(dialogContext, 'save')))
               ]));
   name.dispose();
   guard.dispose();

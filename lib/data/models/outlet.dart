@@ -37,6 +37,9 @@ class Outlet with _$Outlet {
     @JsonKey(fromJson: _outletString) String? district,
     @JsonKey(fromJson: _outletString) String? upazila,
     @JsonKey(fromJson: _outletString) String? union,
+    // Urban counterpart of union: an outlet sits under one or the other,
+    // never both (rural chain uses union, town chain uses pourashava).
+    @JsonKey(fromJson: _outletString) String? pourashava,
     @JsonKey(fromJson: _outletString) String? ward,
     @JsonKey(fromJson: _outletString) String? village,
     @JsonKey(fromJson: _outletDouble) double? latitude,
@@ -67,6 +70,7 @@ extension OutletLocation on Outlet {
     final parts = <String?>[
       village,
       ward,
+      pourashava,
       upazila,
       union,
       district,

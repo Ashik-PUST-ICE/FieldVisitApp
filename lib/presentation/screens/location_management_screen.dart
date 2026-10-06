@@ -18,14 +18,29 @@ class _Level {
   const _Level(this.type, this.label, this.icon);
 }
 
-const _levels = <_Level>[
+const _levelsUnion = <_Level>[
   _Level('division', 'Division', Icons.public_rounded),
   _Level('district', 'District', Icons.map_rounded),
   _Level('upazila', 'Upazila', Icons.account_tree_rounded),
+  // Rural branch under upazila (mutually exclusive with pourashava).
   _Level('union', 'Union', Icons.hub_outlined),
   _Level('ward', 'Ward', Icons.grid_view_rounded),
   _Level('village', 'Village', Icons.home_work_outlined),
 ];
+
+/// Urban branch: upazila -> pourashava -> ward -> village(mahalla).
+/// Shares the ward/village tail with the rural chain above.
+const _pourashavaLevels = <_Level>[
+  _Level('division', 'Division', Icons.public_rounded),
+  _Level('district', 'District', Icons.map_rounded),
+  _Level('upazila', 'Upazila', Icons.account_tree_rounded),
+  _Level('pourashava', 'Pourashava', Icons.location_city_rounded),
+  _Level('ward', 'Ward', Icons.grid_view_rounded),
+  _Level('village', 'Village / Mahalla', Icons.home_work_outlined),
+];
+
+/// Which branch (rural union vs urban pourashava) the admin is browsing.
+enum _Branch { union, pourashava }
 
 /// Lets an administrator maintain the location tree from the device.
 ///
@@ -42,12 +57,22 @@ class LocationManagementScreen extends ConsumerStatefulWidget {
 
 class _LocationManagementScreenState
     extends ConsumerState<LocationManagementScreen> {
-  /// Id chosen at each level; null means nothing chosen there yet.
+  /// All branch types are present so switching rural/urban never misses a key.
   final Map<String, int?> _selected = {
-    for (final l in _levels) l.type: null,
+    for (final l in [..._levelsUnion, ..._pourashavaLevels]) l.type: null,
   };
 
   final Map<String, List<Location>> _children = {};
+
+  /// Rural (union) vs urban (pourashava) branch under the chosen upazila.
+  /// Defaults to union; the picker row below the upazila step switches it.
+  var _branch = _Branch.union;
+
+  /// Levels for the active branch. Both chains share division/district/
+  /// upazila at the top and ward/village at the bottom; only the middle
+  /// step (union vs pourashava) differs.
+  List<_Level> get _levels =>
+      _branch == _Branch.union ? _levelsUnion : _pourashavaLevels;
 
   bool _loading = true;
   bool _saving = false;
@@ -158,6 +183,35 @@ class _LocationManagementScreenState
     }
   }
 
+  /// Switches the rural/urban branch, clearing the middle step downwards.
+  /// Division/district/upazila stay, because both chains share them.
+  Future<void> _switchBranch(_Branch branch) async {
+    if (_branch == branch) return;
+    setState(() {
+      _branch = branch;
+      _selected['union'] = null;
+      _selected['pourashava'] = null;
+      _selected['ward'] = null;
+      _selected['village'] = null;
+      _children['union'] = const [];
+      _children['pourashava'] = const [];
+      _children['ward'] = const [];
+      _children['village'] = const [];
+      _loading = true;
+      _error = null;
+    });
+    try {
+      await _loadChildren();
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _error = e.toString();
+          _loading = false;
+        });
+      }
+    }
+  }
+
   Future<void> _refresh() async {
     setState(() => _loading = true);
     try {
@@ -262,6 +316,32 @@ class _LocationManagementScreenState
             ),
           ),
           const Divider(height: 1),
+          // Rural <-> urban branch switch. Both chains share upazila above
+          // and ward/village below; only the middle step differs, so the
+          // switch resets everything from that step downwards.
+          if (_selected['upazila'] != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(12, 8, 12, 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ChoiceChip(
+                      label: Text(trOf(context, 'union')),
+                      selected: _branch == _Branch.union,
+                      onSelected: (_) => _switchBranch(_Branch.union),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: ChoiceChip(
+                      label: Text(trOf(context, 'pourashava')),
+                      selected: _branch == _Branch.pourashava,
+                      onSelected: (_) => _switchBranch(_Branch.pourashava),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           Expanded(
             child: _loading
                 ? const Center(child: CircularProgressIndicator())
@@ -366,10 +446,21 @@ class _LocationManagementScreenState
             title: Text(row.name,
                 style:
                     const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
-            subtitle: row.nameBn != null && row.nameBn!.isNotEmpty
-                ? Text(row.nameBn!,
-                    style: const TextStyle(fontSize: 12.5, color: Colors.grey))
-                : null,
+            subtitle: [
+              if (row.nameBn != null && row.nameBn!.isNotEmpty) row.nameBn!,
+              if (row.type == 'pourashava')
+                '• ${trOf(context, 'pourashavaTag')}',
+            ].join(' ').isEmpty
+                ? null
+                : Text(
+                    [
+                      if (row.nameBn != null && row.nameBn!.isNotEmpty)
+                        row.nameBn!,
+                      if (row.type == 'pourashava')
+                        '• ${trOf(context, 'pourashavaTag')}',
+                    ].join(' '),
+                    style:
+                        const TextStyle(fontSize: 12.5, color: Colors.grey)),
             trailing: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -425,7 +516,11 @@ class _LocationManagementScreenState
           AppDropdownOption<int>(
             value: row.id,
             title: row.name,
-            subtitle: row.nameBn,
+            subtitle: [
+              if (row.nameBn != null && row.nameBn!.isNotEmpty) row.nameBn!,
+              if (row.type == 'pourashava')
+                trOf(context, 'pourashavaTag'),
+            ].join(' • '),
           ),
       ],
       onChanged: (id) {
@@ -595,6 +690,24 @@ class _LocationManagementScreenState
     await _refresh();
   }
 
+  /// tr() key for a location type, falling back to the raw type when the
+  /// server returns a level the app does not translate yet (e.g. a future
+  /// `pourashava` on an old string table).
+  String _knownTypeLabel(String type) {
+    switch (type) {
+      case 'division':
+      case 'district':
+      case 'upazila':
+      case 'union':
+      case 'pourashava':
+      case 'ward':
+      case 'village':
+        return type;
+      default:
+        return 'village';
+    }
+  }
+
   /// Returns an error message, or null when everything saved.
   /// [parentId] is null for a top-level division.
   Future<String?> _submitAdd({
@@ -647,7 +760,7 @@ class _LocationManagementScreenState
               ? trOf(context, 'nothingNew')
               : trOf(context, 'addedCount')
                   .replaceAll('{n}', '$created')
-                  .replaceAll('{type}', trOf(context, type)));
+                  .replaceAll('{type}', trOf(context, _knownTypeLabel(type))));
         }
       } else {
         if (singleName.trim().isEmpty) return trOf(context, 'nameRequired');
@@ -661,7 +774,7 @@ class _LocationManagementScreenState
 
         if (!mounted) return null;
         _toast(trOf(context, 'typeAdded')
-            .replaceAll('{type}', trOf(context, type)));
+            .replaceAll('{type}', trOf(context, _knownTypeLabel(type))));
       }
 
       return null;
@@ -698,19 +811,19 @@ class _LocationManagementScreenState
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                  '${trOf(sheet, 'edit')} ${trOf(sheet, row.type)}',
+                  '${trOf(sheet, 'edit')} ${trOf(sheet, _knownTypeLabel(row.type))}',
                   style: const TextStyle(
                       fontWeight: FontWeight.w800, fontSize: 16)),
               const SizedBox(height: 14),
               CellfinInputField(
                   controller: name,
                   hint: trOf(sheet, 'nameEnglishHint')
-                      .replaceAll('{level}', trOf(sheet, row.type))),
+                      .replaceAll('{level}', trOf(sheet, _knownTypeLabel(row.type)))),
               const SizedBox(height: 10),
               CellfinInputField(
                   controller: nameBn,
                   hint: trOf(sheet, 'nameBanglaHint')
-                      .replaceAll('{level}', trOf(sheet, row.type))),
+                      .replaceAll('{level}', trOf(sheet, _knownTypeLabel(row.type)))),
               const SizedBox(height: 16),
               Row(
                 children: [
@@ -780,7 +893,7 @@ class _LocationManagementScreenState
             trOf(dialog, 'deleteQuestion').replaceAll('{name}', row.name)),
         content: Text(
           trOf(dialog, 'deleteTypeWarning')
-              .replaceAll('{type}', trOf(dialog, row.type)),
+              .replaceAll('{type}', trOf(dialog, _knownTypeLabel(row.type))),
         ),
         actions: [
           TextButton(

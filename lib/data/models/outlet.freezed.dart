@@ -38,7 +38,11 @@ mixin _$Outlet {
   @JsonKey(fromJson: _outletString)
   String? get upazila => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _outletString)
-  String? get union => throw _privateConstructorUsedError;
+  String? get union =>
+      throw _privateConstructorUsedError; // Urban counterpart of union: an outlet sits under one or the other,
+// never both (rural chain uses union, town chain uses pourashava).
+  @JsonKey(fromJson: _outletString)
+  String? get pourashava => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _outletString)
   String? get ward => throw _privateConstructorUsedError;
   @JsonKey(fromJson: _outletString)
@@ -85,6 +89,7 @@ abstract class $OutletCopyWith<$Res> {
       @JsonKey(fromJson: _outletString) String? district,
       @JsonKey(fromJson: _outletString) String? upazila,
       @JsonKey(fromJson: _outletString) String? union,
+      @JsonKey(fromJson: _outletString) String? pourashava,
       @JsonKey(fromJson: _outletString) String? ward,
       @JsonKey(fromJson: _outletString) String? village,
       @JsonKey(fromJson: _outletDouble) double? latitude,
@@ -123,6 +128,7 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
     Object? district = freezed,
     Object? upazila = freezed,
     Object? union = freezed,
+    Object? pourashava = freezed,
     Object? ward = freezed,
     Object? village = freezed,
     Object? latitude = freezed,
@@ -171,6 +177,10 @@ class _$OutletCopyWithImpl<$Res, $Val extends Outlet>
       union: freezed == union
           ? _value.union
           : union // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pourashava: freezed == pourashava
+          ? _value.pourashava
+          : pourashava // ignore: cast_nullable_to_non_nullable
               as String?,
       ward: freezed == ward
           ? _value.ward
@@ -237,6 +247,7 @@ abstract class _$$OutletImplCopyWith<$Res> implements $OutletCopyWith<$Res> {
       @JsonKey(fromJson: _outletString) String? district,
       @JsonKey(fromJson: _outletString) String? upazila,
       @JsonKey(fromJson: _outletString) String? union,
+      @JsonKey(fromJson: _outletString) String? pourashava,
       @JsonKey(fromJson: _outletString) String? ward,
       @JsonKey(fromJson: _outletString) String? village,
       @JsonKey(fromJson: _outletDouble) double? latitude,
@@ -273,6 +284,7 @@ class __$$OutletImplCopyWithImpl<$Res>
     Object? district = freezed,
     Object? upazila = freezed,
     Object? union = freezed,
+    Object? pourashava = freezed,
     Object? ward = freezed,
     Object? village = freezed,
     Object? latitude = freezed,
@@ -321,6 +333,10 @@ class __$$OutletImplCopyWithImpl<$Res>
       union: freezed == union
           ? _value.union
           : union // ignore: cast_nullable_to_non_nullable
+              as String?,
+      pourashava: freezed == pourashava
+          ? _value.pourashava
+          : pourashava // ignore: cast_nullable_to_non_nullable
               as String?,
       ward: freezed == ward
           ? _value.ward
@@ -383,6 +399,7 @@ class _$OutletImpl implements _Outlet {
       @JsonKey(fromJson: _outletString) this.district,
       @JsonKey(fromJson: _outletString) this.upazila,
       @JsonKey(fromJson: _outletString) this.union,
+      @JsonKey(fromJson: _outletString) this.pourashava,
       @JsonKey(fromJson: _outletString) this.ward,
       @JsonKey(fromJson: _outletString) this.village,
       @JsonKey(fromJson: _outletDouble) this.latitude,
@@ -427,6 +444,11 @@ class _$OutletImpl implements _Outlet {
   @override
   @JsonKey(fromJson: _outletString)
   final String? union;
+// Urban counterpart of union: an outlet sits under one or the other,
+// never both (rural chain uses union, town chain uses pourashava).
+  @override
+  @JsonKey(fromJson: _outletString)
+  final String? pourashava;
   @override
   @JsonKey(fromJson: _outletString)
   final String? ward;
@@ -462,7 +484,7 @@ class _$OutletImpl implements _Outlet {
 
   @override
   String toString() {
-    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, division: $division, district: $district, upazila: $upazila, union: $union, ward: $ward, village: $village, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Outlet(id: $id, name: $name, code: $code, qrToken: $qrToken, address: $address, division: $division, district: $district, upazila: $upazila, union: $union, pourashava: $pourashava, ward: $ward, village: $village, latitude: $latitude, longitude: $longitude, phone: $phone, ownerName: $ownerName, category: $category, status: $status, geofenceRadius: $geofenceRadius, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -481,6 +503,8 @@ class _$OutletImpl implements _Outlet {
                 other.district == district) &&
             (identical(other.upazila, upazila) || other.upazila == upazila) &&
             (identical(other.union, union) || other.union == union) &&
+            (identical(other.pourashava, pourashava) ||
+                other.pourashava == pourashava) &&
             (identical(other.ward, ward) || other.ward == ward) &&
             (identical(other.village, village) || other.village == village) &&
             (identical(other.latitude, latitude) ||
@@ -513,6 +537,7 @@ class _$OutletImpl implements _Outlet {
         district,
         upazila,
         union,
+        pourashava,
         ward,
         village,
         latitude,
@@ -553,6 +578,7 @@ abstract class _Outlet implements Outlet {
       @JsonKey(fromJson: _outletString) final String? district,
       @JsonKey(fromJson: _outletString) final String? upazila,
       @JsonKey(fromJson: _outletString) final String? union,
+      @JsonKey(fromJson: _outletString) final String? pourashava,
       @JsonKey(fromJson: _outletString) final String? ward,
       @JsonKey(fromJson: _outletString) final String? village,
       @JsonKey(fromJson: _outletDouble) final double? latitude,
@@ -597,7 +623,12 @@ abstract class _Outlet implements Outlet {
   String? get upazila;
   @override
   @JsonKey(fromJson: _outletString)
-  String? get union;
+  String?
+      get union; // Urban counterpart of union: an outlet sits under one or the other,
+// never both (rural chain uses union, town chain uses pourashava).
+  @override
+  @JsonKey(fromJson: _outletString)
+  String? get pourashava;
   @override
   @JsonKey(fromJson: _outletString)
   String? get ward;

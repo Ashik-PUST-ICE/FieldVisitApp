@@ -489,6 +489,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
         'd': _clean(outlet.district),
         'u': _clean(outlet.upazila),
         'un': _clean(outlet.union),
+        'ps': _clean(outlet.pourashava),
         'w': _clean(outlet.ward),
         'v': _clean(outlet.village),
         'a': _clean(outlet.address),
@@ -508,6 +509,7 @@ class _OutletQrDialogState extends ConsumerState<_OutletQrDialog> {
         if (_clean(outlet.district) != '') ('District', outlet.district!),
         if (_clean(outlet.upazila) != '') ('Upazila', outlet.upazila!),
         if (_clean(outlet.union) != '') ('Union', outlet.union!),
+        if (_clean(outlet.pourashava) != '') ('Pourashava', outlet.pourashava!),
         if (_clean(outlet.ward) != '') ('Ward', outlet.ward!),
         if (_clean(outlet.village) != '') ('Village', outlet.village!),
         if (_clean(outlet.address) != '') ('Address', outlet.address!),
@@ -957,6 +959,8 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
   final district = TextEditingController(text: outlet?.district);
   final upazila = TextEditingController(text: outlet?.upazila);
   final unionCtrl = TextEditingController(text: outlet?.union);
+  // Urban branch alternative to union (town chain vs rural chain).
+  final pourashavaCtrl = TextEditingController(text: outlet?.pourashava);
   final ward = TextEditingController(text: outlet?.ward);
   final village = TextEditingController(text: outlet?.village);
 
@@ -1018,6 +1022,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
         district: district,
         upazila: upazila,
         union: unionCtrl,
+        pourashava: pourashavaCtrl,
         ward: ward,
         village: village,
       ),
@@ -1069,6 +1074,9 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
         if (district.text.trim().isNotEmpty) 'district': district.text.trim(),
         if (upazila.text.trim().isNotEmpty) 'upazila': upazila.text.trim(),
         if (unionCtrl.text.trim().isNotEmpty) 'union': unionCtrl.text.trim(),
+        // Only one branch is ever filled (the cascade locks the other).
+        if (pourashavaCtrl.text.trim().isNotEmpty)
+          'pourashava': pourashavaCtrl.text.trim(),
         if (ward.text.trim().isNotEmpty) 'ward': ward.text.trim(),
         if (village.text.trim().isNotEmpty) 'village': village.text.trim(),
         if (phone.text.trim().isNotEmpty) 'phone': phone.text.trim(),
@@ -1110,6 +1118,7 @@ Future<void> _showOutletForm(BuildContext context, WidgetRef ref,
   district.dispose();
   upazila.dispose();
   unionCtrl.dispose();
+  pourashavaCtrl.dispose();
   ward.dispose();
   village.dispose();
 }

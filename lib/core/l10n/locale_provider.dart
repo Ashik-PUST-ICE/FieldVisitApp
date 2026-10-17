@@ -44,7 +44,8 @@ class LocaleNotifier extends StateNotifier<Locale> {
   /// Applies the language from the logged-in account (backend wins).
   /// Call after login / profile fetch; falls back to the saved device value.
   Future<void> syncFromServer(String? serverLocale) async {
-    final code = switch (serverLocale) { 'bn' => 'bn', 'en' => 'en', _ => null };
+    final code =
+        switch (serverLocale) { 'bn' => 'bn', 'en' => 'en', _ => null };
     if (code == null) return;
     state = Locale(code);
     final prefs = await SharedPreferences.getInstance();
@@ -83,9 +84,18 @@ String tr(WidgetRef ref, String key) {
 }
 
 /// Same as [tr] for places that only have a BuildContext.
-/// Rebuilds when the locale changes via the inherited ProviderScope listener.
+/// One-shot translation lookup — does NOT subscribe [context] to the
+/// ProviderScope.
+///
+/// NOTE: a `listen: true` lookup registered the calling element (e.g. a
+/// bottom-sheet/dialog body) as a dependent of the inherited
+/// ProviderScope. If that route got popped while a provider notification
+/// was mid-flight, the framework asserted on element unmount
+/// (`framework.dart:6065 '_dependents.isEmpty'`). Reads are therefore
+/// non-listening; code that must rebuild on locale change should use
+/// [tr] inside a Consumer instead.
 String trOf(BuildContext context, String key) {
-  final container = ProviderScope.containerOf(context, listen: true);
+  final container = ProviderScope.containerOf(context, listen: false);
   final code = container.read(localeProvider).languageCode;
   if (code == 'bn') return bnStrings[key] ?? enStrings[key] ?? key;
   return enStrings[key] ?? key;

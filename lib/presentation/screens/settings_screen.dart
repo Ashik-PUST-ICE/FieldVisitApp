@@ -6,6 +6,7 @@ import 'package:field_visit_app/presentation/screens/location_management_screen.
 import 'package:field_visit_app/presentation/screens/map_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/security_settings_screen.dart';
 import 'package:field_visit_app/presentation/screens/storage_settings_screen.dart';
+import 'package:field_visit_app/presentation/screens/users_screen.dart';
 
 /// Central Settings hub.
 ///
@@ -71,6 +72,15 @@ class SettingsScreen extends ConsumerWidget {
               title: tr(ref, 'storageSettings'),
               subtitle: tr(ref, 'storageSubtitle'),
               screen: const StorageSettingsScreen(),
+            ),
+            const SizedBox(height: 12),
+            _tile(
+              context,
+              icon: Icons.manage_accounts_rounded,
+              color: const Color(0xFFB45309),
+              title: tr(ref, 'userManagement'),
+              subtitle: tr(ref, 'userManagementSubtitle'),
+              screen: const UsersScreen(),
             ),
           ],
         ],

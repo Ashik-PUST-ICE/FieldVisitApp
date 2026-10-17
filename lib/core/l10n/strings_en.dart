@@ -595,6 +595,23 @@ const enStrings = <String, String>{
   'roleNameRequired': 'Role name is required',
   'guardName': 'Guard name',
 
+  // ─── User Management ───
+  'userManagement': 'User management',
+  'userManagementSubtitle': 'Create users, assign roles, toggle status',
+  'searchUsers': 'Search users (name, email, ID)',
+  'noUserMatches': 'No user matches "{name}"',
+  'tryAnotherSearch': 'Try a different name or email.',
+  'noUsersYet': 'No users yet',
+  'createFirstUser': 'Create your first user account to get started.',
+  'newUser': 'New user',
+  'editUser': 'Edit user',
+  'userCreated': 'User created',
+  'userUpdated': 'User updated',
+  'newPasswordOptional': 'New password (leave blank to keep)',
+  'assignRoles': 'Assign roles',
+  'noRolesAvailable': 'No roles available to assign',
+  'passwordMismatch': 'Passwords do not match',
+
   // ─── Security Settings ───
   'settings': 'Settings',
   'changePin': 'Change PIN',

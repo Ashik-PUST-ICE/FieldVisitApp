@@ -1,3 +1,4 @@
+import 'package:field_visit_app/core/utils/api_error.dart';
 import 'package:field_visit_app/data/auth_api.dart';
 import 'package:field_visit_app/data/models/role_permission_models.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -149,6 +150,8 @@ class RolePermissionsNotifier extends StateNotifier<RolePermissionsState> {
   }
 
   /// Creates a custom role, refreshes the list and selects the new role.
+  /// Returns the new role id, or null when creation failed. On failure the
+  /// state error holds a human-readable message (never a raw exception dump).
   Future<int?> createRole({
     required String name,
     String guardName = 'api',
@@ -169,7 +172,7 @@ class RolePermissionsNotifier extends StateNotifier<RolePermissionsState> {
       if (newId != null) await selectRole(newId);
       return newId;
     } catch (e) {
-      state = state.copyWith(error: e.toString());
+      state = state.copyWith(error: friendlyApiError(e));
       return null;
     }
   }

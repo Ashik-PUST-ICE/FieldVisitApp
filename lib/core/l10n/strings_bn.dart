@@ -590,6 +590,23 @@ const bnStrings = <String, String>{
   'roleNameRequired': 'রোলের নাম আবশ্যক',
   'guardName': 'গার্ড নাম',
 
+  // ─── User Management ───
+  'userManagement': 'ব্যবহারকারী ব্যবস্থাপনা',
+  'userManagementSubtitle': 'ব্যবহারকারী তৈরি, রোল নির্ধারণ, স্ট্যাটাস পরিবর্তন',
+  'searchUsers': 'ব্যবহারকারী খুঁজুন (নাম, ইমেইল, আইডি)',
+  'noUserMatches': '"{name}" নামে কোনো ব্যবহারকারী মেলেনি',
+  'tryAnotherSearch': 'অন্য নাম বা ইমেইল দিয়ে চেষ্টা করুন।',
+  'noUsersYet': 'এখনো কোনো ব্যবহারকারী নেই',
+  'createFirstUser': 'শুরু করতে প্রথম ব্যবহারকারী অ্যাকাউন্ট তৈরি করুন।',
+  'newUser': 'নতুন ব্যবহারকারী',
+  'editUser': 'ব্যবহারকারী সম্পাদনা',
+  'userCreated': 'ব্যবহারকারী তৈরি হয়েছে',
+  'userUpdated': 'ব্যবহারকারী আপডেট হয়েছে',
+  'newPasswordOptional': 'নতুন পাসওয়ার্ড (খালি রাখলে পুরনো থাকবে)',
+  'assignRoles': 'রোল নির্ধারণ করুন',
+  'noRolesAvailable': 'নির্ধারণ করার মতো কোনো রোল নেই',
+  'passwordMismatch': 'পাসওয়ার্ড মিলছে না',
+
   // ─── Security Settings ───
   'settings': 'সেটিংস',
   'changePin': 'পিন পরিবর্তন',

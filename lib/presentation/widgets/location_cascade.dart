@@ -90,7 +90,6 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
         'ward' => widget.ward,
         'village' => widget.village,
         'mohalla' => widget.mohalla,
-        'mohalla' => widget.mohalla,
         _ => widget.division,
       };
 
@@ -100,6 +99,9 @@ class _LocationCascadeFieldState extends ConsumerState<LocationCascadeField> {
   /// ward hangs off whichever of the two the officer picked.
   String? _parentType(String type) {
     if (type == 'pourashava') return 'upazila';
+    // Mahalla hangs off a ward, never off a village: the rural leaf is
+    // village, the urban leaf is mahalla, and both sit directly on the ward.
+    if (type == 'mohalla') return 'ward';
     if (type == 'ward') {
       if (_selectedId['union'] != null) return 'union';
       if (_selectedId['pourashava'] != null) return 'pourashava';

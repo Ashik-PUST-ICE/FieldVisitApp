@@ -565,7 +565,7 @@ class _PermissionGroupCard extends StatelessWidget {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '$subtitle  •  $selectedCount/$totalCount',
+                          '$subtitle  â€¢  $selectedCount/$totalCount',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: isDark
                                 ? AppColors.darkTextSecondary
@@ -727,14 +727,12 @@ class _SaveBar extends StatelessWidget {
                   Text(
                     trOf(context, 'selectedOfCount')
                         .replaceAll('{done}', '${state.selectedCount}')
-                        .replaceAll(
-                            '{total}', '${state.permissions.length}'),
+                        .replaceAll('{total}', '${state.permissions.length}'),
                     style: theme.textTheme.titleSmall
                         ?.copyWith(fontWeight: FontWeight.w700),
                   ),
                   Text(
-                    state.selectedRole?.name ??
-                        trOf(context, 'noRoleSelected'),
+                    state.selectedRole?.name ?? trOf(context, 'noRoleSelected'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodySmall?.copyWith(
@@ -904,27 +902,13 @@ String _humanize(String value, BuildContext context) {
   return text[0].toUpperCase() + text.substring(1);
 }
 
-/// Turns a raw Dio/provider error into something readable.
-String _readableError(Object? error, BuildContext context) {
-  if (error == null) return trOf(context, 'couldNotCreateRole');
-  var message = error
-      .toString()
-      .replaceFirst('DioException [connection error]: ', '')
-      .replaceFirst('DioException: ', '')
-      .trim();
-  if (message.isEmpty || message == 'null') {
-    return trOf(context, 'couldNotCreateRole');
-  }
-  return message;
-}
-
 /// Bottom sheet for creating a custom role.
 Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
   final nameController = TextEditingController();
   final guardController = TextEditingController(text: 'api');
   var isActive = true;
+  var busy = false;
   String? localError;
-  final messenger = ScaffoldMessenger.of(context);
   final notifier = ref.read(rolePermissionsProvider.notifier);
   final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -937,124 +921,159 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
         builder: (sheetContext, setSheetState) {
           return Padding(
             padding: EdgeInsets.only(
-              left: 20,
-              right: 20,
-              bottom: MediaQuery.of(sheetContext).viewInsets.bottom + 20,
+              bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  trOf(context, 'newRole'),
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w800),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  trOf(context, 'createRoleHint'),
-                  style: TextStyle(
-                    fontSize: 12.5,
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.textTertiary,
-                  ),
-                ),
-                const SizedBox(height: 18),
-                TextField(
-                  controller: nameController,
-                  autofocus: true,
-                  textCapitalization: TextCapitalization.words,
-                  decoration: InputDecoration(
-                    labelText: trOf(context, 'roleName'),
-                    hintText: trOf(context, 'roleNamePlaceholder'),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                TextField(
-                  controller: guardController,
-                  decoration: InputDecoration(
-                    labelText: trOf(context, 'guardName'),
-                    hintText: 'api',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(AppTheme.radiusSm),
-                    ),
-                  ),
-                ),
-                SwitchListTile(
-                  contentPadding: EdgeInsets.zero,
-                  title: Text(
-                    trOf(context, 'active'),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    trOf(context, 'newRole'),
                     style: const TextStyle(
-                        fontSize: 14, fontWeight: FontWeight.w600),
+                        fontSize: 18, fontWeight: FontWeight.w800),
                   ),
-                  value: isActive,
-                  onChanged: (v) => setSheetState(() => isActive = v),
-                ),
-                if (localError != null)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 4),
-                    child: Text(
-                      localError!,
+                  const SizedBox(height: 4),
+                  Text(
+                    trOf(context, 'createRoleHint'),
+                    style: TextStyle(
+                      fontSize: 12.5,
+                      color: isDark
+                          ? AppColors.darkTextSecondary
+                          : AppColors.textTertiary,
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+                  TextField(
+                    controller: nameController,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.words,
+                    decoration: InputDecoration(
+                      labelText: trOf(context, 'roleName'),
+                      hintText: trOf(context, 'roleNamePlaceholder'),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: guardController,
+                    decoration: InputDecoration(
+                      labelText: trOf(context, 'guardName'),
+                      hintText: 'api',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.radiusSm),
+                      ),
+                    ),
+                  ),
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text(
+                      trOf(context, 'active'),
                       style: const TextStyle(
-                        color: AppColors.error,
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                      ),
+                          fontSize: 14, fontWeight: FontWeight.w600),
                     ),
+                    value: isActive,
+                    onChanged: (v) => setSheetState(() => isActive = v),
                   ),
-                const SizedBox(height: 14),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.of(sheetContext).pop(),
-                        child: Text(trOf(sheetContext, 'cancel')),
+                  if (localError != null)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 4),
+                      child: Text(
+                        localError!,
+                        style: const TextStyle(
+                          color: AppColors.error,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: FilledButton.icon(
-                        onPressed: () async {
-                          final name = nameController.text.trim();
-                          if (name.isEmpty) {
-                            setSheetState(() =>
-                                localError = trOf(context, 'roleNameRequired'));
-                            return;
-                          }
-                          final guard = guardController.text.trim();
-                          final id = await notifier.createRole(
-                            name: name,
-                            guardName: guard.isEmpty ? 'api' : guard,
-                            isActive: isActive,
-                          );
-                          if (!sheetContext.mounted) return;
-                          if (id != null) {
-                            Navigator.of(sheetContext).pop();
-                            messenger.showSnackBar(
-                              SnackBar(
-                                content: Text(trOf(sheetContext, 'roleCreated')
-                                    .replaceAll('{name}', name)),
-                                backgroundColor: AppColors.success,
-                              ),
-                            );
-                          } else {
-                            final message = _readableError(
-                                ref.read(rolePermissionsProvider).error,
-                                sheetContext);
-                            setSheetState(() => localError = message);
-                          }
-                        },
-                        icon: const Icon(Icons.check_rounded, size: 18),
-                        label: Text(trOf(sheetContext, 'createRole')),
+                  const SizedBox(height: 14),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(sheetContext).pop(),
+                          child: Text(trOf(sheetContext, 'cancel')),
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: FilledButton.icon(
+                          onPressed: busy
+                              ? null
+                              : () async {
+                                  final name = nameController.text.trim();
+                                  if (name.isEmpty) {
+                                    if (sheetContext.mounted) {
+                                      setSheetState(
+                                        () => localError = trOf(
+                                          sheetContext,
+                                          'roleNameRequired',
+                                        ),
+                                      );
+                                    }
+                                    return;
+                                  }
+                                  // Resolve every context-dependent value BEFORE the
+                                  // await: createRole() notifies listeners, and if the
+                                  // sheet unmounts first, touching sheetContext after
+                                  // (trOf/pop/setSheetState) hits a deactivated
+                                  // element â€” the '_dependents.isEmpty' crash.
+                                  final messenger =
+                                      ScaffoldMessenger.of(context);
+                                  final okText = trOf(context, 'roleCreated')
+                                      .replaceAll('{name}', name);
+                                  setSheetState(() {
+                                    busy = true;
+                                    localError = null;
+                                  });
+                                  final guard = guardController.text.trim();
+                                  final wantActive = isActive;
+                                  final id = await notifier.createRole(
+                                    name: name,
+                                    guardName: guard.isEmpty ? 'api' : guard,
+                                    isActive: wantActive,
+                                  );
+                                  if (!context.mounted) return;
+                                  if (id != null) {
+                                    Navigator.of(context, rootNavigator: true)
+                                        .pop();
+                                    WidgetsBinding.instance
+                                        .addPostFrameCallback((_) {
+                                      if (!context.mounted) return;
+                                      messenger.showSnackBar(
+                                        SnackBar(
+                                          content: Text(okText),
+                                          backgroundColor: AppColors.success,
+                                        ),
+                                      );
+                                    });
+                                  } else if (sheetContext.mounted) {
+                                    final message = ref.read(
+                                      rolePermissionsProvider
+                                          .select((s) => s.error),
+                                    );
+                                    final fallback = trOf(
+                                      context,
+                                      'couldNotCreateRole',
+                                    );
+                                    setSheetState(() {
+                                      busy = false;
+                                      localError = message ?? fallback;
+                                    });
+                                  }
+                                },
+                          icon: const Icon(Icons.check_rounded, size: 18),
+                          label: Text(trOf(sheetContext, 'createRole')),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           );
         },
@@ -1062,8 +1081,12 @@ Future<void> _showCreateRoleSheet(BuildContext context, WidgetRef ref) async {
     },
   );
 
-  nameController.dispose();
-  guardController.dispose();
+  // Defer disposal past the sheet's exit animation so the still-animating
+  // TextField never reads a disposed controller (was a crash source).
+  Future<void>.delayed(const Duration(milliseconds: 400), () {
+    nameController.dispose();
+    guardController.dispose();
+  });
 }
 
 /// Lists roles and offers create / toggle-status / delete.
@@ -1126,8 +1149,7 @@ class RoleDirectoryScreen extends ConsumerWidget {
       builder: (dialogContext) => AlertDialog(
         title: Text(trOf(dialogContext, 'deleteRoleTitle')),
         content: Text(
-          trOf(dialogContext, 'deleteRoleBody')
-              .replaceAll('{name}', roleName),
+          trOf(dialogContext, 'deleteRoleBody').replaceAll('{name}', roleName),
         ),
         actions: [
           TextButton(
@@ -1205,8 +1227,7 @@ class _RoleDirectoryTile extends StatelessWidget {
             },
             itemBuilder: (_) => [
               PopupMenuItem(
-                  value: 'toggle',
-                  child: Text(trOf(context, 'toggleStatus'))),
+                  value: 'toggle', child: Text(trOf(context, 'toggleStatus'))),
               PopupMenuItem(
                   value: 'delete', child: Text(trOf(context, 'deleteRole'))),
             ],

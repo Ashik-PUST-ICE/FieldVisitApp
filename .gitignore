@@ -44,3 +44,10 @@ app.*.map.json
 
 # Android local config - contains the Google Maps API key
 /android/local.properties
+
+# Local scratch / probe files (not part of the app)
+.tok
+ds/
+*.php
+probe_api.ps1
+
